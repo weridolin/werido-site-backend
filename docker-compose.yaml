@@ -1,6 +1,6 @@
 version: "3"
 services:
-
+#  挂载全部是根据服务器的目录来的,需要根据实际情况更改
   sitedb:
     container_name: site-database
     environment:
@@ -14,7 +14,7 @@ services:
       - 5432:5432
     restart: unless-stopped
     volumes:
-      - pgdata:/var/lib/postgresql/data/pgdata
+      - /usr/site/data/pgdata:/var/lib/postgresql/data/pgdata
 
   redis:
     image: redis:latest
@@ -24,11 +24,11 @@ services:
       REDIS_PASSWORD: werido
     ports:
       - "6379:6379"
-    # volumes:
-    #   - ./redis.conf:/etc/redis/redis.conf
-    #   - ./data:/data
-    # command: redis-server /etc/redis/redis.conf --requirepass werido
-    command: redis-server --requirepass werido
+    volumes:
+      - /usr/site/conf/redis.conf:/etc/redis/redis.conf
+      - /usr/site/data/redis:/data
+    command: redis-server /etc/redis/redis.conf --requirepass werido
+    # command: redis-server --requirepass werido
     privileged: true
 
   django:
@@ -43,6 +43,8 @@ services:
         python manage.py makemigrations
         python manage.py migrate
         python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - /pythons/blogNew/werido-site-backend/:/var/www/html/weridoBlog/
     ports:
       - "8000:8000"
     depends_on:
