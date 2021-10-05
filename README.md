@@ -1,5 +1,12 @@
-# werido-blog-Vfinal
-个人博客
+<!--
+ * @Description: 
+ * @email: 359066432@qq.com
+ * @Author: lhj
+ * @software: vscode
+ * @Date: 2021-10-02 16:08:58
+ * @platform: windows 10
+ * @LastEditors: lhj
+ * @LastEditTime: 2021-10-05 21:57:27
+-->
 
-## 
-``docker run -it -d --name blogbackend -p 8000:8000 -v F:\PYTHON_CODE\Djiano\blog_rest\backend\weridoBlog:/var/www/html/weridoBlog/ blogbackend:latest ``
+### 个人网站后端
