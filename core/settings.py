@@ -97,12 +97,12 @@ WSGI_APPLICATION = 'core.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'blogDB',  # 数据库名称
-        'USER': 'werido',  # 拥有者，这个一般没修改
-        'PASSWORD': 359066432,  # 密码，自己设定的
-        'HOST': '127.0.0.1',  # 默认的就没写
+        'NAME': os.environ.get("POSTGRES_DB",'blogDB'),  # 数据库名称
+        'USER': os.environ.get("POSTGRES_USER",'werido'),  # 拥有者，这个一般没修改
+        'PASSWORD': os.environ.get("POSTGRES_PASSWORD",359066432),  # 密码，自己设定的
+        # 'HOST': '127.0.0.1',  # 默认的就没写
         'PORT': '5432',
-        # 'HOST': '172.17.0.2',
+        'HOST': 'sitedb',
         # 'PORT': '5432',
     }
 }
@@ -110,12 +110,13 @@ DATABASES = {
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": f"redis://:{os.environ.get('redis_password','werido')}@localhost:6379/0",
+        "LOCATION": f"redis://:{os.environ.get('REDIS_PASSWORD','werido')}@{'redis'}:6379/0",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
             # "PASSWORD": "mysecret",
             "REDIS_CLIENT_CLASS": "redis.client.StrictRedis",
             "REDIS_CLIENT_KWARGS": {"decode_responses": True, "charset":"utf-8"},
+            
         }
     },
     # "redis":{

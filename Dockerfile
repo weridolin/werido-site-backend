@@ -2,8 +2,6 @@
 FROM python:3.7
 
 
-MAINTAINER werido
-
  # 设置 python 环境变量
 ENV PYTHONUNBUFFERED 1
 
@@ -19,6 +17,7 @@ WORKDIR /var/www/html/weridoBlog
  # 将当前目录文件加入到容器工作目录中（. 表示当前宿主机目录） 改用挂载的形式
 ADD ./requirements.txt /var/www/html/weridoBlog/
 
+COPY . /var/www/html/weridoBlog/
 #VOLUME . /var/www/html/weridoBlog
 
  # 利用 pip 安装依赖

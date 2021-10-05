@@ -1,0 +1,53 @@
+version: "3"
+services:
+
+  sitedb:
+    container_name: site-database
+    environment:
+      PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_DB: blogDB
+      POSTGRES_PASSWORD: 359066432
+      POSTGRES_USER: werido
+      version: "v1"
+    image: postgres:12
+    ports:
+      - 5432:5432
+    restart: unless-stopped
+    volumes:
+      - pgdata:/var/lib/postgresql/data/pgdata
+
+  redis:
+    image: redis:latest
+    restart: "no"
+    container_name: redis-site
+    environment:
+      REDIS_PASSWORD: werido
+    ports:
+      - "6379:6379"
+    # volumes:
+    #   - ./redis.conf:/etc/redis/redis.conf
+    #   - ./data:/data
+    # command: redis-server /etc/redis/redis.conf --requirepass werido
+    command: redis-server --requirepass werido
+    privileged: true
+
+  django:
+    container_name: site-backend
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    command:       
+      - /bin/bash
+      - -c
+      - |
+        python manage.py makemigrations
+        python manage.py migrate
+        python manage.py runserver 0.0.0.0:8000
+    ports:
+      - "8000:8000"
+    depends_on:
+      - sitedb
+      - redis
+
+volumes:
+  pgdata:
