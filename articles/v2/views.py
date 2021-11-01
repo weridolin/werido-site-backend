@@ -6,7 +6,7 @@ software: vscode
 Date: 2021-05-16 12:32:46
 platform: windows 10
 LastEditors: lhj
-LastEditTime: 2021-11-02 00:30:50
+LastEditTime: 2021-11-02 00:39:41
 '''
 from json.decoder import JSONDecodeError
 import re,json
@@ -81,6 +81,18 @@ class ArticleViewsSet(ModelViewSet):
             return Response(serializer.data,status=status.HTTP_404_NOT_FOUND)
         else:
             return Response("not match found!",status=status.HTTP_404_NOT_FOUND)        
+
+    @action(methods=["GET"],detail=False,url_name="article-count")
+    def count(self,request):
+        """文章检索，检索条件可以为:title/tag/type TODO:tag/type"""
+        title = request.query_params.get("title", None)
+        print(title)
+        if title:
+            article_list = Article.objects.filter(title__icontains=title).order_by("-created")
+        else:
+            article_list = Article.objects.all()
+        return Response({"count":len(article_list)},status=status.HTTP_200_OK)
+  
 
 
 class TagViewsSet(ModelViewSet):
