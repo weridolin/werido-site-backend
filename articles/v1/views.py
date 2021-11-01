@@ -6,7 +6,7 @@ software: vscode
 Date: 2021-05-16 12:32:46
 platform: windows 10
 LastEditors: lhj
-LastEditTime: 2021-10-05 12:57:16
+LastEditTime: 2021-10-10 10:26:53
 '''
 from json.decoder import JSONDecodeError
 import re,json
@@ -64,22 +64,25 @@ class ArticleViews(APIView):
             return Response(payload,status=status.HTTP_200_OK)
 
     def post(self,request,*args,**kwargs):
-        if request.data:  
-            type = Types.objects.get(name = request.data.get("type")) or None
-            user = User.objects.get(id=1)
-            tags = []
-            for name in request.data.get("tags"):
-                tags.append(Tags.objects.get(name = name))
-            request.data.pop("type")
-            request.data.pop("tags")
-            try:
-                pre = Article.objects.filter(author = user).latest("id")
-            except Article.DoesNotExist:
-                pre = None 
-            article = Article.objects.create(type= type,author=user,pre=pre,**request.data) 
-            article.tags.set(tags)
-            article.save()
-            update_pre_and_next_signal.send(sender=article.__class__, created=True,instance=article)
+        if request.data: 
+            print(request.data) 
+            serializer = ArticleSerializer(data=request.data,)
+            serializer.is_valid(raise_exception=True)
+            # type = Types.objects.get(name = request.data.get("type")) or None
+            # user = User.objects.get(id=1)
+            # tags = []
+            # for name in request.data.get("tags"):
+            #     tags.append(Tags.objects.get(name = name))
+            # request.data.pop("type")
+            # request.data.pop("tags")
+            # try:
+            #     pre = Article.objects.filter(author = user).latest("id")
+            # except Article.DoesNotExist:
+            #     pre = None 
+            # article = Article.objects.create(type= type,author=user,pre=pre,**request.data) 
+            # article.tags.set(tags)
+            # article.save()
+            # update_pre_and_next_signal.send(sender=article.__class__, created=True,instance=article)
             return Response(
                 {"msg":f"create article success! {model2json(article)}"},
                 status=status.HTTP_200_OK)
@@ -165,6 +168,22 @@ class TagsViews(APIView):
         tags_serializer = TagsSerializer(tags, many=True)
         return Response(tags_serializer.data, status=status.HTTP_200_OK)
 
+
+    def post(self,request):
+        print(request.data)
+        serializer  = TagsSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save() # 调用Serializer 的create方法
+        return Response({"detail":"create tags success","data":serializer.validated_data}, status=status.HTTP_200_OK)
+
+
+    def put(self,request,pk):
+        print(request.data)
+        update_obj = Tags.objects.get(id=pk)
+        serializer  = TagsSerializer(instance=update_obj,data=request.data, partial=True) #  partial=True ->not all required field are allowed
+        serializer.is_valid(raise_exception=True)
+        serializer.save() # 调用Serializer 的update方法 instance 和 data不为空
+        return Response({"detail":"update tags success","data":serializer.validated_data}, status=status.HTTP_200_OK)
 
 class TypesViews(APIView):
 

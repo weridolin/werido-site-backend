@@ -120,7 +120,7 @@ class Article(BaseModel):
                                 choices=LANGUAGE_CHOICES, default='python', max_length=100)
 
     style = models.CharField(choices=STYLE_CHOICES, null=True,
-                             default='friendly', max_length=100)
+                            default='friendly', max_length=100)
 
     # 文章浏览量
     # PositiveIntegerField是用于存储正整数的字段

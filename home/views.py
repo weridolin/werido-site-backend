@@ -6,7 +6,7 @@ software: vscode
 Date: 2021-10-04 18:46:56
 platform: windows 10
 LastEditors: lhj
-LastEditTime: 2021-10-05 16:41:07
+LastEditTime: 2021-10-06 21:04:48
 '''
 from django.shortcuts import render
 
@@ -105,12 +105,11 @@ class SiteCommentViewsSet(viewsets.ModelViewSet):
         return Response("created success!", status=status.HTTP_201_CREATED)
 
 
-
 class UpdateLogViewSet(viewsets.ModelViewSet):
     serializer_class = UpdateLogSerializer
     queryset = UpdateLog.objects.all() # 这里是针对所有的请求都会以这个为标准
 
-   
+
 
 class FriendsLinksViewsApi(APIView):
 

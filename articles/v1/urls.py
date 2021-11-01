@@ -6,7 +6,7 @@ software: vscode
 Date: 2021-05-16 12:32:46
 platform: windows 10
 LastEditors: lhj
-LastEditTime: 2021-10-05 12:46:49
+LastEditTime: 2021-10-10 09:55:30
 '''
 # -*- encoding: utf-8 -*-
 from django.urls import path,re_path
@@ -26,6 +26,8 @@ urlpatterns=[
     re_path(r"articles/(?P<pk>\d+)$",ArticleViews.as_view(),name="article-detail"),
 
     path(r"tags",TagsViews.as_view(),name="tags"),
+    re_path(r"tags/(?P<pk>\d+)$",TagsViews.as_view(),name="modify-tags"),
+
     path(r"types",TypesViews.as_view(),name="types"),
     # # 文章搜索，返回简略信息
     # path(r"search/", Search.as_view(), name="article-search-brief"),

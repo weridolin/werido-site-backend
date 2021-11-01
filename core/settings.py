@@ -26,7 +26,7 @@ SECRET_KEY = '2h+r=ch3g(m9w!1fg_zk_le)g@&qalpb8b%k4+8z)r(pfx&brk'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['www.weridolin.cn']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -100,9 +100,9 @@ DATABASES = {
         'NAME': os.environ.get("POSTGRES_DB",'blogDB'),  # 数据库名称
         'USER': os.environ.get("POSTGRES_USER",'werido'),  # 拥有者，这个一般没修改
         'PASSWORD': os.environ.get("POSTGRES_PASSWORD",359066432),  # 密码，自己设定的
-        # 'HOST': '127.0.0.1',  # 默认的就没写
+        'HOST': '127.0.0.1',  # 默认的就没写
         'PORT': '5432',
-        'HOST': 'sitedb',
+        # 'HOST': 'sitedb',
         # 'PORT': '5432',
     }
 }
@@ -110,7 +110,8 @@ DATABASES = {
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": f"redis://:{os.environ.get('REDIS_PASSWORD','werido')}@{'redis'}:6379/0",
+        "LOCATION": f"redis://:{os.environ.get('REDIS_PASSWORD','werido')}@127.0.0.1:6379/0",
+        # "LOCATION": f"redis://:{os.environ.get('REDIS_PASSWORD','werido')}@localhost:6379/0",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
             # "PASSWORD": "mysecret",

@@ -6,7 +6,7 @@ software: vscode
 Date: 2021-04-28 15:43:58
 platform: windows 10
 LastEditors: lhj
-LastEditTime: 2021-10-05 12:56:04
+LastEditTime: 2021-11-01 22:00:43
 '''
 """weridoBlog URL Configuration
 
@@ -32,6 +32,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path("api/v1/",include(routers.urls)),
     path("api/v1/blogs/", include("articles.v1.urls")),
+    path("api/v2/blogs/", include("articles.v2.urls")),
     path("api/v1/auth/",include("authentication.urls")),
     path("api/v1/drug/",include("drug.urls")),
     path("api/v1/home/",include("home.urls"))
