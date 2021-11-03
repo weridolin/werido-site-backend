@@ -6,12 +6,15 @@ software: vscode
 Date: 2021-05-16 12:32:46
 platform: windows 10
 LastEditors: lhj
-LastEditTime: 2021-11-02 00:39:41
+LastEditTime: 2021-11-04 01:06:18
 '''
+# from _typeshed import Self
 from json.decoder import JSONDecodeError
 import re,json
+import typing_extensions
 from django.db.models import query
 from django.db.models.query import QuerySet
+import django_filters
 
 from rest_framework.settings import IMPORT_STRINGS
 from articles.v1.serializers import *
@@ -51,6 +54,18 @@ class ArticlePagination(PageNumberPagination):
             self.request) == 0 else int(self.page.paginator.count/self.get_page_size(self.request)+1)
         return index    
 
+from django_filters import FilterSet
+class ArticleFilterSet(FilterSet):
+    # title 为 request get的字段 
+    title = django_filters.CharFilter(lookup_expr="icontains", field_name = "title")
+    # _type =django_filters.CharFilter(lookup_expr="icontains", field_name = "type_name")
+    type = django_filters.CharFilter(lookup_expr="icontains", field_name = "type__name")
+    tags = django_filters.CharFilter(lookup_expr="icontains", field_name = "tags__name")
+    class Meta:
+        model = Article
+        fields = ["title", "type__name","tags__name"]
+
+from django_filters.rest_framework import   DjangoFilterBackend
 class ArticleViewsSet(ModelViewSet):
     """文章接口"""
 
@@ -60,6 +75,7 @@ class ArticleViewsSet(ModelViewSet):
     queryset = Article.objects.all()
     serializer_class = ArticleSerializer 
     pagination_class = ArticlePagination
+
 
     def update(self, request, *args, **kwargs):
         """put 也改为部分更新"""
@@ -71,20 +87,15 @@ class ArticleViewsSet(ModelViewSet):
     @action(methods=["GET"],detail=False,url_name="article-search")
     def search(self,request):
         """文章检索，检索条件可以为:title/tag/type TODO:tag/type"""
-        title = request.query_params.get("title", None)
-        print(title)
-        if title:
-            article_list = Article.objects.filter(title__icontains=title).order_by("-created")
-            serializer = ArticleBriefSerializer(article_list, many=True)
-            print(serializer.data)
-            # return ArticlePagination().get_paginated_response(data=serializer.data)
-            return Response(serializer.data,status=status.HTTP_404_NOT_FOUND)
-        else:
-            return Response("not match found!",status=status.HTTP_404_NOT_FOUND)        
-
+        print(request.query_params)
+        filter_article_list = ArticleFilterSet(request.query_params,queryset=self.get_queryset()).qs
+        serializer = ArticleBriefSerializer(filter_article_list, many=True)
+        # return ArticlePagination().get_paginated_response(data=serializer.data)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+    
     @action(methods=["GET"],detail=False,url_name="article-count")
     def count(self,request):
-        """文章检索，检索条件可以为:title/tag/type TODO:tag/type"""
+        """统计文章总数，检索条件可以为:title/tag/type TODO:tag/type"""
         title = request.query_params.get("title", None)
         print(title)
         if title:
