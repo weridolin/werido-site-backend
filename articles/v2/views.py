@@ -6,7 +6,7 @@ software: vscode
 Date: 2021-05-16 12:32:46
 platform: windows 10
 LastEditors: lhj
-LastEditTime: 2021-11-04 01:06:18
+LastEditTime: 2021-11-05 00:48:32
 '''
 # from _typeshed import Self
 from json.decoder import JSONDecodeError
@@ -65,7 +65,7 @@ class ArticleFilterSet(FilterSet):
         model = Article
         fields = ["title", "type__name","tags__name"]
 
-from django_filters.rest_framework import   DjangoFilterBackend
+from django_filters.rest_framework import  DjangoFilterBackend
 class ArticleViewsSet(ModelViewSet):
     """文章接口"""
 
@@ -86,7 +86,7 @@ class ArticleViewsSet(ModelViewSet):
 
     @action(methods=["GET"],detail=False,url_name="article-search")
     def search(self,request):
-        """文章检索，检索条件可以为:title/tag/type TODO:tag/type"""
+        """文章检索，检索条件可以为:title/tag/type """
         print(request.query_params)
         filter_article_list = ArticleFilterSet(request.query_params,queryset=self.get_queryset()).qs
         serializer = ArticleBriefSerializer(filter_article_list, many=True)
@@ -95,7 +95,7 @@ class ArticleViewsSet(ModelViewSet):
     
     @action(methods=["GET"],detail=False,url_name="article-count")
     def count(self,request):
-        """统计文章总数，检索条件可以为:title/tag/type TODO:tag/type"""
+        """统计文章总数，检索条件可以为:title/tag/type """
         title = request.query_params.get("title", None)
         print(title)
         if title:

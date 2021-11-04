@@ -6,7 +6,7 @@ software: vscode
 Date: 2021-10-02 16:08:58
 platform: windows 10
 LastEditors: lhj
-LastEditTime: 2021-10-09 23:13:41
+LastEditTime: 2021-11-05 00:29:22
 '''
 # -*- encoding: utf-8 -*-
 from rest_framework import serializers
@@ -58,9 +58,11 @@ class UserSerializer(serializers.ModelSerializer):
         ]
 
 class ArticleBriefSerializer(serializers.ModelSerializer):
+    tags = TagsSerializer(many=True)
     class Meta:
         model= Article
-        fields =["id","title"]
+        fields =["id","title","tags","type"]
+        depth = 1
 
 class ArticleSerializer(serializers.ModelSerializer):
     type = TypesSerializer()
