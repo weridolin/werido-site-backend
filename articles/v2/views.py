@@ -6,7 +6,7 @@ software: vscode
 Date: 2021-05-16 12:32:46
 platform: windows 10
 LastEditors: lhj
-LastEditTime: 2021-11-05 00:48:32
+LastEditTime: 2021-11-05 00:52:45
 '''
 # from _typeshed import Self
 from json.decoder import JSONDecodeError
@@ -96,13 +96,8 @@ class ArticleViewsSet(ModelViewSet):
     @action(methods=["GET"],detail=False,url_name="article-count")
     def count(self,request):
         """统计文章总数，检索条件可以为:title/tag/type """
-        title = request.query_params.get("title", None)
-        print(title)
-        if title:
-            article_list = Article.objects.filter(title__icontains=title).order_by("-created")
-        else:
-            article_list = Article.objects.all()
-        return Response({"count":len(article_list)},status=status.HTTP_200_OK)
+        filter_article_list = ArticleFilterSet(request.query_params,queryset=self.get_queryset()).qs
+        return Response({"count":len(filter_article_list)},status=status.HTTP_200_OK)
   
 
 
