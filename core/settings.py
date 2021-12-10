@@ -101,8 +101,8 @@ DATABASES = {
         'NAME': os.environ.get("POSTGRES_DB",'blogDB'),  # 数据库名称
         'USER': os.environ.get("POSTGRES_USER",'werido'),  # 拥有者，这个一般没修改
         'PASSWORD': os.environ.get("POSTGRES_PASSWORD",359066432),  # 密码，自己设定的
-        'HOST': '127.0.0.1',  # 默认的就没写
-        'PORT': '5432',
+        'HOST': os.environ.get("POSTGRES_HOST",'127.0.0.1'),  # 默认的就没写
+        'PORT': os.environ.get("POSTGRES_PORT",'5432'),
         # 'HOST': 'sitedb',
         # 'PORT': '5432',
     }
