@@ -41,10 +41,12 @@ INSTALLED_APPS = [
     'articles.apps.ArticlesConfig',
     'drug.apps.DrugConfig',
     'home.apps.HomeConfig',
+    "filebroker.apps.FilebrokerConfig",
     'rest_framework',
     'corsheaders',
     'authentication',
     'django_filters',
+
 ]
 
 MIDDLEWARE = [
@@ -59,15 +61,15 @@ MIDDLEWARE = [
 ]
 
 # # 跨域配置
-# CORS_ORIGIN_WHITELIST = (
-#     'http://127.0.0.1:8000',
-#     'http://127.0.0.1:8888',
-#     'http://localhost:8000',
-#     'http://localhost:8080',
-#     'http://localhost:8085',
-#     'http://localhost:8888',
-#     'http://localhost:8081', #凡是出现在白名单中的域名，都可以访问后端接口
-# )
+CORS_ORIGIN_WHITELIST = (
+    'http://127.0.0.1:8000',
+    'http://127.0.0.1:8888',
+    'http://localhost:8000',
+    'http://localhost:8080',
+    'http://localhost:8085',
+    'http://localhost:8888',
+    'http://localhost:8081', #凡是出现在白名单中的域名，都可以访问后端接口
+)
 
 CORS_ALLOW_CREDENTIALS = True  # 允许携带cookie
 
@@ -171,7 +173,7 @@ STATIC_URL = '/static/'
 
 # 媒体文件地址
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(os.path.dirname(os.path.dirname(BASE_DIR)), 'media/')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 print(MEDIA_ROOT)
 

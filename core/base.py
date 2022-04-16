@@ -24,3 +24,10 @@ class BaseModel(models.Model):
         app_label = 'Base'
         managed = False 
         abstract = True
+
+
+from rest_framework import serializers
+
+class BaseSerializer(serializers.ModelSerializer):
+    created = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
+    updated = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)

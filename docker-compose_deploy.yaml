@@ -31,25 +31,25 @@ services:
     # command: redis-server --requirepass werido
     privileged: true
 
-  django:
-    container_name: site-backend
-    build: 
-      context: .
-      dockerfile: Dockerfile
-    command:       
-      - /bin/bash
-      - -c
-      - |
-        python manage.py makemigrations
-        python manage.py migrate
-        python manage.py runserver 0.0.0.0:8000
-    volumes:
-      - /pythons/blogNew/werido-site-backend/:/var/www/html/weridoBlog/
-    ports:
-      - "8000:8000"
-    depends_on:
-      - sitedb
-      - redis
+  # django:
+  #   container_name: site-backend
+  #   build: 
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   command:       
+  #     - /bin/bash
+  #     - -c
+  #     - |
+  #       python manage.py makemigrations
+  #       python manage.py migrate
+  #       python manage.py runserver 0.0.0.0:8000
+  #   volumes:
+  #     - /pythons/blogNew/werido-site-backend/:/var/www/html/weridoBlog/
+  #   ports:
+  #     - "8000:8000"
+  #   depends_on:
+  #     - sitedb
+  #     - redis
 
 volumes:
   pgdata:

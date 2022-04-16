@@ -35,5 +35,6 @@ urlpatterns = [
     path("api/v2/blogs/", include("articles.v2.urls")),
     path("api/v1/auth/",include("authentication.urls")),
     path("api/v1/drug/",include("drug.urls")),
-    path("api/v1/home/",include("home.urls"))
+    path("api/v1/home/",include("home.urls")),
+    path("api/v1/fileBroker",include("filebroker.v1.urls"))
 ]
