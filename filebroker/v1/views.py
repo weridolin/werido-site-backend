@@ -46,7 +46,6 @@ class FileOperationViews(APIView):
             user = User.objects.get(id=1)
         else:
             user = request.user
-
         ## 先判断是否已经存在，是的直接返回下载码:
         md5 = request.data.get("md5",None)
         if md5:
