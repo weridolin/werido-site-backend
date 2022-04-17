@@ -16,7 +16,7 @@ import os
 from django.contrib.auth.models import User
 from  django.http import FileResponse
 from rest_framework.decorators import action
-# from 
+from django.utils.http import urlquote
 
 class FileOperationViews(APIView):
     
@@ -33,9 +33,11 @@ class FileOperationViews(APIView):
             record:FileInfo = FileInfo.objects.filter(download_code=download_code,is_merge=True).first()
             if not record:
                 return HttpResponseNotFound(">>> can not find file!")
+            print(">>> downfile ",record.file_name,record.file.size)
             response = FileResponse(record.file.open(mode="rb"),filename=record.file_name)
-            response['content_type'] = "application/octet-stream"
-            response['Content-Disposition'] = 'attachment; filename=' + record.file_name
+            response['Content-Length'] = record.file.size      
+            response['Content-Type'] = "application/octet-stream"
+            response['Content-Disposition'] = f'attachment; filename="{urlquote(record.file_name)}"'
         return response
 
     def post(self,request):
@@ -44,6 +46,15 @@ class FileOperationViews(APIView):
             user = User.objects.get(id=1)
         else:
             user = request.user
+
+        ## 先判断是否已经存在，是的直接返回下载码:
+        md5 = request.data.get("md5",None)
+        if md5:
+            try:
+                record:FileInfo = FileInfo.objects.get(md5=md5,is_merge=True)
+                return Response(data={"data":FileInfoSerializer(record).data,"is_exist":True},status=status.HTTP_200_OK)                
+            except FileInfo.DoesNotExist:
+                pass  
         key = generate_file_key()
         params = request.data.copy()
         print(">>>>>> ",request.data)
@@ -60,7 +71,7 @@ class FileOperationViews(APIView):
                 params.update({"chunk_num":index})
                 file_info_list.append(FileInfo(user=user,**params))
             FileInfo.objects.bulk_create(file_info_list)
-            return Response(data={"key":key},status=status.HTTP_200_OK)
+            return Response(data={"key":key,"is_exist":False},status=status.HTTP_200_OK)
 
     def put(self,request):
         ### 上传文件切片
@@ -74,6 +85,8 @@ class FileOperationViews(APIView):
         else:
             try:
                 record:FileInfo = FileInfo.objects.filter(file_key=file_key,chunk_num=chunk_num,file_name=file_name).first()
+                if not record:
+                    return HttpResponseBadRequest(content="please upload file info first!")                    
             except FileInfo.DoesNotExist:
                 return HttpResponseBadRequest(content="please upload file info first!")
         try:
