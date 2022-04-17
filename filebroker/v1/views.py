@@ -51,8 +51,9 @@ class FileOperationViews(APIView):
         md5 = request.data.get("md5",None)
         if md5:
             try:
-                record:FileInfo = FileInfo.objects.get(md5=md5,is_merge=True)
-                return Response(data={"data":FileInfoSerializer(record).data,"is_exist":True},status=status.HTTP_200_OK)                
+                record:FileInfo = FileInfo.objects.filter(md5=md5,is_merge=True).first()
+                if record:
+                    return Response(data={"data":FileInfoSerializer(record).data,"is_exist":True},status=status.HTTP_200_OK)                
             except FileInfo.DoesNotExist:
                 pass  
         key = generate_file_key()
