@@ -8,3 +8,5 @@ platform: windows 10
 LastEditors: lhj
 LastEditTime: 2021-11-30 23:10:59
 '''
+import datetime
+print(datetime.datetime.utcnow().timestamp() - datetime.datetime.utcnow().timestamp())

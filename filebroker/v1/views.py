@@ -1,7 +1,5 @@
 
 # Create your views here.
-
-import imp
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.http import HttpResponseBadRequest,HttpResponseForbidden, HttpResponseNotFound,HttpResponseServerError
@@ -17,6 +15,8 @@ from django.contrib.auth.models import User
 from  django.http import FileResponse
 from rest_framework.decorators import action
 from django.utils.http import urlquote
+from filebroker.utils import is_expired
+from celery_app.tasks import remove_file
 
 class FileOperationViews(APIView):
     
@@ -24,7 +24,6 @@ class FileOperationViews(APIView):
         # if not request.user.is_authenticated:
         #     return HttpResponseForbidden("please login first")
         ## 下载文件
-
         download_code = request.query_params.get("down_code",None)
         print(">>> down load file",{download_code})
         if not download_code:
@@ -33,7 +32,6 @@ class FileOperationViews(APIView):
             record:FileInfo = FileInfo.objects.filter(download_code=download_code,is_merge=True).first()
             if not record:
                 return HttpResponseNotFound(">>> can not find file!")
-            print(">>> downfile ",record.file_name,record.file.size)
             response = FileResponse(record.file.open(mode="rb"),filename=record.file_name)
             response['Content-Length'] = record.file.size      
             response['Content-Type'] = "application/octet-stream"
@@ -52,12 +50,22 @@ class FileOperationViews(APIView):
             try:
                 record:FileInfo = FileInfo.objects.filter(md5=md5,is_merge=True).first()
                 if record:
-                    return Response(data={"data":FileInfoSerializer(record).data,"is_exist":True},status=status.HTTP_200_OK)                
+                    is_expire,timedelta = is_expired(record=record)
+                    if is_expire:
+                        ## delete expire record
+                        file_path = os.path.join(settings.MEDIA_ROOT,record.file)
+                        remove_file.delay(file_path)
+                    else:
+                        return Response(data={
+                            "data":FileInfoSerializer(record).data,
+                            "is_exist":True,
+                            "timedelta":timedelta,
+                            },
+                        status=status.HTTP_200_OK)                
             except FileInfo.DoesNotExist:
                 pass  
         key = generate_file_key()
         params = request.data.copy()
-        print(">>>>>> ",request.data)
         params.update({
             "file_key":key,
             "expire_time":datetime.datetime.now()+datetime.timedelta(hours=request.data.get("expire",24)),
@@ -110,14 +118,17 @@ def generate_download_code(request):
     down_code = generate_file_key()[:5]
     print("generate dowload code",down_code)
     try:
+        ## 合并文件
         records:list[FileInfo] = FileInfo.objects.filter(file_key=file_key).order_by("chunk_num").all()
         merge_file_path = get_merge_file_path(records[0],filename=records[0].file_name)
         target_file_path = os.path.join(settings.MEDIA_ROOT,merge_file_path)
         with open(target_file_path,"ab") as f:
             for record in records:
-                slice_file = record.file.open(mode="rb")
-                for chunk in slice_file.chunks():
-                    f.write(chunk)
+                with record.file.open(mode="rb") as slice_file:
+                    for chunk in slice_file.chunks():
+                        f.write(chunk)
+        ## 提交删除文件的任务
+        remove_file.delay([os.path.join(settings.MEDIA_ROOT,record.file.name) for record in records])
         ## 修改其中一条记录,并将多余的删除
         records[0].update(download_code=down_code,is_merge=True,file = merge_file_path)
         records[0].save()
@@ -140,3 +151,6 @@ def search_by_down_code(request,download_code=None):
                 return HttpResponseServerError(content="find more than one file!")
             res = FileInfoSerializer(records,many=True).data
             return Response(data={"data":res},status=status.HTTP_200_OK)
+
+
+    

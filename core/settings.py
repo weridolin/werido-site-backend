@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'drug.apps.DrugConfig',
     'home.apps.HomeConfig',
     "filebroker.apps.FilebrokerConfig",
+    "celery_app.apps.CeleryAppConfig",
     'rest_framework',
     'corsheaders',
     'authentication',
@@ -180,3 +181,12 @@ print(MEDIA_ROOT)
 # 过期时间
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 SESSION_COOKIE_AGE = 200 #
+
+
+############## CELERY ################3333
+CELERY_BROKER_URL = f"redis://:{os.environ.get('REDIS_PASSWORD','werido')}@{os.environ.get('REDIS_HOST','127.0.0.1')}:{os.environ.get('REDIS_PORT','6379')}/0"
+CELERY_RESULT_BACKEND = CELERY_BROKER_URL
+#: Only add pickle to this list if your broker is secured
+#: from unwanted access (see userguide/security.html)
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'

@@ -31,3 +31,14 @@ from rest_framework import serializers
 class BaseSerializer(serializers.ModelSerializer):
     created = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
     updated = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
+
+
+
+from django.http import HttpResponse
+
+
+class ResponseWithCallback(HttpResponse):
+
+    def close(self) -> None:
+        super().close()
+        
