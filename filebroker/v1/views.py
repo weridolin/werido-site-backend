@@ -143,14 +143,12 @@ def generate_download_code(request):
 
 @api_view(http_method_names=["GET"])
 def search_by_down_code(request,download_code=None):
-        if not download_code:
-            return HttpResponseBadRequest(content=f"bad request:download_code can not be None")
-        else:
-            records = FileInfo.objects.filter(download_code=download_code,is_merge=True).all()
-            if len(records)>1:
-                return HttpResponseServerError(content="find more than one file!")
-            res = FileInfoSerializer(records,many=True).data
-            return Response(data={"data":res},status=status.HTTP_200_OK)
+    if not download_code:
+        return HttpResponseBadRequest(content=f"bad request:download_code can not be None")
+    else:
+        records = FileInfo.objects.filter(download_code=download_code,is_merge=True).all()
+        if len(records)>1:
+            return HttpResponseServerError(content="find more than one file!")
+        res = FileInfoSerializer(records,many=True).data
+        return Response(data={"data":res},status=status.HTTP_200_OK)
 
-
-    
