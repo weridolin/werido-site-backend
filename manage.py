@@ -8,7 +8,6 @@ platform: windows 10
 LastEditors: lhj
 LastEditTime: 2021-09-04 12:20:30
 '''
-#!/usr/bin/env python
 """Django's command-line utility for administrative tasks."""
 import os
 import sys

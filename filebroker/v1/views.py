@@ -53,7 +53,7 @@ class FileOperationViews(APIView):
                     is_expire,timedelta = is_expired(record=record)
                     if is_expire:
                         ## delete expire record
-                        file_path = os.path.join(settings.MEDIA_ROOT,record.file)
+                        file_path = os.path.join(settings.MEDIA_ROOT,record.file.name)
                         remove_file.delay(file_path)
                     else:
                         return Response(data={
