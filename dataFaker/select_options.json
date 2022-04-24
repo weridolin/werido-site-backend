@@ -1,89 +1,115 @@
-{
-    "int":{
+[
+    {
+        "type":"int",
         "alias":"整形",
-        "condition":{
-            "min":{
+        "condition":[
+            {
+                "type":"min",
                 "value":null,
                 "alias":"最小值"
             }, 
-            "max":{
+            {
+                "type":"max",
                 "value":null,
                 "alias":"最大值"
             },
-            "only_positive":{
+            {
+                "type":"only_positive",
                 "value":null,
                 "alias":"只为正值"
             },
-            "only_negative":{
+            {
+                "type":"only_negative",
                 "value":null,
                 "alias":"只为负值"
-            }
-        }
+            }]
     },
-    "mail":{
-        "alias":"邮箱"
+    {
+        "type":"mail",
+        "alias":"邮箱",
+                "condition":[]
     },
-    "IP4":{
-        "alias":"IP4"
+    {
+        "type":"IP4",
+        "alias":"IP4",
+        "condition":[]
     },
-    "IP6":{
-        "alias":"IP6"
+    {
+        "type":"IP6",
+        "alias":"IP6",
+        "condition":[]
     },
-    "address":{
-        "alias":"地址"
+    {
+        "type":"address",
+        "alias":"地址",
+        "condition":[]
     },
-    "age":{
+    {
+        "type":"age",
         "alias":"年龄",
-        "condition":{
-            "min":{
+        "condition":[
+            {
+                "type":"min",
                 "value":null,
                 "alias":"最小值"
             }, 
-            "max":{
+            {
+                "type":"max",
                 "value":null,
                 "alias":"最大值"
             }
-        }        
+        ] 
     },
-    "gender":{
+    {
+        "type":"gender",
+        "condition":[],
         "alias":"性别"
     },
-    "phone":{
+    {   
+        "type":"phone",
         "alias":"电话",
-        "condition":{
-            "region":{
+        "condition":[
+            {
+                "type":"region",
                 "value":null,
                 "alias":"区号"
             }
-        }
+        ]
     },
-    "telephone":{
-        "alias":"手机电话号码"
+    {
+        "type":"telephone",
+        "alias":"手机电话号码",
+        "condition":[]
     },
-    "location":{
+    {
+        "location":"location",
         "alias":"所在地",
-        "condition":{
-            "options":{
+        "condition":[{
+                "type":"options",
                 "value":null,
                 "alias":"枚举值"
-            }
-        }
+            
+        }]
     },
-    "pay":{
+    {   
+        "type":"pay",
         "alias":"金额",
-        "condition":{
-            "min":{
+        "condition":[
+            {
+                "type":"min",
                 "value":null,
                 "alias":"最小值"
             },
-            "max":{
+            {
+                "type":"max",
                 "value":null,
                 "alias":"最大值"
             },
-            "precision":{
+            {
+                "type":"precision",
                 "value":null,
                 "alias":"精度"
             }
-        }
+        ]
     }
-}
+]
