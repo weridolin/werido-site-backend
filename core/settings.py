@@ -43,12 +43,23 @@ INSTALLED_APPS = [
     'home.apps.HomeConfig',
     "filebroker.apps.FilebrokerConfig",
     "celery_app.apps.CeleryAppConfig",
+    "dataFaker.apps.DatafakerConfig",
     'rest_framework',
     'corsheaders',
     'authentication',
     'django_filters',
+    "channels",
 
 ]
+
+########## DJANGO CHANNELS
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    }
+}
+
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -92,8 +103,8 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'core.wsgi.application'
-
+# WSGI_APPLICATION = 'core.wsgi.application'
+ASGI_APPLICATION = 'core.asgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
@@ -104,7 +115,7 @@ DATABASES = {
         'NAME': os.environ.get("POSTGRES_DB",'blogDB'),  # 数据库名称
         'USER': os.environ.get("POSTGRES_USER",'werido'),  # 拥有者，这个一般没修改
         'PASSWORD': os.environ.get("POSTGRES_PASSWORD",359066432),  # 密码，自己设定的
-        'HOST': os.environ.get("POSTGRES_HOST",'127.0.0.1'),  # 默认的就没写
+        'HOST': os.environ.get("POSTGRES_HOST",'8.131.78.84'),  # 默认的就没写
         'PORT': os.environ.get("POSTGRES_PORT",'5432'),
         # 'HOST': 'sitedb',
         # 'PORT': '5432',
@@ -114,7 +125,7 @@ DATABASES = {
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": f"redis://:{os.environ.get('REDIS_PASSWORD','werido')}@{os.environ.get('REDIS_HOST','127.0.0.1')}:{os.environ.get('REDIS_PORT','6379')}/0",
+        "LOCATION": f"redis://:{os.environ.get('REDIS_PASSWORD','werido')}@{os.environ.get('REDIS_HOST','8.131.78.84')}:{os.environ.get('REDIS_PORT','6379')}/0",
         # "LOCATION": f"redis://:{os.environ.get('REDIS_PASSWORD','werido')}@localhost:6379/0",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",

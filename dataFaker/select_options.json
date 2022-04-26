@@ -3,22 +3,26 @@
         "type":"int",
         "alias":"整形",
         "condition":[
-            {
+            {   
+                "front_type":"input",
                 "type":"min",
                 "value":null,
                 "alias":"最小值"
             }, 
             {
+                "front_type":"input",
                 "type":"max",
                 "value":null,
                 "alias":"最大值"
             },
             {
+                "front_type":"bool",
                 "type":"only_positive",
                 "value":null,
                 "alias":"只为正值"
             },
             {
+                "front_type":"bool",
                 "type":"only_negative",
                 "value":null,
                 "alias":"只为负值"
@@ -49,11 +53,13 @@
         "alias":"年龄",
         "condition":[
             {
+                "front_type":"input",
                 "type":"min",
                 "value":null,
                 "alias":"最小值"
             }, 
             {
+                "front_type":"input",
                 "type":"max",
                 "value":null,
                 "alias":"最大值"
@@ -70,6 +76,8 @@
         "alias":"电话",
         "condition":[
             {
+                "front_type":"select",
+                "select_options":[],
                 "type":"region",
                 "value":null,
                 "alias":"区号"
@@ -85,6 +93,8 @@
         "location":"location",
         "alias":"所在地",
         "condition":[{
+                "front_type":"select",
+                "select_options":[],
                 "type":"options",
                 "value":null,
                 "alias":"枚举值"
@@ -96,16 +106,19 @@
         "alias":"金额",
         "condition":[
             {
+                "front_type":"input",
                 "type":"min",
                 "value":null,
                 "alias":"最小值"
             },
             {
+                "front_type":"input",
                 "type":"max",
                 "value":null,
                 "alias":"最大值"
             },
             {
+                "front_type":"input",
                 "type":"precision",
                 "value":null,
                 "alias":"精度"

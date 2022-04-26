@@ -24,8 +24,9 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path,include
+from django.urls import path,include,re_path
 from rest_framework import routers
+from ws.data_faker_consumer import DataFakerConsumer
 
 routers = routers.DefaultRouter()
 urlpatterns = [
@@ -36,5 +37,8 @@ urlpatterns = [
     path("api/v1/auth/",include("authentication.urls")),
     path("api/v1/drug/",include("drug.urls")),
     path("api/v1/home/",include("home.urls")),
-    path("api/v1/fileBroker",include("filebroker.v1.urls"))
+    path("api/v1/fileBroker",include("filebroker.v1.urls")),
+    path("api/v1/dataFaker",include("dataFaker.v1.urls"))
 ]
+
+
