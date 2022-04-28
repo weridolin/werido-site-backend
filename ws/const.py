@@ -3,3 +3,4 @@ class WSMessageType:
     stop = 2
     progress = 3
     finish = 4
+    error = 5

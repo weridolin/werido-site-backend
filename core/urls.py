@@ -38,7 +38,7 @@ urlpatterns = [
     path("api/v1/drug/",include("drug.urls")),
     path("api/v1/home/",include("home.urls")),
     path("api/v1/fileBroker",include("filebroker.v1.urls")),
-    path("api/v1/dataFaker",include("dataFaker.v1.urls"))
+    path("api/v1/dataFaker/",include("dataFaker.v1.urls"))
 ]
 
 

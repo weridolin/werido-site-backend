@@ -2,6 +2,8 @@
     {
         "type":"int",
         "alias":"整形",
+        "name":"整形字段1",
+        "generator":"IntGenerator",
         "condition":[
             {   
                 "front_type":"input",
@@ -31,26 +33,35 @@
     {
         "type":"mail",
         "alias":"邮箱",
+        "name":"邮箱字段1",
+        "generator":"MailGenerator",
                 "condition":[]
     },
     {
         "type":"IP4",
         "alias":"IP4",
+        "name":"IP4字段1",
+        "generator":"IP4Generator",
         "condition":[]
     },
     {
         "type":"IP6",
         "alias":"IP6",
+        "name":"IP6字段1",
+        "generator":"IP6Generator",
         "condition":[]
     },
     {
         "type":"address",
         "alias":"地址",
+        "name":"地址字段1",
+        "generator":"AddressGenerator",
         "condition":[]
     },
     {
         "type":"age",
         "alias":"年龄",
+        "generator":"AgeGenerator",
         "condition":[
             {
                 "front_type":"input",
@@ -68,12 +79,16 @@
     },
     {
         "type":"gender",
+        "name":"性别字段1",
+        "generator":"GenderGenerator",
         "condition":[],
         "alias":"性别"
     },
     {   
         "type":"phone",
         "alias":"电话",
+        "name":"电话字段1",
+        "generator":"PhoneNumberGenerator",
         "condition":[
             {
                 "front_type":"select",
@@ -86,11 +101,15 @@
     },
     {
         "type":"telephone",
+        "name":"手机电话字段1",
+        "generator":"TelePhoneGenerator",
         "alias":"手机电话号码",
         "condition":[]
     },
     {
         "location":"location",
+        "name":"所在地字段1",
+        "generator":"LocationGenerator",
         "alias":"所在地",
         "condition":[{
                 "front_type":"select",
@@ -103,6 +122,8 @@
     },
     {   
         "type":"pay",
+        "name":"金额字段1",
+        "generator":"PayGenerator",
         "alias":"金额",
         "condition":[
             {

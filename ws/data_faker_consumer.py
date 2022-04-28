@@ -1,15 +1,19 @@
 
-import json
+import json,asyncio
 from channels.generic.websocket import AsyncWebsocketConsumer
 from ws.const import WSMessageType
+from dataFaker.dfaker import create_task_async
 
+## 所有的 WS连接都是一个线程里面的 receive
 class DataFakerConsumer(AsyncWebsocketConsumer):
     """
         datafaker-ws:
             {
                 "type":WSMessageType,
-                "data":"",
-                "key":""
+                "data":{
+                    "dataCount":
+                },
+                "record_key":""
             }    
     """
     async def connect(self):
@@ -34,24 +38,26 @@ class DataFakerConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         try:
             text_data_json = json.loads(text_data)
+            if text_data_json.get("type",None)== WSMessageType.start:
+                ## START CREATE TASK
+                record_key = text_data_json.get("record_key",None)
+                asyncio.run_coroutine_threadsafe(
+                    create_task_async(
+                        record_key=record_key,
+                        ws=self), 
+                    asyncio.get_running_loop()
+                ).add_done_callback(_on_done_callback)
+            elif text_data_json.get("type",None)== WSMessageType.stop:
+                ...# TODO
+            message = "generating data ing..."
         except json.JSONDecodeError:
             message = f"get invalid json format data:{text_data}"
         except Exception as exc:
             message = f"an error raise:{exc}"
-        if text_data_json.get("type",None)== WSMessageType.start:
-            ## START CREATE TASK
-            ...
-        elif text_data_json.get("type",None)== WSMessageType.stop:
-            ...
 
-        # Send message to room group,
-        await self.channel_layer.group_send(
-            self.key_group_name,
-            {
-                'type': 'chat_message',
-                'message': message
-            }
-        )
+        # await self.send(text_data=json.dumps({
+        #     'message': message
+        # }))
 
     # Receive message from room group
     async def chat_message(self, event):
@@ -59,4 +65,10 @@ class DataFakerConsumer(AsyncWebsocketConsumer):
         # Send message to WebSocket
         await self.send(text_data=json.dumps({
             'message': message
-        }))
+        })) 
+
+
+def _on_done_callback(future):
+    target_path,ws = future.result()
+    print(">>>>>>>>>> on done callback","target_path:",target_path,ws)
+    

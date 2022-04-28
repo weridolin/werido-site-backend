@@ -8,10 +8,11 @@ from django.contrib.auth.models import User
 
 
 def file_directory_path(instance):
-    target_path = 'faker/user_{userid}/{record_key}'.format(instance.user.id,instance.record_key)
+    print(">>>>>>>>",instance)
+    target_path = 'faker/user_{userid}/{record_key}.csv'.format(userid=instance.user.id,record_key=instance.record_key)
     if os.path.exists(os.path.join(settings.MEDIA_ROOT,target_path)):
         os.remove(os.path.join(settings.MEDIA_ROOT,target_path))
-    return target_path
+    return os.path.join(settings.MEDIA_ROOT,target_path)
 
 class DataFakerRecordInfo(BaseModel):
     # 上传时第一步会发送一个POST请求会生成一个唯一KEY
@@ -32,7 +33,7 @@ class DataFakerRecordInfo(BaseModel):
 
 
     def __str__(self) -> str:
-        return f"{self.record_key}"
+        return f"{self.user}-{self.record_key}"
 
 
     def update(self,**kwargs):

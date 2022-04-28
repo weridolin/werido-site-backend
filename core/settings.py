@@ -61,6 +61,7 @@ CHANNEL_LAYERS = {
 
 
 
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -86,6 +87,9 @@ MIDDLEWARE = [
 CORS_ALLOW_CREDENTIALS = True  # 允许携带cookie
 
 ROOT_URLCONF = 'core.urls'
+
+import os
+os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 
 TEMPLATES = [
     {
@@ -121,6 +125,7 @@ DATABASES = {
         # 'PORT': '5432',
     }
 }
+
 
 CACHES = {
     "default": {
