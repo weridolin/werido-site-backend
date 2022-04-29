@@ -139,8 +139,7 @@ def generate_download_code(request):
         return HttpResponseNotFound("can not find file! please re upload")
     except Exception as exc:
         return HttpResponseServerError(content=f"serve error when generate down load code:{str(exc)}")
-
-import threading    
+ 
 
 @api_view(http_method_names=["GET"])
 def search_by_down_code(request,download_code=None):

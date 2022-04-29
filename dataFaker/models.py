@@ -1,4 +1,4 @@
-from email.policy import default
+
 import os
 from django.db import models
 from core.base import BaseModel
@@ -7,12 +7,12 @@ from core import settings
 from django.contrib.auth.models import User
 
 
-def file_directory_path(instance):
-    print(">>>>>>>>",instance)
+def upload_path(instance):
+    # print(">>>>>>>>",instance)
     target_path = 'faker/user_{userid}/{record_key}.csv'.format(userid=instance.user.id,record_key=instance.record_key)
     if os.path.exists(os.path.join(settings.MEDIA_ROOT,target_path)):
         os.remove(os.path.join(settings.MEDIA_ROOT,target_path))
-    return os.path.join(settings.MEDIA_ROOT,target_path)
+    return target_path
 
 # def get (instance, filename):
 #     target_path = 'file/user_{0}/{1}/{2}'.format(instance.user.id,instance.file_key,filename)
@@ -25,7 +25,7 @@ class DataFakerRecordInfo(BaseModel):
     record_key = models.CharField(max_length=255,verbose_name="记录唯一标识",null=False,db_index=True)
     is_delete = models.BooleanField(verbose_name="是否删除",default=False)
     expire_time = models.DateTimeField(verbose_name="过期时间",null=False)
-    file = models.FileField(max_length=255, upload_to=file_directory_path,null=True)
+    file = models.FileField(max_length=255, upload_to=upload_path,null=True)
     download_code = models.CharField(max_length=255,verbose_name="文件下载码",null=True)
     is_finish = models.BooleanField(verbose_name="数据是否已经生成完成",default=False)
     user = models.ForeignKey(to=User,verbose_name="文件上传所属用户",on_delete=models.CASCADE,null=True)
