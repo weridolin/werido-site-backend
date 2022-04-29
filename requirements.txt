@@ -71,4 +71,4 @@ zope.interface==5.4.0
 channels==3.0.3
 daphne==3.0.1
 Twisted==21.2.0
-twisted-iocpsupport==1.0.1
+# twisted-iocpsupport==1.0.1
