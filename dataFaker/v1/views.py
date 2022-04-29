@@ -39,7 +39,8 @@ class FakerRecord(APIView):
         if not download_code:
             return HttpResponseBadRequest(content=f"bad request:download_code can not be None")
         else:
-            record:DataFakerRecordInfo = DataFakerRecordInfo.objects.filter(download_code=download_code,is_finish=True).first()
+            record:DataFakerRecordInfo = DataFakerRecordInfo.objects.filter(
+                download_code=download_code,is_finish=True).first()
             if not record:
                 return HttpResponseNotFound(">>> can not find file!")
             response = FileResponse(record.file.open(mode="rb"),filename=f"{record.record_key}.csv")
@@ -71,37 +72,6 @@ class FakerRecord(APIView):
         return Response(data={"key":record_key,"is_exist":False},status=status.HTTP_200_OK)
 
 from rest_framework.decorators import api_view
-
-@api_view(http_method_names=["POST"])
-def generate_download_code(request):
-    ### 合并文件并生成对应的下载码
-    file_key=request.data.get("file_key",None)
-    if not file_key:
-        return HttpResponseBadRequest(content=f"bad request:file_key can not be None!")
-    down_code = generate_file_key()[:5]
-    print("generate dowload code",down_code)
-    try:
-        ## 合并文件
-        records:list[FileInfo] = FileInfo.objects.filter(file_key=file_key).order_by("chunk_num").all()
-        merge_file_path = get_merge_file_path(records[0],filename=records[0].file_name)
-        target_file_path = os.path.join(settings.MEDIA_ROOT,merge_file_path)
-        with open(target_file_path,"ab") as f:
-            for record in records:
-                with record.file.open(mode="rb") as slice_file:
-                    for chunk in slice_file.chunks():
-                        f.write(chunk)
-        ## 提交删除文件的任务
-        remove_file.delay([os.path.join(settings.MEDIA_ROOT,record.file.name) for record in records])
-        ## 修改其中一条记录,并将多余的删除
-        records[0].update(download_code=down_code,is_merge=True,file = merge_file_path)
-        records[0].save()
-        for record in records[1:]:
-            record.delete()
-        return Response(data={"code":down_code},status=status.HTTP_200_OK)
-    except FileInfo.DoesNotExist:
-        return HttpResponseNotFound("can not find file! please re upload")
-    except Exception as exc:
-        return HttpResponseServerError(content=f"serve error when generate down load code:{str(exc)}")
         
 
 @api_view(http_method_names=["GET"])
