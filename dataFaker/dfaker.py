@@ -65,7 +65,9 @@ async def create_task_async(record_key=None,ws=None):
     async with aiofiles.open(target_path, mode= 'w') as f:
         writer = AsyncWriter(f,lineterminator = '\n')
         index,threshold =0,data_count // 100
-        for item in FakerDataFactory(data_count=data_count,fields_info=fields_info):  
+        data_iterator = FakerDataFactory(data_count=data_count,fields_info=fields_info)
+        await writer.writerow(data_iterator.field_titles) 
+        for item in data_iterator:  
             index+=1
             if index % threshold==0:
                 # ws send progress

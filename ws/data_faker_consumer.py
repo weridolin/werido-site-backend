@@ -57,10 +57,6 @@ class DataFakerConsumer(AsyncWebsocketConsumer):
         except Exception as exc:
             message = f"an error raise:{exc}"
 
-        # await self.send(text_data=json.dumps({
-        #     'message': message
-        # }))
-
     # Receive message from room group
     async def chat_message(self, event):
         message = event['message']

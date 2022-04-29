@@ -22,7 +22,7 @@ class BaseGenerator(object):
 class IntGenerator(BaseGenerator):
 
     def generate(self,min=None,max=None,only_positive=None,only_negative=None,**kwargs):
-        res = random.randint(min or -99999,max or 99999)
+        res = random.randint(int(min) or -99999,int(max) or 99999)
         if only_positive:
             return res if res > 0 else (0-res)
         elif only_negative:
