@@ -36,17 +36,16 @@ class FakerRecord(APIView):
         #     return HttpResponseForbidden("please login first")
         ## 下载文件
         download_code = request.query_params.get("download_code",None)
-        print(">>> down load file",{download_code})
         if not download_code:
             return HttpResponseBadRequest(content=f"bad request:download_code can not be None")
         else:
             record:DataFakerRecordInfo = DataFakerRecordInfo.objects.filter(download_code=download_code,is_finish=True).first()
             if not record:
                 return HttpResponseNotFound(">>> can not find file!")
-            response = FileResponse(record.file.open(mode="rb"),filename=record.file_name)
+            response = FileResponse(record.file.open(mode="rb"),filename=f"{record.record_key}.csv")
             response['Content-Length'] = record.file.size      
             response['Content-Type'] = "application/octet-stream"
-            response['Content-Disposition'] = f'attachment; filename="{urlquote(record.file_name)}"'
+            response['Content-Disposition'] = f'attachment; filename="{urlquote(f"{record.record_key}.csv")}"'
         return response
 
     def post(self,request):
@@ -59,7 +58,7 @@ class FakerRecord(APIView):
         fields = request.data.get("fields",[])
         count = request.data.get("count",0)
         if len(fields)==0 or count==0:
-            return HttpResponseBadRequest(content=f"bad request:fields or count can not be None")
+            return HttpResponseBadRequest(content=f"bad request:fields can not be None and count cannot be None OR 0")
         record_key = generate_file_key()
         record:DataFakerRecordInfo =DataFakerRecordInfo(
             expire_time = datetime.datetime.now()+datetime.timedelta(hours=request.data.get("expire",24)),

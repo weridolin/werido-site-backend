@@ -9,8 +9,8 @@ class DataFakerRecordInfoSerializer(BaseSerializer):
     class Meta:
         model = DataFakerRecordInfo
         fields = '__all__'
-
-    
+        
+            
     def get_timedelta(self,obj):
         expire_time = obj.expire_time.replace(tzinfo=None).timestamp()
         now = datetime.datetime.utcnow().timestamp()

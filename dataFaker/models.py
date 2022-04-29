@@ -14,6 +14,12 @@ def file_directory_path(instance):
         os.remove(os.path.join(settings.MEDIA_ROOT,target_path))
     return os.path.join(settings.MEDIA_ROOT,target_path)
 
+# def get (instance, filename):
+#     target_path = 'file/user_{0}/{1}/{2}'.format(instance.user.id,instance.file_key,filename)
+#     if os.path.exists(os.path.join(settings.MEDIA_ROOT,target_path)):
+#         os.remove(os.path.join(settings.MEDIA_ROOT,target_path))
+#     return 'file/user_{0}/{1}/{2}'.format(instance.user.id,instance.file_key,filename)
+
 class DataFakerRecordInfo(BaseModel):
     # 上传时第一步会发送一个POST请求会生成一个唯一KEY
     record_key = models.CharField(max_length=255,verbose_name="记录唯一标识",null=False,db_index=True)

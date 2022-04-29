@@ -1,4 +1,3 @@
-
 import json,asyncio
 from channels.generic.websocket import AsyncWebsocketConsumer
 from ws.const import WSMessageType
@@ -17,7 +16,6 @@ class DataFakerConsumer(AsyncWebsocketConsumer):
             }    
     """
     async def connect(self):
-        # print(">>>>>>>>>>>",self.scope,type(self.scope))
         self.key = self.scope['url_route']['kwargs']['key']
         self.key_group_name = 'dataFaker_%s' % self.key ## socket连接的唯一标识？
         # Join room group
@@ -26,6 +24,9 @@ class DataFakerConsumer(AsyncWebsocketConsumer):
             self.channel_name
         )
         await self.accept()
+        await self.send(text_data=json.dumps({
+            'message': "hello welcome!"
+        }))
 
     async def disconnect(self, close_code):
         # Leave room group
@@ -38,6 +39,7 @@ class DataFakerConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         try:
             text_data_json = json.loads(text_data)
+            print("receive ws message",text_data_json)
             if text_data_json.get("type",None)== WSMessageType.start:
                 ## START CREATE TASK
                 record_key = text_data_json.get("record_key",None)

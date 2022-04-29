@@ -26,6 +26,7 @@ from dataFaker.models import DataFakerRecordInfo,file_directory_path
 from aiocsv import AsyncWriter
 from ws.const import WSMessageType
 from  asgiref.sync import sync_to_async
+from filebroker.utils import generate_file_key
 
 
 @sync_to_async
@@ -77,8 +78,9 @@ async def create_task_async(record_key=None,ws=None):
                 }   
                 await ws.send(text_data=json.dumps(payload,ensure_ascii=False))
             await writer.writerow(item) #将列表的每个元素写到csv文件的一行
-    await ws.send(text_data=json.dumps({"type":WSMessageType.finish,"record_key":record_key},ensure_ascii=False))
-    await update_record(record=record,file=target_path,is_finish=True)
+    download_code = generate_file_key()[:6]
+    await update_record(record=record,file=target_path,is_finish=True,download_code=download_code)
+    await ws.send(text_data=json.dumps({"type":WSMessageType.finish,"record_key":record_key,"download_code":download_code},ensure_ascii=False))
     return target_path,ws
 
 
