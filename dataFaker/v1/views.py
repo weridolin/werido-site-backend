@@ -16,7 +16,6 @@ from rest_framework.response import Response
 from django.http import HttpResponseBadRequest,HttpResponseForbidden, HttpResponseNotFound,HttpResponseServerError
 import datetime,json
 from rest_framework import status
-from filebroker.models import FileInfo,get_merge_file_path
 import json
 from core import settings
 import os

@@ -24,7 +24,7 @@ class Migration(migrations.Migration):
                 ('record_key', models.CharField(db_index=True, max_length=255, verbose_name='记录唯一标识')),
                 ('is_delete', models.BooleanField(default=False, verbose_name='是否删除')),
                 ('expire_time', models.DateTimeField(verbose_name='过期时间')),
-                ('file', models.FileField(max_length=255, null=True, upload_to=dataFaker.models.file_directory_path)),
+                ('file', models.FileField(max_length=255, null=True, upload_to=dataFaker.models.upload_path)),
                 ('download_code', models.CharField(max_length=255, null=True, verbose_name='文件下载码')),
                 ('is_finish', models.BooleanField(default=False, verbose_name='数据是否已经生成完成')),
                 ('fields', models.JSONField(default=[], verbose_name='字段集')),
