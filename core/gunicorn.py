@@ -7,7 +7,7 @@ threads = 2
 # 监听内网端口5000
 bind = '127.0.0.1:5000'
 # 设置守护进程,将进程交给supervisor管理
-daemon = 'true'
+daemon = 'false'
 # 工作模式协程
 worker_class = 'gevent'
 # 设置最大并发量
