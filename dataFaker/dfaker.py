@@ -65,7 +65,6 @@ async def create_task_async(record_key=None,ws=None):
     if not os.path.exists(os.path.dirname(target_path)):
         os.makedirs(os.path.dirname(target_path))
 
-    print(">>>>>>>>>>>>>>>>>>> begin to create file --> path",target_path)
     async with aiofiles.open(target_path, mode= 'w') as f:
         writer = AsyncWriter(f,lineterminator = '\n')
         index,threshold =0,data_count // 100
