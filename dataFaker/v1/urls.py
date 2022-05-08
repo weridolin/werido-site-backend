@@ -7,6 +7,6 @@ router = routers.SimpleRouter(trailing_slash=False)
 urlpatterns = [
     path('', FakerRecord.as_view(), name='dataFaker'),  
     # path("/downCode",generate_download_code,name="downCode"),
-    path("search/<str:download_code>",search_by_down_code,name="search")
+    path("/search/<str:download_code>",search_by_down_code,name="search")
 ]
 # urlpatterns += router.urls
