@@ -1,6 +1,7 @@
 aiocsv==1.2.2
 aiofiles==0.8.0
 amqp==5.1.1
+anyio==3.5.0
 asgiref==3.5.1
 astroid==2.5.2
 attrs==21.4.0
@@ -37,6 +38,7 @@ gevent==21.12.0
 greenlet==1.1.2
 gunicorn==20.1.0
 h11==0.13.0
+httptools==0.4.0
 hyperlink==21.0.0
 idna==3.2
 importlib-metadata==3.10.0
@@ -58,23 +60,27 @@ Pygments==2.8.1
 pylint==2.7.4
 pyOpenSSL==22.0.0
 python-dateutil==2.8.2
+python-dotenv==0.20.0
 pytz==2022.1
+PyYAML==6.0
 redis==3.5.3
 requests==2.26.0
 service-identity==21.1.0
 six==1.16.0
+sniffio==1.2.0
 sqlparse==0.4.1
 supervisor==4.2.4
 toml==0.10.2
 Twisted==22.4.0
-# twisted-iocpsupport==1.0.2
 txaio==22.2.1
 typed-ast==1.4.2
 typing-extensions
 urllib3==1.26.7
 uvicorn==0.17.6
 vine==5.0.0
+watchgod==0.8.2
 wcwidth==0.2.5
+websockets==10.3
 wrapt==1.12.1
 zipp==3.4.1
 zope.event==4.5.0
