@@ -3,9 +3,6 @@
 """
 
 import asyncio,os,csv,json
-from concurrent.futures import ThreadPoolExecutor
-import re
-
 from django.conf import settings
 from dataFaker import generator
 
@@ -22,6 +19,8 @@ from dataFaker import generator
 #             cw.writerow(item) #将列表的每个元素写到csv文件的一行
 #         #或采用writerows()方法
 #         #cw.writerows(l) #将嵌套列表内容写入csv文件，每个外层元素为一行，每个内层元素为一个数据
+from django import setup
+setup(set_prefix=False)
 
 import aiofiles
 from dataFaker.models import DataFakerRecordInfo,upload_path
