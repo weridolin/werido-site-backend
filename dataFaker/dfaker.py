@@ -19,9 +19,6 @@ from dataFaker import generator
 #             cw.writerow(item) #将列表的每个元素写到csv文件的一行
 #         #或采用writerows()方法
 #         #cw.writerows(l) #将嵌套列表内容写入csv文件，每个外层元素为一行，每个内层元素为一个数据
-from django import setup
-setup(set_prefix=False)
-
 import aiofiles
 from dataFaker.models import DataFakerRecordInfo,upload_path
 from aiocsv import AsyncWriter
@@ -29,6 +26,8 @@ from ws.const import WSMessageType
 from  asgiref.sync import sync_to_async
 from filebroker.utils import generate_file_key
 from core import settings
+from django.http import HttpResponseBadRequest
+from django.core.exceptions import ObjectDoesNotExist
 
 @sync_to_async
 def get_record(record_key):
@@ -44,13 +43,13 @@ def update_record(record,**kwargs):
 async def create_task_async(record_key=None,ws=None):
     try:
         if not record_key:
-            raise DataFakerRecordInfo.DoesNotExist
+            raise HttpResponseBadRequest(F"record key cannot be None")
         record = await get_record(record_key=record_key)
         relative_path = upload_path(instance=record)
         target_path = os.path.join(settings.MEDIA_ROOT,relative_path) 
         data_count = record.count
         fields_info = record.fields
-    except DataFakerRecordInfo.DoesNotExist:
+    except ObjectDoesNotExist:
         payload = {
             "type":WSMessageType.error,
             "data":{
