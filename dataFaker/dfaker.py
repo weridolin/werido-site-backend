@@ -2,11 +2,6 @@
     WS收到开始任务信息 --> 根据条数分割产生任务()--> 开始执行 --> 每完成1%通过WS返回 
 """
 
-import os
-from django import setup
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
-setup(set_prefix=False)
-
 import asyncio,os,csv,json
 from django.conf import settings
 from dataFaker import generator
