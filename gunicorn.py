@@ -5,7 +5,7 @@ workers = 4
 # 指定每个工作者的线程数
 threads = 2
 # 监听内网端口5000
-bind = '127.0.0.1:5000'
+bind = '0.0.0.0.:8000'
 # 设置守护进程,将进程交给supervisor管理
 daemon = 'false'
 # 工作模式协程
