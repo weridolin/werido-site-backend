@@ -13,8 +13,9 @@ from core import settings
 import os
 from django.contrib.auth.models import User
 from  django.http import FileResponse
-from rest_framework.decorators import action
-from django.utils.http import urlquote
+# from django.utils.http import urlquote
+from urllib.parse import urlencode
+# from urllib.parse import 
 from filebroker.utils import is_expired
 from celery_app.tasks import remove_file
 
@@ -35,7 +36,7 @@ class FileOperationViews(APIView):
             response = FileResponse(record.file.open(mode="rb"),filename=record.file_name)
             response['Content-Length'] = record.file.size      
             response['Content-Type'] = "application/octet-stream"
-            response['Content-Disposition'] = f'attachment; filename="{urlquote(record.file_name)}"'
+            response['Content-Disposition'] = f'attachment; filename="{urlencode(record.file_name)}"'
         return response
 
     def post(self,request):

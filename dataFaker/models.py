@@ -1,4 +1,5 @@
 
+from email.policy import default
 import os
 from django.db import models
 from core.base import BaseModel
@@ -30,7 +31,7 @@ class DataFakerRecordInfo(BaseModel):
     is_finish = models.BooleanField(verbose_name="数据是否已经生成完成",default=False)
     user = models.ForeignKey(to=User,verbose_name="文件上传所属用户",on_delete=models.CASCADE,null=True)
     fields = models.JSONField(verbose_name="字段集",null=False,default=[])
-    count = models.IntegerField(verbose_name="数据条数",default=0,null=False)
+    count = models.IntegerField(verbose_name="数据条数",default=-1,null=False)
 
     class Meta:
         db_table = "faker_record"

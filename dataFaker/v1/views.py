@@ -22,7 +22,8 @@ import os
 from django.contrib.auth.models import User
 from  django.http import FileResponse
 from rest_framework.decorators import action
-from django.utils.http import urlquote
+# from django.utils.http import urlquote
+from urllib.parse import urlencode
 from celery_app.tasks import remove_file
 from filebroker.utils import generate_file_key
 from dataFaker.models import DataFakerRecordInfo
@@ -45,7 +46,7 @@ class FakerRecord(APIView):
             response = FileResponse(record.file.open(mode="rb"),filename=f"{record.record_key}.csv")
             response['Content-Length'] = record.file.size      
             response['Content-Type'] = "application/octet-stream"
-            response['Content-Disposition'] = f'attachment; filename="{urlquote(f"{record.record_key}.csv")}"'
+            response['Content-Disposition'] = f'attachment; filename="{urlencode(f"{record.record_key}.csv")}"'
         return response
 
     def post(self,request):

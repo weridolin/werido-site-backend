@@ -35,3 +35,4 @@ class CommentBrief(object):
     @property
     def cache_key(self):
         return f"{self.model}:comments.is_valid"
+

@@ -27,6 +27,7 @@ from django.contrib import admin
 from django.urls import path,include,re_path
 from rest_framework import routers
 from ws.data_faker_consumer import DataFakerConsumer
+# from oauth2_provider.urls
 
 routers = routers.DefaultRouter()
 urlpatterns = [
@@ -34,11 +35,13 @@ urlpatterns = [
     path("api/v1/",include(routers.urls)),
     path("api/v1/blogs/", include("articles.v1.urls")),
     path("api/v2/blogs/", include("articles.v2.urls")),
-    path("api/v1/auth/",include("authentication.urls")),
+    path("api/v1/auth/",include("authentication.v1.urls")),
     path("api/v1/drug/",include("drug.urls")),
     path("api/v1/home/",include("home.urls")),
     path("api/v1/fileBroker",include("filebroker.v1.urls")),
-    path("api/v1/dataFaker",include("dataFaker.v1.urls"))
+    path("api/v1/dataFaker",include("dataFaker.v1.urls")),
+    path("api/v1/oauth", include('oauth.v1.urls')),
+    path("api/oauth/test/",include('oauth2_provider.urls'))
 ]
 
 

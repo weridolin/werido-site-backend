@@ -48,6 +48,8 @@ INSTALLED_APPS = [
     'authentication',
     'django_filters',
     "channels",
+    'oauth.apps.OauthConfig',
+    "oauth2_provider",
 
 ]
 
@@ -109,7 +111,7 @@ TEMPLATES = [
 # WSGI_APPLICATION = 'core.wsgi.application'
 ASGI_APPLICATION = 'core.asgi.application'
 
-# Database
+######################################  Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
 DATABASES = {
@@ -125,7 +127,7 @@ DATABASES = {
     }
 }
 
-
+######################################### cache
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
@@ -206,3 +208,41 @@ CELERY_RESULT_BACKEND = CELERY_BROKER_URL
 #: from unwanted access (see userguide/security.html)
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
+
+
+
+########################### rest framework
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        
+    ),
+    'EXCEPTION_HANDLER': 'utils.exceptions.exceptions_handler'
+}
+
+
+################# oauth provider
+# OAUTH2_PROVIDER = {
+#     # 'SCOPES': {
+#     #     'read': 'Read scope',
+#     #     'write': 'Write scope',
+#     # },
+
+#     # 'CLIENT_ID_GENERATOR_CLASS': 'oauth2_provider.generators.ClientIdGenerator',
+#     'APPLICATION_MODEL':"oauth.OauthModel"
+# }
+#  OAUTH2_PROVIDER_ACCESS_TOKEN_MODEL = "oauth2_provider.AccessToken" 
+# OAUTH2_PROVIDER_APPLICATION_MODEL = "oauth.OauthModel" 
+#  OAUTH2_PROVIDER_REFRESH_TOKEN_MODEL = "oauth2_provider.RefreshToken" 
+#  OAUTH2_PROVIDER_ID_TOKEN_MODEL = "oauth2_provider.IDToken" 
+
+OAUTH2_PROVIDER = {
+    'ACCESS_TOKEN_EXPIRE_SECONDS': 3600,
+    # 'SCOPES_BACKEND_CLASS': 'oauth.backend.DjangoScopes',
+    'APPLICATION_MODEL': 'oauth.OauthModel',
+    'ACCESS_TOKEN_MODEL': 'oauth.AccessTokenModel',
+}
+OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth.OauthModel'
+OAUTH2_PROVIDER_ACCESS_TOKEN_MODEL = 'oauth.AccessTokenModel'
+OAUTH2_PROVIDER_REFRESH_TOKEN_MODEL = "oauth.RefreshTokenModel"
+OAUTH2_PROVIDER_ID_TOKEN_MODEL = "oauth.IDTokenModel"
