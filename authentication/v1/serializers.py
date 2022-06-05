@@ -11,9 +11,11 @@ LastEditTime: 2021-10-31 12:22:49
 from django.contrib.auth.models import User
 from authentication.models import UserProfile,ThirdOauthInfo
 from core.base import BaseSerializer
+from rest_framework import serializers
 
 class UserSerializer(BaseSerializer):
-
+    last_login = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
+    # updated = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
     class Meta:
         model = User
         fields =[
@@ -52,13 +54,13 @@ class UserProfileSerializer(BaseSerializer):
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer,TokenRefreshSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 
-class CustomTokenObtainPairSerialier(TokenObtainPairSerializer):
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         token =  super().get_token(user)
 
         # 增加增定义的字段
-        token["flag"]="tianji"
+        token["flag"]="werido-site"
         roles= []
         for role in user.profile.roles.all():
             roles.append(role.name)
@@ -68,4 +70,4 @@ class CustomTokenObtainPairSerialier(TokenObtainPairSerializer):
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
-    serializer_class=CustomTokenObtainPairSerialier
+    serializer_class=CustomTokenObtainPairSerializer       

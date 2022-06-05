@@ -163,7 +163,7 @@ def filter_profie(info:dict):
     return result
 
 from django.contrib.auth import login,logout,authenticate
-from .serializers import CustomTokenObtainPairSerialier
+from .serializers import CustomTokenObtainPairSerializer
 from django_redis import get_redis_connection
 from redis.client import Redis
 import json
@@ -203,7 +203,7 @@ class AuthApis(viewsets.ModelViewSet):
             #     json.dumps(permissions,ensure_ascii=False))
             
             # refresh_token = RefreshToken.for_user(user) # 默认的token
-            refresh_token = CustomTokenObtainPairSerialier.get_token(user=user) # 添加了自定义的token
+            refresh_token = CustomTokenObtainPairSerializer.get_token(user=user) # 添加了自定义的token
             data= {
                 "access_token":str(refresh_token.access_token),
                 "refresh_token":str(refresh_token),

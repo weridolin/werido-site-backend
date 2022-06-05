@@ -222,27 +222,17 @@ REST_FRAMEWORK = {
 
 
 ################# oauth provider
-# OAUTH2_PROVIDER = {
-#     # 'SCOPES': {
-#     #     'read': 'Read scope',
-#     #     'write': 'Write scope',
-#     # },
 
-#     # 'CLIENT_ID_GENERATOR_CLASS': 'oauth2_provider.generators.ClientIdGenerator',
-#     'APPLICATION_MODEL':"oauth.OauthModel"
-# }
-#  OAUTH2_PROVIDER_ACCESS_TOKEN_MODEL = "oauth2_provider.AccessToken" 
-# OAUTH2_PROVIDER_APPLICATION_MODEL = "oauth.OauthModel" 
-#  OAUTH2_PROVIDER_REFRESH_TOKEN_MODEL = "oauth2_provider.RefreshToken" 
-#  OAUTH2_PROVIDER_ID_TOKEN_MODEL = "oauth2_provider.IDToken" 
 
 OAUTH2_PROVIDER = {
     'ACCESS_TOKEN_EXPIRE_SECONDS': 3600,
-    # 'SCOPES_BACKEND_CLASS': 'oauth.backend.DjangoScopes',
-    'APPLICATION_MODEL': 'oauth.OauthModel',
+    # 'SCOPES_BACKEND_CLASS': 'oauth2_provider.oauth2_backends.JSONOAuthLibCore',
+    'APPLICATION_MODEL': 'oauth.OauthApplicationModel',
     'ACCESS_TOKEN_MODEL': 'oauth.AccessTokenModel',
+    # "ACCESS_TOKEN_GENERATOR": "oauth.utils.oauth_token_generator"
 }
-OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth.OauthModel'
+OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth.OauthApplicationModel'
 OAUTH2_PROVIDER_ACCESS_TOKEN_MODEL = 'oauth.AccessTokenModel'
 OAUTH2_PROVIDER_REFRESH_TOKEN_MODEL = "oauth.RefreshTokenModel"
 OAUTH2_PROVIDER_ID_TOKEN_MODEL = "oauth.IDTokenModel"
+OAUTH2_PROVIDER_GRANT_MODEL= "oauth.OauthGrantModel"

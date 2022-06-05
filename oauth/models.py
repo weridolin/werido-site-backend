@@ -8,16 +8,16 @@ from oauth2_provider.models import (
     AbstractAccessToken,
     AbstractRefreshToken
     ) 
+from oauth2_provider.models import generate_client_secret
 
-
-class OauthGrant(AbstractGrant):
+class OauthGrantModel(AbstractGrant):
     class Meta:
         swappable = "OAUTH2_PROVIDER_GRANT_MODEL"
         db_table = "oauthGrant"
         verbose_name = u'oauthGrant'
         verbose_name_plural = verbose_name        
 
-class OauthModel(AbstractApplication):
+class OauthApplicationModel(AbstractApplication):
     class Meta:
         swappable = "OAUTH2_PROVIDER_APPLICATION_MODEL"
         db_table = "oauthApplication"
@@ -32,7 +32,7 @@ class OauthModel(AbstractApplication):
         (CLIENT_PUBLIC, _("公开")),
     )
 
-    GRANT_AUTHORIZATION_CODE = "code"
+    GRANT_AUTHORIZATION_CODE = "authorization-code"
     GRANT_IMPLICIT = "implicit"
     GRANT_PASSWORD = "password"
     GRANT_CLIENT_CREDENTIALS = "client-credentials"
@@ -44,7 +44,15 @@ class OauthModel(AbstractApplication):
         (GRANT_CLIENT_CREDENTIALS, _("Client credentials")),
         (GRANT_OPENID_HYBRID, _("OpenID connect hybrid")),
     )
-
+    
+    authorization_grant_type = models.CharField(max_length=32, choices=GRANT_TYPES)
+    client_secret_src = models.CharField(
+        max_length=255,
+        blank=True,
+        default=generate_client_secret,
+        db_index=True,
+        help_text=_("secret src code before hash"),
+    )
 
 class AccessTokenModel(AbstractAccessToken):
     class Meta(AbstractAccessToken.Meta):

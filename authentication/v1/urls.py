@@ -12,7 +12,7 @@ from rest_framework import routers
 from django.urls import path,re_path
 from .api import UserProfileApis,AuthApis
 from rest_framework_simplejwt.views import TokenObtainPairView,TokenRefreshView
-from authentication.v1.serializers import CustomTokenObtainPairSerialier,CustomTokenObtainPairView
+from authentication.v1.serializers import CustomTokenObtainPairSerializer,CustomTokenObtainPairView
 
 router = routers.SimpleRouter(trailing_slash=False)
 router.register("user",viewset=UserProfileApis,basename="user")
