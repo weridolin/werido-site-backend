@@ -9,3 +9,4 @@ urlpatterns = [
     path("/search/<str:download_code>",search_by_down_code,name="search")
 ]
 # urlpatterns += router.urls
+

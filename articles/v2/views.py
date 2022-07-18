@@ -20,8 +20,7 @@ from rest_framework.settings import IMPORT_STRINGS
 from articles.v1.serializers import *
 from articles.models import *
 # Create your views here.
-from rest_framework.exceptions import UnsupportedMediaType
-from django.http import Http404,HttpResponseBadRequest,HttpResponseNotFound,HttpResponseNotAllowed
+
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -31,6 +30,8 @@ from rest_framework.parsers import JSONParser,FormParser
 from rest_framework.decorators import parser_classes
 from articles.v1.signals import update_pre_and_next,update_pre_and_next_signal
 from collections import OrderedDict
+from utils.http_ import HTTPResponse
+
 
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.decorators import action
@@ -87,17 +88,17 @@ class ArticleViewsSet(ModelViewSet):
     @action(methods=["GET"],detail=False,url_name="article-search")
     def search(self,request):
         """文章检索，检索条件可以为:title/tag/type """
-        print(request.query_params)
+        print("查询文章",request.query_params)
         filter_article_list = ArticleFilterSet(request.query_params,queryset=self.get_queryset()).qs
         serializer = ArticleBriefSerializer(filter_article_list, many=True)
         # return ArticlePagination().get_paginated_response(data=serializer.data)
-        return Response(serializer.data,status=status.HTTP_200_OK)
+        return HTTPResponse(data=serializer.data,status=status.HTTP_200_OK)
     
     @action(methods=["GET"],detail=False,url_name="article-count")
     def count(self,request):
         """统计文章总数，检索条件可以为:title/tag/type """
         filter_article_list = ArticleFilterSet(request.query_params,queryset=self.get_queryset()).qs
-        return Response({"count":len(filter_article_list)},status=status.HTTP_200_OK)
+        return HTTPResponse(data={"count":len(filter_article_list)},status=status.HTTP_200_OK)
   
 
 

@@ -16,13 +16,16 @@ from articles.v2.views import ArticleViewsSet,TagViewsSet,TypesViewsSet
 app_name="blog"
 
 router = routers.SimpleRouter(trailing_slash=False)
-router.register(r"articles",ArticleViewsSet,basename="articles")
-router.register(r"articles_tags",TagViewsSet,basename="articles-tags")
-router.register(r"articles_types",TypesViewsSet,basename="articles-types")
+router.register("articles",ArticleViewsSet,basename="articles")
+router.register("articlesTags",TagViewsSet,basename="articles-tags")
+router.register("articlesTypes",TypesViewsSet,basename="articles-types")
 urlpatterns =[
 
 ]
 urlpatterns += router.urls
+
+
+
 
 
 

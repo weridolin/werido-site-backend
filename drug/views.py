@@ -8,11 +8,8 @@ platform: windows 10
 LastEditors: lhj
 LastEditTime: 2021-10-04 23:09:43
 '''
-from inspect import FrameInfo, indentsize
-from django.db import models
-from django.shortcuts import render
-
 # Create your views here.
+from django import http
 from rest_framework import viewsets
 from rest_framework.response import Response
 from drug.serializers import DrugWordsSerializer
@@ -24,6 +21,7 @@ from utils.helper import queryset2list
 import json
 from rest_framework.decorators import action
 from rest_framework import status
+from utils.http_ import HTTPResponse
 
 class DrugWordsViewSet(viewsets.ModelViewSet):
     serializer_class = DrugWordsSerializer
@@ -59,4 +57,4 @@ class DrugWordsViewSet(viewsets.ModelViewSet):
                 print("last id== index",index)
         item  = queryset[index]
         serializer = DrugWordsSerializer(instance=item)
-        return Response(serializer.data,status=status.HTTP_200_OK)
+        return HTTPResponse(data=serializer.data,status=status.HTTP_200_OK,app_code="drug")

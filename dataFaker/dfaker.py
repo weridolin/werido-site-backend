@@ -88,7 +88,12 @@ async def create_task_async(record_key=None,ws=None):
             await writer.writerow(item) #将列表的每个元素写到csv文件的一行
     download_code = generate_file_key()[:6]
     await update_record(record=record,file=relative_path,is_finish=True,download_code=download_code)
-    await ws.send(text_data=json.dumps({"type":WSMessageType.finish,"record_key":record_key,"download_code":download_code},ensure_ascii=False))
+    await ws.send(text_data=json.dumps({
+        "type":WSMessageType.finish,
+        "record_key":record_key,
+        "data":{
+            "download_code":download_code}
+        },ensure_ascii=False))
     return target_path,ws
 
 

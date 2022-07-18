@@ -7,10 +7,9 @@
 
 
 '''
-
-
-
 # Create your views here.
+
+from email.message import Message
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.http import HttpResponseBadRequest,HttpResponseForbidden, HttpResponseNotFound,HttpResponseServerError
@@ -23,11 +22,12 @@ from django.contrib.auth.models import User
 from  django.http import FileResponse
 from rest_framework.decorators import action
 # from django.utils.http import urlquote
-from urllib.parse import urlencode
+from urllib.parse import unquote
 from celery_app.tasks import remove_file
 from filebroker.utils import generate_file_key
 from dataFaker.models import DataFakerRecordInfo
 from dataFaker.v1.serializers import DataFakerRecordInfoSerializer
+from utils.http_ import HTTPResponse
 
 class FakerRecord(APIView):
     
@@ -46,7 +46,7 @@ class FakerRecord(APIView):
             response = FileResponse(record.file.open(mode="rb"),filename=f"{record.record_key}.csv")
             response['Content-Length'] = record.file.size      
             response['Content-Type'] = "application/octet-stream"
-            response['Content-Disposition'] = f'attachment; filename="{urlencode(f"{record.record_key}.csv")}"'
+            response['Content-Disposition'] = f'attachment; filename="{unquote(f"{record.record_key}.csv")}"'
         return response
 
     def post(self,request):
@@ -59,7 +59,11 @@ class FakerRecord(APIView):
         fields = request.data.get("fields",[])
         count = request.data.get("count",0)
         if len(fields)==0 or count==0:
-            return HttpResponseBadRequest(content=f"bad request:fields can not be None and count cannot be None OR 0")
+            return HTTPResponse(
+                message=f"bad request:fields can not be None and count cannot be None OR 0",
+                code=-1,
+                status=status.HTTP_400_BAD_REQUEST,
+                app_code="dataFaker")
         record_key = generate_file_key()
         record:DataFakerRecordInfo =DataFakerRecordInfo(
             expire_time = datetime.datetime.now()+datetime.timedelta(hours=request.data.get("expire",24)),
@@ -69,7 +73,7 @@ class FakerRecord(APIView):
             record_key =record_key,
         )
         record.save()
-        return Response(data={"key":record_key,"is_exist":False},status=status.HTTP_200_OK)
+        return HTTPResponse(data={"key":record_key,"is_exist":False},status=status.HTTP_200_OK,app_code="dataFaker")
 
 from rest_framework.decorators import api_view
         
@@ -79,9 +83,10 @@ def search_by_down_code(request,download_code=None):
     if not download_code:
         return HttpResponseBadRequest(content=f"bad request:download_code can not be None")
     else:
-        records = DataFakerRecordInfo.objects.filter(download_code=download_code,is_finish=True).all()
-        if len(records)>1:
-            return HttpResponseServerError(content="find more than one file!")
-        res = DataFakerRecordInfoSerializer(records,many=True).data
-        return Response(data={"data":res},status=status.HTTP_200_OK)
+        try:
+            record = DataFakerRecordInfo.objects.filter(download_code=download_code,is_finish=True).first()
+        except DataFakerRecordInfo.DoesNotExist:
+            return HTTPResponse(message="find more than one file!",status=status.HTTP_400_BAD_REQUEST,app_code="dataFaker",code=-1)
+        res = DataFakerRecordInfoSerializer(record).data
+        return HTTPResponse(data=res,status=status.HTTP_200_OK,app_code="dataFaker")
 

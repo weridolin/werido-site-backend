@@ -1,65 +1,76 @@
-import re
-from time import sleep
-def get_undefined_variable_from_code(code,_global,_locals):
-    ### 获取一段PYTHON代码中未定义的变量名称
-    try:
-        eval(code,_global,_locals)
-    except NameError as exc:
-        # 获取未定义的变量名
-        undefined_var_name = re.search(pattern="\'(.*)\'",string=exc.__str__()).group().replace("'","").strip()
-        print(undefined_var_name)
-    except Exception as exc:
-        print("该python表达式不合法")
 
-def get_all_undefined_variable_from_code(code):
-    _global = globals().copy()
-    _local  = locals().copy()
-    res = []
-    class TemValue(object):
+# {type:"logp",# }
 
-        def __getattribute__(self, __name: str):
-            return self
 
-        def __call__(self, *args,**kwds):
-            return self
+class Line:
+    def __init__(self,code,breakpoint,id) -> None:
+        self.code=code
+        self.breakpoint=breakpoint
+        self.id=id
 
-        def __add__(self,other):
-            return self
+class LoopGen:
+
+    stop_at_loop_condition:False
+    already_loop_count:int=0
+    items:list[Line] =["a=2","b=3","print(a)","print(b)"]
+    # loop_conditions={"type":"range","start":0,"end":10,"step":1}
+
+    def update_items(self,new_items):
+        self.items = new_items
+        ...
+
+    def parse(self,data):
+        ...
+
+    def run(self):
+        if self.stop_at_loop_condition:
+            globals().update(locals())
+            yield
         
-        __sub__ = __add__ 
-        __mul__ = __add__ 
-        __truediv__ = __add__
+        while not self.is_end_loop():
+            self.already_loop_count+=1
+            for i in self.items:
+                if i.breakpoint:
+                    yield
+                else:
+                    exec(i)
+                    globals().update(locals())
 
-    while True:
-        try:
-            eval(code,_global,_local)
-            return res # 没有未定义的变量
-        except NameError as exc:       
-            undefined_var_name = re.search(pattern="\'(.*)\'",string=exc.__str__()).group().replace("'","").strip()
-            res.append(undefined_var_name)
-            _local.update({
-                undefined_var_name:TemValue()
-            })
-        # except AttributeError as exc:
-        #     print(exc.args)
-        #     raise
-        except Exception as exc:
-            return res # 语法错误，直接返回
+    def is_end_loop(self):
+        if self.already_loop_count >=4:
+            return True
+        return False
 
 
+def _exec(code):
+    if isinstance(code,"str"):
+        exec(code)
+    elif isinstance:
+        ...
 
-# r = get_all_undefined_variable_from_code('func([2,3.4,d,func2(s,3,d+f"{a}")])')
-r = get_all_undefined_variable_from_code('func(b+2+adads,t*s,i/d)')
-print(r)
+loop_gen = LoopGen()
+gen = loop_gen.run()
 
-# class ADD:
-#     def __add__(self,other):
-#         return self
-    
-#     def __mul__(self,other):
-#         return self
+# for i in range(10):
+code:Line = gen.send(None)
+while code.breakpoint:
+    LoopGen.items[1]="b=4"
+    gen.send(None)
+    gen.send(None)
+    gen.send(None)
+    gen.send(None)
+    print(globals())
 
-# print(ADD()+1,ADD()*2)
+# for code in codes:
+#     exec(code)
+# print(globals(),locals)
 
-
+# import time
+# t = [1,2,3,4]
+# for i in t:
+#     # t.append(5)
+#     t.insert(0,5)
+#     print(t)
+#     print(i)
+#     time.sleep(2)
 

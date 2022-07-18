@@ -92,7 +92,7 @@ class SiteCommentViewsSet(viewsets.ModelViewSet):
             self.ip = socket.gethostbyname(socket.gethostname())
         location = parse_ip(ip=self.ip)
         new_comment = SiteComments.objects.create(
-            body = request.data.get("content",""),
+            body = request.data.get("body",""),
             qq = request.data.get("qq",""),
             email = request.data.get("email",""),
             name = request.data.get("name",""),

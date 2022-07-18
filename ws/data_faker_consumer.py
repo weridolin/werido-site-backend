@@ -25,11 +25,14 @@ class DataFakerConsumer(AsyncWebsocketConsumer):
         )
         await self.accept()
         await self.send(text_data=json.dumps({
-            'message': "hello welcome!"
-        }))
+                "type":WSMessageType.start,
+                "data":{},
+                "record_key":self.key
+            })
+        )
 
     async def disconnect(self, close_code):
-        # Leave room group
+        print(f">>> close websocket 链接({self.key})")
         await self.channel_layer.group_discard(
             self.key_group_name,
             self.channel_name
@@ -57,7 +60,6 @@ class DataFakerConsumer(AsyncWebsocketConsumer):
         except Exception as exc:
             message = f"an error raise:{exc}"
 
-    # Receive message from room group
     async def chat_message(self, event):
         message = event['message']
         # Send message to WebSocket
