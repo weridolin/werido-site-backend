@@ -99,7 +99,24 @@ class ArticleViewsSet(ModelViewSet):
         """统计文章总数，检索条件可以为:title/tag/type """
         filter_article_list = ArticleFilterSet(request.query_params,queryset=self.get_queryset()).qs
         return HTTPResponse(data={"count":len(filter_article_list)},status=status.HTTP_200_OK)
-  
+
+    @action(methods=["POST"],detail=False,url_name="articleStatusUpdate")
+    def update_status(self,request):
+        print("更新文章状态",request.data)
+        id = request.data.get("id",None)
+        if not id:
+            return HTTPResponse(status=status.HTTP_400_BAD_REQUEST,message="article id can not be None",code=-1)
+        try:
+            article = Article.objects.get(id=id)
+            # Article.objects.filter(id=id).update(**request.data)
+        except Article.DoesNotExist:
+            return HTTPResponse(status=status.HTTP_404_NOT_FOUND,message="can not find article",code=-1)
+        status_params = request.data
+        for k,v in status_params.items():
+            if k!="id":
+                setattr(article,k,v)
+        article.save()
+        return HTTPResponse(message="update success",status=status.HTTP_200_OK)
 
 
 class TagViewsSet(ModelViewSet):

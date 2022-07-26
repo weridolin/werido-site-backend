@@ -167,7 +167,7 @@ from .serializers import CustomTokenObtainPairSerializer
 from django_redis import get_redis_connection
 from redis.client import Redis
 import json
-
+import time
 
 class AuthApis(viewsets.ModelViewSet):
 
@@ -186,6 +186,9 @@ class AuthApis(viewsets.ModelViewSet):
     
     @action(methods=["POST"],detail=False,url_path="login")
     def login(self,request):
+        print(request.data)
+        for i in range(6):
+            time.sleep(2)
         username = request.data.get("username",None)
         password = request.data.get("password",None)
         user = authenticate(request, username=username, password=password)
@@ -217,9 +220,13 @@ class AuthApis(viewsets.ModelViewSet):
                 status=status.HTTP_200_OK
             )
         else:
-            return HttpResponseForbidden(
-                HTTPResponse.build(code=status.HTTP_403_FORBIDDEN,message="账户名或密码错误!").to_json()
+            return HTTPResponse(
+                code=-1,
+                status=status.HTTP_403_FORBIDDEN,
+                message="账户名或密码错误!",
+                app_code="auth"
             )
+        
         
 
     @action(methods=["POST"],detail=False)
@@ -235,3 +242,5 @@ class AuthApis(viewsets.ModelViewSet):
             app_code="auth",
             message="logout success"
         )
+
+
