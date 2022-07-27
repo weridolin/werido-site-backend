@@ -60,7 +60,7 @@ mccabe==0.6.1
 numpy
 oauthlib==3.2.0
 openpyxl==3.0.9
-pandas==1.4.2
+pandas
 Pillow==8.1.2
 prompt-toolkit==3.0.29
 psycopg2==2.8.6
