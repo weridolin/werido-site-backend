@@ -186,9 +186,6 @@ class AuthApis(viewsets.ModelViewSet):
     
     @action(methods=["POST"],detail=False,url_path="login")
     def login(self,request):
-        print(request.data)
-        for i in range(6):
-            time.sleep(2)
         username = request.data.get("username",None)
         password = request.data.get("password",None)
         user = authenticate(request, username=username, password=password)
