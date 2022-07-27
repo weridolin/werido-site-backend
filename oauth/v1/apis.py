@@ -1,4 +1,4 @@
-from numpy import rec
+
 from rest_framework.generics import CreateAPIView
 from rest_framework.permissions import IsAuthenticated,AllowAny,IsAdminUser
 from oauth.v1.serializers import ApplicationSerializer,ApplicationBriefSerializer
