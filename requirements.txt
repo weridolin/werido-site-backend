@@ -24,7 +24,7 @@ constantly==15.1.0
 cryptography==36.0.2
 daphne==3.0.2
 Deprecated==1.2.13
-Django==4.0.4
+Django
 django-cors-headers==3.7.0
 django-filter==21.1
 django-js-asset==1.2.2
