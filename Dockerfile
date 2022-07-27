@@ -1,5 +1,5 @@
  # 建立 python3.7 环境
-FROM python:3.7
+FROM python:3.9
 
 
  # 设置 python 环境变量
