@@ -111,6 +111,8 @@ class UserProfileApis(viewsets.ModelViewSet):
         new_user.save()
         created_done.send(sender=new_user.__class__, created=True,
                         instance=new_user, **filter_profie(request.data))
+        # from core.celery import send_welcome_mail
+        # send_welcome_mail.delay(receiver=email)
         return HTTPResponse(
             code=status.HTTP_200_OK,message=f"created user:{username} success!",app_code="auth"
         )

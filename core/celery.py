@@ -20,8 +20,8 @@ app.autodiscover_tasks()
 app.autodiscover_tasks()
 
 import smtplib
-from django.conf import settings
 import datetime
+from core import settings
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
@@ -30,12 +30,12 @@ from jinja2 import Environment
 
 @app.task
 def send_welcome_mail(receiver,**kwargs):
-        host = getattr(settings,"EMAIL_HOST","smtp.qq.com")  
-        mail_user = getattr(settings,"EMAIL_USER","weridolin@qq.com")   # 密码(部分邮箱为授权码)
-        mail_pass = getattr(settings,"EMAIL_PWD","hcxavwnfxybmcbdb")   # 邮件发送方邮箱地址
-        # host = "smtp.qq.com"
-        # mail_user = "weridolin@qq.com"   
-        # mail_pass = "hcxavwnfxybmcbdb"
+        # host = getattr(settings,"EMAIL_HOST","smtp.qq.com")  
+        # mail_user = getattr(settings,"EMAIL_USER","weridolin@qq.com")   # 密码(部分邮箱为授权码)
+        mail_pass = os.environ.get("EMAIL_PWD",None)   # 邮件发送方邮箱地址
+        print(">>>>>>>> get mail pass",mail_pass)
+        host = "smtp.qq.com"
+        mail_user = "weridolin@qq.com"   
         sender = mail_user
         # receivers = ["359066432@qq.com;notification@ibrpa.com"]  # 邮件接受方邮箱地址，注意需要[]包裹，这意味着你可以写多个邮件地址群发
         receiver =[f"{receiver};{sender}"]
@@ -56,8 +56,8 @@ def send_welcome_mail(receiver,**kwargs):
             img.add_header("Content-ID", "<content>")
             message.attach(img)
 
-        message['Subject'] = Header("田鸡计划注册成功","utf-8") # 发送方信息
-        message['From'] = Header("田鸡计划","utf-8")  # 接受方信息
+        message['Subject'] = Header("注册成功","utf-8") # 发送方信息
+        message['From'] = Header("林叔叔是个怪叔叔","utf-8")  # 接受方信息
         message['To'] = ','.join(receiver)   # 登录并发送邮件
 
         # import time
