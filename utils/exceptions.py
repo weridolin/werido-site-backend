@@ -31,7 +31,7 @@ def exceptions_handler(exc,content):
         return HTTPResponse(
             code=-1,
             status = status.HTTP_403_FORBIDDEN,
-            message="当前用户没有改操作的权限",
+            message=f"操作不被允许!({exc.detail})",
             app_code="oauth"
         )  
     if isinstance(exc,MethodNotAllowed):

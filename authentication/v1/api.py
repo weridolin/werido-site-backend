@@ -37,10 +37,10 @@ class IsUserAlreadyExistPermission(permissions.BasePermission):
             telephone = request.data.get("telephone", None)
             if username:
                 if User.objects.filter(username=username).exists():
-                    IsUserAlreadyExistPermission.message = f"username:{username} is already exist"
+                    IsUserAlreadyExistPermission.message = f"user:{username} is already exist"
                     return False
             if email:
-                if User.objects.filter(email=email).exists():
+                if User.objects.filter(email=email).exists(): # TODO 改成唯一
                     # IsUserAlreadyExistPermission.message = f"email:{email} is already exist"
                     return True
             if telephone:
