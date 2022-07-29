@@ -33,7 +33,6 @@ def send_welcome_mail(receiver,**kwargs):
         # host = getattr(settings,"EMAIL_HOST","smtp.qq.com")  
         # mail_user = getattr(settings,"EMAIL_USER","weridolin@qq.com")   # 密码(部分邮箱为授权码)
         mail_pass = os.environ.get("EMAIL_PWD",None)   # 邮件发送方邮箱地址
-        print(">>>>>>>> get mail pass",mail_pass)
         host = "smtp.qq.com"
         mail_user = "weridolin@qq.com"   
         sender = mail_user
@@ -44,7 +43,7 @@ def send_welcome_mail(receiver,**kwargs):
         
         mail_body = Environment().from_string(mail_body).render(
         date=datetime.datetime.now().strftime('%Y-%m-%d'),
-        number="10",site="www.baidu.com")
+        number=kwargs.get("number",10))
     
         message = MIMEMultipart("alternative")
         message.attach(MIMEText(mail_body, _subtype='html', _charset='utf-8'))

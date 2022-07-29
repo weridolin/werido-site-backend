@@ -109,8 +109,9 @@ class UserProfileApis(viewsets.ModelViewSet):
             username=username, email=email)
         new_user.set_password(password) # 密码不能明文保存
         new_user.save()
+        count = User.objects.count() 
         created_done.send(sender=new_user.__class__, created=True,
-                        instance=new_user, **filter_profie(request.data))
+                        instance=new_user, number=count+1,**filter_profie(request.data))          
         # from core.celery import send_welcome_mail
         # send_welcome_mail.delay(receiver=email)
         return HTTPResponse(
