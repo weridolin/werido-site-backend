@@ -29,7 +29,7 @@ from email.header import Header
 from jinja2 import Environment
 
 @app.task
-def send_welcome_mail(receiver,**kwargs):
+def send_welcome_mail(receiver,number,**kwargs):
         # host = getattr(settings,"EMAIL_HOST","smtp.qq.com")  
         # mail_user = getattr(settings,"EMAIL_USER","weridolin@qq.com")   # 密码(部分邮箱为授权码)
         mail_pass = os.environ.get("EMAIL_PWD",None)   # 邮件发送方邮箱地址

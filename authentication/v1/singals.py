@@ -22,7 +22,7 @@ from core.celery import send_welcome_mail
 
 #django 的signal是同步执行，如果耗时操作（发送邮件或者email,不建议用信号来处理）
 @receiver(created_done,sender=User,dispatch_uid="create-profile")
-def created_user_profile(sender,instance,created=False,**kwargs):
+def created_user_profile(sender,instance,created=False,number=10,**kwargs):
     if created:
         new = UserProfile.objects.create(user=instance)
         try:
@@ -32,5 +32,5 @@ def created_user_profile(sender,instance,created=False,**kwargs):
             pass
         new.save()
         if instance.email:
-            send_welcome_mail.delay(receiver=instance.email,**kwargs)
+            send_welcome_mail.delay(receiver=instance.email,number=number,**kwargs)
             
