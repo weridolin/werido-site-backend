@@ -10,7 +10,7 @@ LastEditTime: 2021-11-18 00:37:56
 '''
 from django.contrib import admin
 from django.db import models
-from .models import UserProfile,UserRoleMemberShip
+from .models import UserProfile,ThirdOauthInfo
 # Register your models here.
 
 ## 多对多中间模型 admin显示
@@ -32,3 +32,8 @@ class AdminRole(admin.ModelAdmin):
         return ','.join(role_list)
 
     show_roles.short_description = "角色" 
+
+
+@admin.register(ThirdOauthInfo)
+class AdminRole(admin.ModelAdmin):
+    ...

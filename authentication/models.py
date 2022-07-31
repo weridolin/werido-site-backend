@@ -79,7 +79,6 @@ class ThirdOauthInfo(BaseModel):
     oauth_avatar_url = models.CharField(max_length=256,verbose_name="头像链接url",null=True,blank=True)
     is_bind = models.BooleanField(verbose_name="是否已经绑定账户",null=False,blank=False,default=False)
 
-
     @classmethod
     def from_gitee(cls,*args,**kwargs):
         return cls(

@@ -8,6 +8,7 @@ platform: windows 10
 LastEditors: lhj
 LastEditTime: 2021-10-31 12:22:49
 '''
+from pyexpat import model
 from django.contrib.auth.models import User
 from authentication.models import UserProfile,ThirdOauthInfo
 from core.base import BaseSerializer
@@ -49,6 +50,12 @@ class UserProfileSerializer(BaseSerializer):
         """this is created"""
         return super().create(validated_data)
 
+
+class OauthInfoSerializer(BaseSerializer):
+    class Meta:
+        model=ThirdOauthInfo
+        fields = "__all__"
+        depth = 1
 
 
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer,TokenRefreshSerializer
