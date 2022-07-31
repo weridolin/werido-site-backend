@@ -32,5 +32,5 @@ def created_user_profile(sender,instance,created=False,number=10,**kwargs):
             pass
         new.save()
         if instance.email:
-            send_welcome_mail.delay(receiver=instance.email,number=number,**kwargs)
+            send_welcome_mail.delay(receiver=instance.email,number=number)
             
