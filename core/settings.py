@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     "channels",
     'oauth.apps.OauthConfig',
     "oauth2_provider",
+    "thirdApis.apps.ThirdapisConfig"
 
 ]
 
@@ -110,7 +111,7 @@ TEMPLATES = [
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [],
         'APP_DIRS': True,
-        'OPTIONS': {
+        'OPTIONS': { 
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',

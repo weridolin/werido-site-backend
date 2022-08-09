@@ -41,7 +41,9 @@ urlpatterns = [
     path("api/v1/fileBroker",include("filebroker.v1.urls")),
     path("api/v1/dataFaker",include("dataFaker.v1.urls")),
     path("api/v1/oauth", include('oauth.v1.urls')),
+    path("api/v1/third",include('thirdApis.urls')),
     path("api/oauth/test/",include('oauth2_provider.urls'))
+
 ]
 
 

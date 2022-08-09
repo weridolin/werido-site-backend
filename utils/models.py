@@ -36,3 +36,11 @@ class CommentBrief(object):
     def cache_key(self):
         return f"{self.model}:comments.is_valid"
 
+
+@dataclasses.dataclass
+class ShortUrlKey(object):
+    app:str="thirdApis"
+
+    @classmethod
+    def create(cls,short_number):
+        return f"{cls.app}:shortUrl:{short_number}"
