@@ -19,26 +19,32 @@ class ShortUrlRecordApis(CreateAPIView):
         timedelta = request.data.pop("expire_time",24*3600)
         expire_time = datetime.datetime.now()+datetime.timedelta(seconds=timedelta)
         long_url = request.data.pop("url")
-        count = self.queryset.count()
-        record:ShortUrlRecords = ShortUrlRecords.objects.filter(type=request.data.get("type","self"),url=long_url).first()
-        if record:
-            conn:Redis = get_redis_connection("default") # return redis client:<redis.client.Redis>
-            conn.set(ShortUrlKey.create(record.short_flag),record.url,ex=timedelta)
-            return HTTPResponse(data=ShortUrlSerializer(record).data,message="create short url success" ,app_code="thirdApis")
-
+        count = ShortUrlRecords.objects.count()
         short_flag = longUrl2Short(count=count)
-        print(f">>> change {long_url} to short url {short_flag}")
-        serializer = self.get_serializer(data={
-            "url":long_url,
-            "expire_time":expire_time,
-            "short_flag":short_flag,
-            **request.data
-        })
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
+        record  = ShortUrlRecords.objects.filter(
+            url=long_url,
+            # expire_time=expire_time,
+            # short_flag=short_flag,
+            type=request.data.get("type","self"),
+            # description=request.data.get("description",None)
+        ).first()
+        if record:
+            record.expire_time=expire_time
+            record.save()
+        else:
+            record = ShortUrlRecords(
+                url=long_url,
+                expire_time=expire_time,
+                short_flag=short_flag,
+                type=request.data.get("type","self"),
+                description=request.data.get("description",None)
+            )
+            record.save()
+        print(f">>> change {long_url} to short url {short_flag} expire time {expire_time}")
+        # self.perform_create(serializer)
         conn:Redis = get_redis_connection("default") # return redis client:<redis.client.Redis>
         conn.set(ShortUrlKey.create(short_flag),long_url,ex=timedelta)
-        return HTTPResponse(data=serializer.data,message="create short url success" ,app_code="thirdApis")
+        return HTTPResponse(data=ShortUrlSerializer(record).data,message="create short url success" ,app_code="thirdApis")
 
 
 def longUrl2Short(count):
