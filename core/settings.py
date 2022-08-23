@@ -216,7 +216,7 @@ SESSION_COOKIE_AGE = 200 #
 
 
 ############## CELERY ################3333
-CELERY_BROKER_URL = f"redis://:{os.environ.get('REDIS_PASSWORD','werido')}@{os.environ.get('REDIS_HOST','127.0.0.1')}:{os.environ.get('REDIS_PORT','6379')}/0"
+CELERY_BROKER_URL = f"redis://:{os.environ.get('REDIS_PASSWORD','werido')}@{os.environ.get('REDIS_HOST','8.131.78.84')}:{os.environ.get('REDIS_PORT','6379')}/0"
 CELERY_RESULT_BACKEND = CELERY_BROKER_URL
 #: Only add pickle to this list if your broker is secured
 #: from unwanted access (see userguide/security.html)
