@@ -62,7 +62,8 @@ INSTALLED_APPS = [
     "channels",
     'oauth.apps.OauthConfig',
     "oauth2_provider",
-    "thirdApis.apps.ThirdapisConfig"
+    "thirdApis.apps.ThirdapisConfig",
+    "django_celery_beat"
 
 ]
 
@@ -148,7 +149,7 @@ CACHES = {
         "LOCATION": f"redis://:{os.environ.get('REDIS_PASSWORD','werido')}@{os.environ.get('REDIS_HOST','8.131.78.84')}:{os.environ.get('REDIS_PORT','6379')}/0",
         # "LOCATION": f"redis://:{os.environ.get('REDIS_PASSWORD','werido')}@localhost:6379/0",
         "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "CLIENT_CLASS": "django_redis.client.DefaultClient", 
             # "PASSWORD": "mysecret",
             "REDIS_CLIENT_CLASS": "redis.client.StrictRedis",
             "REDIS_CLIENT_KWARGS": {"decode_responses": True, "charset":"utf-8"},
@@ -208,7 +209,11 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-print(MEDIA_ROOT)
+# 日志相关地址
+LOG_URL = '/logs/'
+LOG_ROOT = os.path.join(BASE_DIR, 'logs')
+if not os.path.exists(LOG_ROOT):
+    os.makedirs(LOG_ROOT)
 
 # 过期时间
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
@@ -216,7 +221,7 @@ SESSION_COOKIE_AGE = 200 #
 
 
 ############## CELERY ################3333
-CELERY_BROKER_URL = f"redis://:{os.environ.get('REDIS_PASSWORD','werido')}@{os.environ.get('REDIS_HOST','8.131.78.84')}:{os.environ.get('REDIS_PORT','6379')}/0"
+CELERY_BROKER_URL = f"redis://:{os.environ.get('REDIS_PASSWORD','werido')}@{os.environ.get('REDIS_HOST','8.131.78.84')}:{os.environ.get('REDIS_PORT','6379')}/1"
 CELERY_RESULT_BACKEND = CELERY_BROKER_URL
 #: Only add pickle to this list if your broker is secured
 #: from unwanted access (see userguide/security.html)
@@ -250,3 +255,9 @@ OAUTH2_PROVIDER_ACCESS_TOKEN_MODEL = 'oauth.AccessTokenModel'
 OAUTH2_PROVIDER_REFRESH_TOKEN_MODEL = "oauth.RefreshTokenModel"
 OAUTH2_PROVIDER_ID_TOKEN_MODEL = "oauth.IDTokenModel"
 OAUTH2_PROVIDER_GRANT_MODEL= "oauth.OauthGrantModel"
+
+
+
+################## api collector
+
+SPIDER_DIR = 'D:/code/python/scrapy-learn/'

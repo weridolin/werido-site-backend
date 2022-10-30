@@ -2,6 +2,7 @@ import os
 
 from celery import Celery
 
+
 # Set the default Django settings module for the 'celery' program.
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
 
@@ -68,3 +69,30 @@ def send_welcome_mail(receiver,number):
         finally:
             conn.quit()
 
+
+# @app.on_after_configure.connect
+# def setup_periodic_tasks(sender, **kwargs):
+#     # Calls test('hello') every 10 seconds.
+#     sender.add_periodic_task(10.0, test.s('hello'), name='add every 10')
+
+#     # Calls test('world') every 30 seconds
+#     sender.add_periodic_task(30.0, test.s('world'), expires=10)
+
+
+@app.task
+def test(arg):
+    print(arg,"loop for every 10")
+
+@app.task
+def add(x, y):
+    z = x + y
+    print(z,"loop for every 30")
+
+
+@app.task(bind=True)
+def bindKey(self, a, b):
+    print(a,b)
+    print(self)
+    self.update_state(state="PROGRESS", meta={'progress': 50})
+    self.update_state(state="PROGRESS", meta={'progress': 90})
+    return 'hello world: %i' % (a+b)

@@ -23,11 +23,44 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from asyncio import tasks
 from django.contrib import admin
 from django.urls import path,include,re_path
 from rest_framework import routers
 from ws.data_faker_consumer import DataFakerConsumer
 # from oauth2_provider.urls
+import time
+from rest_framework.decorators import api_view
+from rest_framework.response  import Response
+from django_celery_beat.models import PeriodicTask, IntervalSchedule
+import json
+
+@api_view(["GET"])
+def celery_test(request):
+    # from core.celery import test
+    # res = test.delay(2222)
+    # print(res.get())
+    # return Response("test")
+    ...
+    # schedule, created = IntervalSchedule.objects.get_or_create(every=1,period=IntervalSchedule.SECONDS)
+    # tasks, created = PeriodicTask.objects.get_or_create(
+    #     interval=schedule,                  # we created this above.
+    #     name='TestTask1-2',          # simply describes this periodic task.
+    #     task='core.celery.test_task',  # name of task.
+    #     args=json.dumps([8]),
+    # )
+    # tasks.enabled=False
+    # tasks.save()
+    for i in range(10):
+        time.sleep(1)
+        print(">>>>>",i)
+    return Response("Ssss")
+
+def test_task(count):
+    for i in count:
+        print(i,">>>>>>>>>>>>>>>")
+
+
 
 routers = routers.DefaultRouter()
 urlpatterns = [
@@ -42,13 +75,10 @@ urlpatterns = [
     path("api/v1/dataFaker",include("dataFaker.v1.urls")),
     path("api/v1/oauth", include('oauth.v1.urls')),
     path("api/v1/third",include('thirdApis.urls')),
-    path("api/oauth/test/",include('oauth2_provider.urls'))
+    path("api/oauth/test/",include('oauth2_provider.urls')),
+    path("api/celeryTest",celery_test)
 
 ]
-
-
-from rest_framework.views import APIView
-
 
 
 
