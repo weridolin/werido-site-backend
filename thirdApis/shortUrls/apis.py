@@ -13,7 +13,7 @@ from rest_framework import status
 class ShortUrlRecordApis(CreateAPIView):
     queryset = ShortUrlRecords.objects.all()
     serializer_class = ShortUrlSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [AllowAny] # 所有人都有权限
 
     def create(self, request, *args, **kwargs):
         timedelta = request.data.pop("expire_time",24*3600)

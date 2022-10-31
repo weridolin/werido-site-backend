@@ -68,7 +68,7 @@ class ApiCollectorSpiderRunRecord(BaseModel):
         verbose_name = "apiSpider执行记录"
         verbose_name_plural = "apiSpider执行记录"
     
-    pid = models.SmallIntegerField(null=False,help_text="脚本运行的进程ID",default="unknown",verbose_name="脚本运行的进程ID")
+    pid = models.IntegerField(null=False,help_text="脚本运行的进程ID",default="unknown",verbose_name="脚本运行的进程ID")
     # pid_path = 
     log_path = models.CharField(max_length=128,null=False,help_text="脚本运行的日志地址",verbose_name="脚本运行的日志地址")
     finish_time = models.DateTimeField(verbose_name="完成时间",null=False,help_text="完成时间",default = datetime.datetime.now())

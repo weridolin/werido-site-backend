@@ -7,10 +7,13 @@ from thirdApis.apiCollector.serializers import ApiCollectorSpiderRunRecordSerial
 import datetime,os,sys
 from django.conf import settings
 import subprocess
+from rest_framework.permissions import DjangoModelPermissions,IsAuthenticated
 
 class TaskOperationView(APIView):
 
-
+    # permission默认view,即为get不加权限限制.
+    permission_classes = [IsAuthenticated,DjangoModelPermissions]
+    queryset = ApiCollectorSpiderRunRecord.objects.all()
 
     def get(self, request, format=None):
         """
@@ -44,16 +47,6 @@ class TaskOperationView(APIView):
                 message="api-collector-spider会固定在周末启动"
             )
 
-    # def delete(self, request, format=None):
-    #     """
-    #     Return a list of all users.
-    #     """
-    #     ...
-    #     return HTTPResponse(
-            
-    #     )
-
-
     def _start_spider(self):
         time =  datetime.datetime.strftime(datetime.datetime.now(),"%Y-%m-%d-%H-%M-%S")
         log_path = os.path.join(settings.LOG_ROOT,f"{time}_spider.log")
@@ -61,6 +54,7 @@ class TaskOperationView(APIView):
         scrapy_cmd = f"scrapy crawl ApisSpider_TianYan --logfile {log_path} --pidfile {pid_path}"
         python_exc = sys.executable
         cmd = f"{python_exc} -m {scrapy_cmd}"
+        print("exec command",cmd)
         p = subprocess.Popen(args=cmd,cwd=settings.SPIDER_DIR)
         return log_path,p.pid
 
