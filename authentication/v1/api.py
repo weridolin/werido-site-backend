@@ -8,8 +8,8 @@ platform: windows 10
 LastEditors: lhj
 LastEditTime: 2021-11-28 23:05:04
 '''
-from ctypes.wintypes import HHOOK
 import json
+from pydoc import apropos
 from django.apps import AppConfig
 from redis import client
 import requests
@@ -25,101 +25,90 @@ from authentication.v1.singals import created_done
 from rest_framework.decorators import action
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from utils.http_ import HTTPResponse
+from rest_framework.decorators import api_view,throttle_classes,permission_classes,authentication_classes
 
-
-class IsUserAlreadyExistPermission(permissions.BasePermission):
-    ## TODO 改成用serializer去校验
-    message = ''
-    def has_permission(self, request, view):
-        # print(request.user.is_authenticated)
-        if request.method == "POST":
-            # 此时跳过验证， request user = None!
-            username = request.data.get("username", None)
-            email = request.data.get("email", None)
-            telephone = request.data.get("telephone", None)
-            if username:
-                if User.objects.filter(username=username).exists():
-                    IsUserAlreadyExistPermission.message = f"user:{username} is already exist"
-                    return False
-            if email:
-                if User.objects.filter(email=email).exists(): # TODO 改成唯一
-                    # IsUserAlreadyExistPermission.message = f"email:{email} is already exist"
-                    return True
-            if telephone:
-                if UserProfile.objects.filter(telephone=telephone).exists():
-                    IsUserAlreadyExistPermission.message = f"telephone:{telephone} is already exist"
-                    return False
-            IsUserAlreadyExistPermission.message = ""
-            return True
-        else:
-            return super().has_permission(request, view)
 
 
 from rest_framework_simplejwt.exceptions import InvalidToken
 
-class ProfileApisAuthentication(JWTAuthentication):
+# class ProfileApisAuthentication(JWTAuthentication):
 
-    def authenticate(self, request):
-        if request.method == "POST":# 注册方法统一为管理员用户的权限进行注册
-            user = User.objects.get(username="werido")
-            return (user, None) # return NONE才会引发 401 @https://www.django-rest-framework.org/api-guide/authentication/
-        else:
-            return super().authenticate(request)
+#     def authenticate(self, request):
+#         if request.method == "POST":# 注册方法统一为管理员用户的权限进行注册
+#             user = User.objects.get(username="werido")
+#             return (user, None) # return NONE才会引发 401 @https://www.django-rest-framework.org/api-guide/authentication/
+#         else:
+#             return super().authenticate(request)
     
 from rest_framework.throttling import UserRateThrottle,AnonRateThrottle
 
-class UserProfileApis(viewsets.ModelViewSet):
-    """
-    
+@api_view(http_method_names=["POST"])
+@throttle_classes(throttle_classes=[AnonRateThrottle])
+def register(request, **kwargs):
+    """ 注册用户 """
+    username = request.data.get("username")
+    email = request.data.get("email")
+    password = request.data.get("password")
+    telephone = request.data.get("telephone")
 
-    """
-    authentication_classes=[ProfileApisAuthentication]
+    if username:
+        if User.objects.filter(username=username).exists():
+            return HTTPResponse(
+                code=status.HTTP_400_BAD_REQUEST,
+                message=f"user:{username} is already exist",
+                app_code="auth"
+            )
+            
+    if email:
+        if User.objects.filter(email=email).exists(): # TODO 改成唯一
+            return HTTPResponse(
+                code=status.HTTP_400_BAD_REQUEST,
+                message= f"email:{email} is already exist",
+                app_code="auth"
+            )
+
+    if telephone:
+        if UserProfile.objects.filter(telephone=telephone).exists():
+            return HTTPResponse(
+                code=status.HTTP_400_BAD_REQUEST,
+                message= f"telephone:{telephone} is already exist",
+                app_code="auth"
+            )
+
+    new_user = User.objects.create(username=username, email=email)
+    new_user.set_password(password) # 密码不能明文保存
+    new_user.save()
+    count = User.objects.count() 
+    created_done.send(sender=new_user.__class__, created=True,
+                    instance=new_user, number=count+1,**filter_profie(request.data))          
+    # from core.celery import send_welcome_mail
+    # send_welcome_mail.delay(receiver=email)
+    return HTTPResponse(
+        code=status.HTTP_200_OK,message=f"created user:{username} success!",app_code="auth"
+    )
+
+
+@api_view(http_method_names=["DELETE"])
+@authentication_classes(authentication_classes=[JWTAuthentication])
+@permission_classes(permission_classes=[permissions.IsAdminUser])
+def unregister(request,**kwargs):
+    """删除用户 only admin"""
+    if not request.user.is_superuser:
+        return HttpResponseForbidden("ONLY SUPER USER CAN OPERATE!")
+    # todo admin 判断
+    return Response(
+        "delete",
+        status=status.HTTP_200_OK
+    )
+
+class UserProfileApis(viewsets.ModelViewSet):
+    """"""
+    # 校验登录账户
+    authentication_classes=[JWTAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
+
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerializer
-    
-    def get_permissions(self):
-        if self.action in ['register'] :
-            permission_classes = [IsUserAlreadyExistPermission,permissions.AllowAny]
-        elif self.action in ['unregister'] :
-            permission_classes = [permissions.IsAuthenticated]
-        elif self.action in ['search']:
-            permission_classes = [permissions.AllowAny]
-        else:
-            permission_classes = [permissions.IsAuthenticated]
-        return [permission() for permission in permission_classes]
-
-    @action(methods=["DELETE"],detail=False)     # 会先校验 permission,再检验method是否合法
-    def unregister(self, request):
-        """删除用户 only admin"""
-        if not request.user.is_superuser:
-            return HttpResponseForbidden("ONLY SUPER USER CAN OPERATE!")
-        # todo admin 判断
-        return Response(
-            "delete",
-            status=status.HTTP_200_OK
-        )
-
-    # 一天只允许注册  100 个用户
-    @action(methods=["POST"],detail=False,throttle_classes=[AnonRateThrottle])
-    def register(self, request, **kwargs):
-        """ 注册用户 """
-        # todo错误回滚
-        username = request.data.get("username")
-        email = request.data.get("email")
-        password = request.data.get("password")
-        new_user = User.objects.create(
-            username=username, email=email)
-        new_user.set_password(password) # 密码不能明文保存
-        new_user.save()
-        count = User.objects.count() 
-        created_done.send(sender=new_user.__class__, created=True,
-                        instance=new_user, number=count+1,**filter_profie(request.data))          
-        # from core.celery import send_welcome_mail
-        # send_welcome_mail.delay(receiver=email)
-        return HTTPResponse(
-            code=status.HTTP_200_OK,message=f"created user:{username} success!",app_code="auth"
-        )
-
 
     @action(methods=["PUT","GET"],detail=False,throttle_classes=[UserRateThrottle])
     def profile(self, request):
@@ -167,83 +156,72 @@ def filter_profie(info:dict):
             result.update({key:info.get(key)})
     return result
 
-from django.contrib.auth import login,logout,authenticate
+from django.contrib.auth import login as _login,logout as _logout,authenticate
 from .serializers import CustomTokenObtainPairSerializer, UserSerializer
 from django_redis import get_redis_connection
 from redis.client import Redis
 import json
 import time
 
-class AuthApis(viewsets.ModelViewSet):
 
-    authentication_classes=[JWTAuthentication]
-    serializer_class = UserProfileSerializer
+@api_view(http_method_names=["POST"])
+def login(request,**kwargs):
+    username = request.data.get("username",None)
+    password = request.data.get("password",None)
+    user = authenticate(request, username=username, password=password)
+    if user:
+        _login(request, user)
+        try:
+            user_profile = UserProfile.objects.get(user_id = user.id)
+        # permissions = get_permission(user_profile=user_profile)
+        except UserProfile.DoesNotExist:
+            user_profile = None
 
-    def get_permissions(self):
-        if self.action in ['login'] :
-            permission_classes = []
-        elif self.action in ['logout'] :
-            permission_classes = []
-        else:
-            print("undefined",self.action)
-            permission_classes = []
-        return [permission() for permission in permission_classes]
-    
-    @action(methods=["POST"],detail=False,url_path="login")
-    def login(self,request):
-        username = request.data.get("username",None)
-        password = request.data.get("password",None)
-        user = authenticate(request, username=username, password=password)
-        if user:
-            login(request, user)
-            try:
-                user_profile = UserProfile.objects.get(user_id = user.id)
-            # permissions = get_permission(user_profile=user_profile)
-            except UserProfile.DoesNotExist:
-                user_profile = None
-
-            # 将permission缓存到redis
-            # conn:Redis = get_redis_connection("default") # return redis client:<redis.client.Redis>
-            # conn.set(UserBriefInfo.from_user(user).cache_permission_key,
-            #     json.dumps(permissions,ensure_ascii=False))
-            
-            # refresh_token = RefreshToken.for_user(user) # 默认的token
-            refresh_token = CustomTokenObtainPairSerializer.get_token(user=user) # 添加了自定义的token
-            data= {
-                "access_token":str(refresh_token.access_token),
-                "refresh_token":str(refresh_token),
-                # "permissions_dict":permissions,
-                "profile":UserProfileSerializer(instance=user_profile).data if user_profile else None
-            }
-            return HTTPResponse(
-                data=data,
-                code=0,
-                app_code="auth",
-                status=status.HTTP_200_OK
-            )
-        else:
-            return HTTPResponse(
-                code=-1,
-                status=status.HTTP_403_FORBIDDEN,
-                message="账户名或密码错误!",
-                app_code="auth"
-            )
-        
-        
-
-    @action(methods=["POST"],detail=False)
-    def logout(self,request):
-        # _user = request.user
-        _ = logout(request=request) # logout之后request user会被清空
-        # 清除缓存
+        # 将permission缓存到redis
         # conn:Redis = get_redis_connection("default") # return redis client:<redis.client.Redis>
-        # conn.delete(UserBriefInfo.from_user(_user).cache_permission_key.encode())
+        # conn.set(UserBriefInfo.from_user(user).cache_permission_key,
+        #     json.dumps(permissions,ensure_ascii=False))
+        
+        # refresh_token = RefreshToken.for_user(user) # 默认的token
+        refresh_token = CustomTokenObtainPairSerializer.get_token(user=user) # 添加了自定义的token
+        data= {
+            "access_token":str(refresh_token.access_token),
+            "refresh_token":str(refresh_token),
+            # "permissions_dict":permissions,
+            "profile":UserProfileSerializer(instance=user_profile).data if user_profile else None
+        }
         return HTTPResponse(
-            status=status.HTTP_200_OK,
+            data=data,
             code=0,
             app_code="auth",
-            message="logout success"
+            status=status.HTTP_200_OK
         )
+    else:
+        return HTTPResponse(
+            code=-1,
+            status=status.HTTP_403_FORBIDDEN,
+            message="账户名或密码错误!",
+            app_code="auth"
+        )
+    
+
+@api_view(http_method_names=['POST'])
+@authentication_classes(authentication_classes=[JWTAuthentication])
+def logout(request,**kwargs):
+    # 此时旧的jwt-token还是有效的.清除已经注销的token?搞一个黑名单存储已经注销的token?
+    # @https://github.com/jazzband/djangorestframework-simplejwt/issues/28
+    # _user = request.user
+    _ = _logout(request=request) # logout之后request user会被清空
+    # 清除缓存
+    # conn:Redis = get_redis_connection("default") # return redis client:<redis.client.Redis>
+    # conn.delete(UserBriefInfo.from_user(_user).cache_permission_key.encode())
+    return HTTPResponse(
+        status=status.HTTP_200_OK,
+        code=0,
+        app_code="auth",
+        message="logout success"
+    )
+
 
 from urllib.parse import urlencode
 from urllib import parse

@@ -63,7 +63,8 @@ INSTALLED_APPS = [
     'oauth.apps.OauthConfig',
     "oauth2_provider",
     "thirdApis.apps.ThirdapisConfig",
-    "django_celery_beat"
+    "django_celery_beat",
+    "rbac.apps.RbacConfig"
 
 ]
 
