@@ -20,20 +20,20 @@ from .models import UserProfile,ThirdOauthInfo
 #     extra =1
 
 
-@admin.register(UserProfile)
-class AdminRole(admin.ModelAdmin):
-    # inlines = (UserRoleMemberShipInline,)
-    list_display=UserProfile.get_db_fields()+["user","show_roles"]
+# @admin.register(UserProfile)
+# class AdminRole(admin.ModelAdmin):
+#     # inlines = (UserRoleMemberShipInline,)
+#     list_display=UserProfile.get_db_fields()+["user","show_roles"]
 
-    def show_roles(self,obj):
-        role_list = []
-        for g in obj.roles.all():
-            role_list.append(g.name)
-        return ','.join(role_list)
+#     def show_roles(self,obj):
+#         role_list = []
+#         for g in obj.roles.all():
+#             role_list.append(g.name)
+#         return ','.join(role_list)
 
-    show_roles.short_description = "角色" 
+#     show_roles.short_description = "角色" 
 
 
-@admin.register(ThirdOauthInfo)
-class AdminRole(admin.ModelAdmin):
-    ...
+# @admin.register(ThirdOauthInfo)
+# class AdminRole(admin.ModelAdmin):
+#     ...

@@ -33,6 +33,8 @@ class ShortUrlRecords(BaseModel):
 
 
 
+def default_expire_time():
+    return datetime.datetime.now()+datetime.timedelta(days=7)
 
 class ApiCollector(BaseModel):
 
@@ -51,7 +53,7 @@ class ApiCollector(BaseModel):
     api_icon = models.CharField(max_length=64,null=False,help_text="api对应的icon",verbose_name="api对应的icon")
     api_url = models.URLField(null=False,help_text="api对应的url",default="unknown" ,verbose_name="api对应的url")
     clicked = models.PositiveIntegerField(null=False,default=0,help_text="点击次数",verbose_name="点击次数")
-    expire_time = models.DateTimeField(verbose_name="过期时间",null=False,help_text="过期时间",default=datetime.datetime.now()+datetime.timedelta(days=7))
+    expire_time = models.DateTimeField(verbose_name="过期时间",null=False,help_text="过期时间",default=default_expire_time)
     api_price = models.FloatField(null=False,help_text="Api价格",default=0.0,verbose_name="Api价格")
     api_price_unit = models.CharField(max_length=64,null=False,help_text="Api价格单位",default=0.0,verbose_name="Api价格单位")
 
@@ -60,6 +62,7 @@ class ApiCollector(BaseModel):
 
     def __repr__(self) -> str:
         return self.api_name
+
 
 
 class ApiCollectorSpiderRunRecord(BaseModel):
@@ -71,5 +74,5 @@ class ApiCollectorSpiderRunRecord(BaseModel):
     pid = models.IntegerField(null=False,help_text="脚本运行的进程ID",default="unknown",verbose_name="脚本运行的进程ID")
     # pid_path = 
     log_path = models.CharField(max_length=128,null=False,help_text="脚本运行的日志地址",verbose_name="脚本运行的日志地址")
-    finish_time = models.DateTimeField(verbose_name="完成时间",null=False,help_text="完成时间",default = datetime.datetime.now())
+    finish_time = models.DateTimeField(verbose_name="完成时间",null=False,help_text="完成时间",default = datetime.datetime.now)
     result = models.SmallIntegerField(default=2,help_text="脚本运行结果,成功为0,异常为1,正在运行为2",verbose_name="脚本运行结果,成功为0,异常为1,正在运行为2")

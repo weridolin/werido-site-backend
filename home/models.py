@@ -15,7 +15,7 @@ from django.contrib.auth.models import User
 
 class UpdateLog(BaseModel):
     class Meta:
-        db_table="update_log"
+        db_table="site_update_log"
         verbose_name = "更新日志"
         verbose_name_plural = "更新日志"
 
@@ -28,7 +28,7 @@ class UpdateLog(BaseModel):
 
 class HomePictures(BaseModel):
     class Meta:
-        db_table = "home_back_pic"
+        db_table = "site_back_pic"
         verbose_name = "网站主页照片显示"
         verbose_name_plural = "网站主页照片显示"
 
@@ -40,7 +40,7 @@ class HomePictures(BaseModel):
 
 class FriendsLink(BaseModel):
     class Meta:
-        db_table = "friends_links"
+        db_table = "site_friends_links"
         verbose_name = "伙伴链接"
         verbose_name_plural = "伙伴连接"
 
@@ -64,7 +64,7 @@ class FriendsLink(BaseModel):
 
 class BackGroundMusic(BaseModel):
     class Meta:
-        db_table = "back_music"
+        db_table = "site_back_music"
         verbose_name = "背景音乐"
         verbose_name_plural = "背景音乐合集"
 

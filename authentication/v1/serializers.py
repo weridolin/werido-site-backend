@@ -69,8 +69,8 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         # 增加增定义的字段
         token["flag"]="werido-site"
         roles= []
-        for role in user.profile.roles.all():
-            roles.append(role.name)
+        # for role in user.profile.roles.all():
+        #     roles.append(role.name)
         token["name"] = user.username
         token["roles"] =roles   
         return token

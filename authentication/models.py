@@ -33,13 +33,13 @@ class UserProfile(BaseModel):
 
     first_login = models.BooleanField(verbose_name="是否首次登录",default=True) # 首次登录前端提示要完善个人资料
 
-    roles = models.ManyToManyField(
-        verbose_name='具有的所有角色',
-        to="Role",
-        blank=True,
-        related_name="user_roles",
-        through="UserRoleMemberShip",
-        through_fields=("userprofile","role"))
+    # roles = models.ManyToManyField(
+    #     verbose_name='具有的所有角色',
+    #     to="Role",
+    #     blank=True,
+    #     related_name="user_roles",
+    #     through="UserRoleMemberShip",
+    #     through_fields=("userprofile","role"))
 
     class Meta:
         db_table = 'user_profile'
@@ -108,69 +108,69 @@ class ThirdOauthInfo(BaseModel):
         self.save()
         
 
-class UserRoleMemberShip(BaseModel):
-    userprofile= models.ForeignKey(UserProfile,verbose_name="角色对应的用户",on_delete=models.CASCADE)
-    role = models.ForeignKey('Role',verbose_name="角色名称",on_delete=models.CASCADE)
+# class UserRoleMemberShip(BaseModel):
+#     userprofile= models.ForeignKey(UserProfile,verbose_name="角色对应的用户",on_delete=models.CASCADE)
+#     role = models.ForeignKey('Role',verbose_name="角色名称",on_delete=models.CASCADE)
     
-    class Meta:
-        db_table = "user_role"
-        verbose_name = u'用户角色关系表'
-        verbose_name_plural = verbose_name   
+#     class Meta:
+#         db_table = "user_role"
+#         verbose_name = u'用户角色关系表'
+#         verbose_name_plural = verbose_name   
 
 
 # Create your models here.
 ################################## RBAC #############################
 # 身份分类
-role_choices = (
-    ("1", "admin"),
-    ("2", "guest"),
-    ("3", "normal"),
-    ("4", "VIP1"),
-    ("5", "VIP2"),
-    ("6", "VIP3"),
-)
+# role_choices = (
+#     ("1", "admin"),
+#     ("2", "guest"),
+#     ("3", "normal"),
+#     ("4", "VIP1"),
+#     ("5", "VIP2"),
+#     ("6", "VIP3"),
+# )
 
-class Role(BaseModel):
-    # default admin/guest/normal
-    # role_choices = (
-    #     ("1", "admin"),
-    #     ("2", "guest"),
-    #     ("3", "normal"),
-    #     ("4", "VIP1"),
-    #     ("5", "VIP2"),
-    #     ("6", "VIP3"),
-    # )
-    name = models.CharField(max_length=256, verbose_name="角色名称",null=False, blank=False, unique=True, default="guest")
-    permissions = models.ManyToManyField(to="Permission", related_name="role_permission", verbose_name="角色拥有的权限")
-    description = models.CharField(max_length=256,verbose_name="描述",null=True)
+# class Role(BaseModel):
+#     # default admin/guest/normal
+#     # role_choices = (
+#     #     ("1", "admin"),
+#     #     ("2", "guest"),
+#     #     ("3", "normal"),
+#     #     ("4", "VIP1"),
+#     #     ("5", "VIP2"),
+#     #     ("6", "VIP3"),
+#     # )
+#     name = models.CharField(max_length=256, verbose_name="角色名称",null=False, blank=False, unique=True, default="guest")
+#     permissions = models.ManyToManyField(to="Permission", related_name="role_permission", verbose_name="角色拥有的权限")
+#     description = models.CharField(max_length=256,verbose_name="描述",null=True)
 
-    class Meta:
-        db_table = 'role'
-        verbose_name = '角色表'
-        verbose_name_plural = verbose_name
+#     class Meta:
+#         db_table = 'role'
+#         verbose_name = '角色表'
+#         verbose_name_plural = verbose_name
 
-    def __str__(self) -> str:
-        return self.name
+#     def __str__(self) -> str:
+#         return self.name
 
-class Permission(BaseModel):
+# class Permission(BaseModel):
     
-    type_choice = [("menu", "menu"), ("button", "button")]
-    name = models.CharField(max_length=256, verbose_name="权限名字", unique=True, null=False, blank=False)
-    url = models.CharField(max_length=300, verbose_name="权限url地址", null=True, blank=True)
-    icon = models.CharField(max_length=300, verbose_name="权限图标", null=True, blank=True)
-    type = models.CharField(max_length=32, verbose_name="类型",default="menu", 
-        null=False, blank=False, choices=type_choice)
-    # menu = models.ForeignKey(to="Menu",db_constraint=False,verbose_name="对应的菜单",blank=True,null=True,on_delete=models.CASCADE)
-    pid = models.ForeignKey("self", db_constraint=False, verbose_name="父级权限",
-        on_delete=models.CASCADE, null=True, blank=True)
+#     type_choice = [("menu", "menu"), ("button", "button")]
+#     name = models.CharField(max_length=256, verbose_name="权限名字", unique=True, null=False, blank=False)
+#     url = models.CharField(max_length=300, verbose_name="权限url地址", null=True, blank=True)
+#     icon = models.CharField(max_length=300, verbose_name="权限图标", null=True, blank=True)
+#     type = models.CharField(max_length=32, verbose_name="类型",default="menu", 
+#         null=False, blank=False, choices=type_choice)
+#     # menu = models.ForeignKey(to="Menu",db_constraint=False,verbose_name="对应的菜单",blank=True,null=True,on_delete=models.CASCADE)
+#     pid = models.ForeignKey("self", db_constraint=False, verbose_name="父级权限",
+#         on_delete=models.CASCADE, null=True, blank=True)
 
-    def __str__(self) -> str:
-        return f"{self.name}"
+#     def __str__(self) -> str:
+#         return f"{self.name}"
 
-    class Meta:
-        db_table = 'permissions'
-        verbose_name = u"api权限表"
-        verbose_name_plural = u"api权限表"
-        ordering = ["id"]
+#     class Meta:
+#         db_table = 'permissions'
+#         verbose_name = u"api权限表"
+#         verbose_name_plural = u"api权限表"
+#         ordering = ["id"]
 
 

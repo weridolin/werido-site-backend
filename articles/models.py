@@ -21,7 +21,7 @@ STYLE_CHOICES = sorted((item, item) for item in get_all_styles())
 
 class Types(BaseModel):
     class Meta:
-        db_table = "types"
+        db_table = "blog_types"
         verbose_name = "类别"
         verbose_name_plural = "类别"
     name = models.CharField(null=True, max_length=255,unique=True,
@@ -42,7 +42,7 @@ class Types(BaseModel):
 
 class Tags(BaseModel):
     class Meta:
-        db_table = "tags"
+        db_table = "blog_tags"
         verbose_name = "标签"
         verbose_name_plural = "标签"
     name = models.CharField(null=True, max_length=255,unique=True,
@@ -66,7 +66,7 @@ class Projects(BaseModel):
     ]
 
     class Meta:
-        db_table = "projects"
+        db_table = "site_projects"
         verbose_name = "项目"
         verbose_name_plural = "项目"
     name = models.CharField(max_length=256, verbose_name="项目名称", null=False)
@@ -78,7 +78,7 @@ class Projects(BaseModel):
 
 class Article(BaseModel):
     class Meta:
-        db_table = "articles"
+        db_table = "blog_articles"
         verbose_name = "博客文章"
         verbose_name_plural = "博客文章"
         ordering = ('created',)
@@ -197,7 +197,7 @@ class Article(BaseModel):
 class ArticleComments(BaseModel):
 
     class Meta:
-        db_table = "article_comments"
+        db_table = "blog_article_comments"
         verbose_name = "文章评论"
         verbose_name_plural = "文章评论"
         ordering = ('created',)

@@ -49,23 +49,22 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'corsheaders',
+    "oauth2_provider",
+    'django_filters',
+    "channels",
+    "django_celery_beat",
+    'authentication.apps.AuthenticationConfig',    
+    "thirdApis.apps.ThirdapisConfig",
+    "rbac.apps.RbacConfig",
     'articles.apps.ArticlesConfig',
     'drug.apps.DrugConfig',
     'home.apps.HomeConfig',
     "filebroker.apps.FilebrokerConfig",
     "celery_app.apps.CeleryAppConfig",
     "dataFaker.apps.DatafakerConfig",
-    'rest_framework',
-    'corsheaders',
-    'authentication',
-    'django_filters',
-    "channels",
     'oauth.apps.OauthConfig',
-    "oauth2_provider",
-    "thirdApis.apps.ThirdapisConfig",
-    "django_celery_beat",
-    "rbac.apps.RbacConfig"
-
 ]
 
 ########## DJANGO CHANNELS
