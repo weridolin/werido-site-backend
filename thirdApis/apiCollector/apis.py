@@ -7,18 +7,22 @@ from thirdApis.apiCollector.serializers import ApiCollectorSpiderRunRecordSerial
 import datetime,os,sys
 from django.conf import settings
 import subprocess
-from rest_framework.permissions import DjangoModelPermissions,IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rbac.permission import RbacModelPermission
 
 class TaskOperationView(APIView):
 
     # permission默认view,即为get不加权限限制.
-    permission_classes = [IsAuthenticated,DjangoModelPermissions]
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated,RbacModelPermission]
     queryset = ApiCollectorSpiderRunRecord.objects.all()
 
     def get(self, request, format=None):
         """
             Return a list of all users.
         """
+        print(type(request.user),request.user)
         only_running = request.data.get("only_running")
         if only_running:
             records = ApiCollectorSpiderRunRecord.objects.filter(result=2).all()

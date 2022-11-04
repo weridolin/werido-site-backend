@@ -1,17 +1,10 @@
 from django.shortcuts import render
 from rbac.models import ModelOperation,Menu,Permissions,OperationPermissionShip
+from rest_framework.permissions import DjangoModelPermissions
+from rbac.permission import ORM_PERMISSION_REF,PERMISSION_ORM_REF
 
 # Create your views here.
 
-PERMISSION_ORM_REF = {
-    "model_op":ModelOperation,
-    "menu":Menu,
-}
-
-ORM_PERMISSION_REF = {
-    ModelOperation:"model_op",
-    Menu:"menu"
-}
 
 
 def add_permission(orm,**kwargs):

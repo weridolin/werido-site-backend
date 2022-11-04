@@ -132,6 +132,7 @@ class ModelOperation(BaseModel):
         verbose_name_plural = "rbac_表操作权限"
         unique_together = ('op_name', 'op_model_name')
 
+    app_label = models.CharField(max_length=128,default="undefined",null=False,help_text="表所对应的app名称",verbose_name="表所对应的app名称")
     op_name = models.CharField(max_length=128,null=False,help_text="操作名称",verbose_name="操作名称")
     # op_model = models.IntegerField(null=False,help_text="操作的表",verbose_name="操作的表")
     op_model_name = models.CharField(max_length=128,null=False,help_text="操作表的名称",verbose_name="操作表的名称")

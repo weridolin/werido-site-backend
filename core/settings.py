@@ -12,30 +12,31 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 
 from pathlib import Path
 import os
-# import environ
+import environ
 
-# # initialize env
-# env = environ.Env(
-#     # set casting, default value
-#     DEBUG=(bool, False)
-# )
-# # reading .env file
-# environ.Env.read_env()
+# initialize env
+env = environ.Env(
+    # # set casting, default value
+    # DEBUG=(bool, False)
+)
+# reading .env file
 
-# EMAIL_PWD=env('EMAIL_PWD')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+environ.Env.read_env(os.path.join(BASE_DIR,".env"))
+
+EMAIL_PWD = env('EMAIL_PWD')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '2h+r=ch3g(m9w!1fg_zk_le)g@&qalpb8b%k4+8z)r(pfx&brk'
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get("DEBUG",True)
+DEBUG = env("DEBUG")
 
 ALLOWED_HOSTS = ['*']
 
@@ -55,6 +56,8 @@ INSTALLED_APPS = [
     'django_filters',
     "channels",
     "django_celery_beat",
+    "rest_framework_simplejwt.token_blacklist",
+
     'authentication.apps.AuthenticationConfig',    
     "thirdApis.apps.ThirdapisConfig",
     "rbac.apps.RbacConfig",
@@ -132,11 +135,16 @@ ASGI_APPLICATION = 'core.asgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get("POSTGRES_DB",'blogDB'),  # 数据库名称
-        'USER': os.environ.get("POSTGRES_USER",'werido'),  # 拥有者，这个一般没修改
-        'PASSWORD': os.environ.get("POSTGRES_PASSWORD",359066432),  # 密码，自己设定的
-        'HOST': os.environ.get("POSTGRES_HOST",'8.131.78.84'),  # 默认的就没写
-        'PORT': os.environ.get("POSTGRES_PORT",'5432'),
+        # 'NAME': os.environ.get("POSTGRES_DB",'blogDB'),  # 数据库名称
+        # 'USER': os.environ.get("POSTGRES_USER",'werido'),  # 拥有者，这个一般没修改
+        # 'PASSWORD': os.environ.get("POSTGRES_PASSWORD",359066432),  # 密码，自己设定的
+        # 'HOST': os.environ.get("POSTGRES_HOST",'8.131.78.84'),  # 默认的就没写
+        # 'PORT': os.environ.get("POSTGRES_PORT",'5432'),
+        'NAME': env("POSTGRES_DB"),  # 数据库名称
+        'USER': env("POSTGRES_USER"),  # 拥有者，这个一般没修改
+        'PASSWORD': env("POSTGRES_PASSWORD"),  # 密码，自己设定的
+        'HOST': env("POSTGRES_HOST"),  # 默认的就没写
+        'PORT': env("POSTGRES_PORT"),        
         # 'HOST': 'sitedb',
         # 'PORT': '5432',
     }
@@ -146,8 +154,9 @@ DATABASES = {
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": f"redis://:{os.environ.get('REDIS_PASSWORD','werido')}@{os.environ.get('REDIS_HOST','8.131.78.84')}:{os.environ.get('REDIS_PORT','6379')}/0",
+        # "LOCATION": f"redis://:{os.environ.get('REDIS_PASSWORD','werido')}@{os.environ.get('REDIS_HOST','8.131.78.84')}:{os.environ.get('REDIS_PORT','6379')}/0",
         # "LOCATION": f"redis://:{os.environ.get('REDIS_PASSWORD','werido')}@localhost:6379/0",
+        "LOCATION": f"redis://:{env('REDIS_PASSWORD')}@{env('REDIS_HOST')}:{env('REDIS_PORT')}/0",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient", 
             # "PASSWORD": "mysecret",
@@ -221,7 +230,7 @@ SESSION_COOKIE_AGE = 200 #
 
 
 ############## CELERY ################3333
-CELERY_BROKER_URL = f"redis://:{os.environ.get('REDIS_PASSWORD','werido')}@{os.environ.get('REDIS_HOST','8.131.78.84')}:{os.environ.get('REDIS_PORT','6379')}/1"
+CELERY_BROKER_URL =  f"redis://:{env('REDIS_PASSWORD')}@{env('REDIS_HOST')}:{env('REDIS_PORT')}/1"
 CELERY_RESULT_BACKEND = CELERY_BROKER_URL
 #: Only add pickle to this list if your broker is secured
 #: from unwanted access (see userguide/security.html)
@@ -261,3 +270,41 @@ OAUTH2_PROVIDER_GRANT_MODEL= "oauth.OauthGrantModel"
 ################## api collector
 
 SPIDER_DIR = 'D:/code/python/scrapy-learn/'
+
+
+
+
+####################### jwt
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': False,
+    'UPDATE_LAST_LOGIN': False,
+
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY,
+    'VERIFYING_KEY': None,
+    'AUDIENCE': None,
+    'ISSUER': None,
+    'JWK_URL': None,
+    'LEEWAY': 0,
+
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'user_id',
+    'USER_AUTHENTICATION_RULE': 'rest_framework_simplejwt.authentication.default_user_authentication_rule',
+
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+    'TOKEN_TYPE_CLAIM': 'token_type',
+    'TOKEN_USER_CLASS': 'rest_framework_simplejwt.models.TokenUser',
+
+    'JTI_CLAIM': 'jti',
+
+    'SLIDING_TOKEN_REFRESH_EXP_CLAIM': 'refresh_exp',
+    'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
+    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
+}

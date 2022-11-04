@@ -9,7 +9,6 @@ LastEditors: lhj
 LastEditTime: 2021-11-28 23:05:04
 '''
 import json
-from pydoc import apropos
 from django.apps import AppConfig
 from redis import client
 import requests
@@ -26,7 +25,7 @@ from rest_framework.decorators import action
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from utils.http_ import HTTPResponse
 from rest_framework.decorators import api_view,throttle_classes,permission_classes,authentication_classes
-
+from rest_framework_simplejwt.tokens import RefreshToken
 
 
 from rest_framework_simplejwt.exceptions import InvalidToken
@@ -205,6 +204,8 @@ def login(request,**kwargs):
         )
     
 
+from rest_framework_simplejwt.views import TokenBlacklistView
+
 @api_view(http_method_names=['POST'])
 @authentication_classes(authentication_classes=[JWTAuthentication])
 def logout(request,**kwargs):
@@ -215,6 +216,7 @@ def logout(request,**kwargs):
     # 清除缓存
     # conn:Redis = get_redis_connection("default") # return redis client:<redis.client.Redis>
     # conn.delete(UserBriefInfo.from_user(_user).cache_permission_key.encode())
+    jwt_token = RefreshToken.for_user(request.user)
     return HTTPResponse(
         status=status.HTTP_200_OK,
         code=0,

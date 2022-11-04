@@ -13,6 +13,7 @@ from django.contrib.auth.models import User
 from authentication.models import UserProfile,ThirdOauthInfo
 from core.base import BaseSerializer
 from rest_framework import serializers
+import uuid
 
 class UserSerializer(BaseSerializer):
     last_login = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
@@ -60,19 +61,37 @@ class OauthInfoSerializer(BaseSerializer):
 
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer,TokenRefreshSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
+from rbac.permission import get_user_perms
+from django_redis import get_redis_connection
+from redis.client import Redis
+from utils.redis_keys import UserPermission
+import json
+from core import settings
+import datetime
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    # jwt加入用户的权限和角色
     @classmethod
     def get_token(cls, user):
         token =  super().get_token(user)
-
+        _uuid = str(uuid.uuid4())
         # 增加增定义的字段
-        token["flag"]="werido-site"
-        roles= []
-        # for role in user.profile.roles.all():
-        #     roles.append(role.name)
+        roles,groups,role_perms = get_user_perms(user=user)
+        token["uuid"] = _uuid
+        token["flag"] = "werido-site"
         token["name"] = user.username
-        token["roles"] =roles   
+        token["groups"] = [(group.group_name,group.id)for group in groups]
+        token["roles"] = [(role.role_name,role.id)for role in roles]
+        # token["perms"] = perms
+    
+            # 把权限缓存到redis.
+        conn:Redis = get_redis_connection("default") # return redis client:<redis.client.Redis>
+        
+        conn.set(
+            UserPermission.permission_key(user,_uuid),
+            json.dumps(role_perms,ensure_ascii=False),
+            ex=settings.SIMPLE_JWT.get("ACCESS_TOKEN_LIFETIME")+datetime.timedelta(minutes=2)) # 比TOKEN的过期时间多加2分分钟
+            
         return token
 
 
