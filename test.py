@@ -1,7 +1,3 @@
-dic = {
-    1:(1,2)
-}
+import datetime
 
-
-for a,(b,c) in dic.items():
-    print(a,b,c)
+print(datetime.datetime.utcnow())

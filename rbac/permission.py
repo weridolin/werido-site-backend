@@ -45,8 +45,8 @@ class RbacModelPermission(BasePermission):
         if request.method not in self.perms_map:
             raise exceptions.MethodNotAllowed(request.method)
         
-        # if request.user.is_superuser:
-        #     return True
+        if request.user.is_superuser:
+            return True
 
         kwargs = {
             'app_label': orm._meta.app_label,
@@ -58,6 +58,9 @@ class RbacModelPermission(BasePermission):
 
         if "model_op" not in user_perms:
             return False
+
+        
+        print("user perms",user_perms,"required perms",perm_required)
 
         for perm in perm_required:
             if  perm not in user_perms["model_op"]:

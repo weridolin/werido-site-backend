@@ -53,24 +53,27 @@ def register(request, **kwargs):
     if username:
         if User.objects.filter(username=username).exists():
             return HTTPResponse(
-                code=status.HTTP_400_BAD_REQUEST,
-                message=f"user:{username} is already exist",
+                status=status.HTTP_400_BAD_REQUEST,
+                code=-1,
+                message=f"账户名 {username} 已经存在",
                 app_code="auth"
             )
             
     if email:
         if User.objects.filter(email=email).exists(): # TODO 改成唯一
             return HTTPResponse(
-                code=status.HTTP_400_BAD_REQUEST,
-                message= f"email:{email} is already exist",
+                status=status.HTTP_400_BAD_REQUEST,
+                code=-1,
+                message= f"邮箱 {email} 已经存在",
                 app_code="auth"
             )
 
     if telephone:
         if UserProfile.objects.filter(telephone=telephone).exists():
             return HTTPResponse(
-                code=status.HTTP_400_BAD_REQUEST,
-                message= f"telephone:{telephone} is already exist",
+                status=status.HTTP_400_BAD_REQUEST,
+                code=-1,
+                message= f"电话 {telephone} 已经存在",
                 app_code="auth"
             )
 
@@ -216,7 +219,7 @@ def logout(request,**kwargs):
     # 清除缓存
     # conn:Redis = get_redis_connection("default") # return redis client:<redis.client.Redis>
     # conn.delete(UserBriefInfo.from_user(_user).cache_permission_key.encode())
-    jwt_token = RefreshToken.for_user(request.user)
+    # jwt_token = RefreshToken.for_user(request.user)
     return HTTPResponse(
         status=status.HTTP_200_OK,
         code=0,

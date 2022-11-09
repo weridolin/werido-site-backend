@@ -135,11 +135,6 @@ ASGI_APPLICATION = 'core.asgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        # 'NAME': os.environ.get("POSTGRES_DB",'blogDB'),  # 数据库名称
-        # 'USER': os.environ.get("POSTGRES_USER",'werido'),  # 拥有者，这个一般没修改
-        # 'PASSWORD': os.environ.get("POSTGRES_PASSWORD",359066432),  # 密码，自己设定的
-        # 'HOST': os.environ.get("POSTGRES_HOST",'8.131.78.84'),  # 默认的就没写
-        # 'PORT': os.environ.get("POSTGRES_PORT",'5432'),
         'NAME': env("POSTGRES_DB"),  # 数据库名称
         'USER': env("POSTGRES_USER"),  # 拥有者，这个一般没修改
         'PASSWORD': env("POSTGRES_PASSWORD"),  # 密码，自己设定的
@@ -267,9 +262,9 @@ OAUTH2_PROVIDER_GRANT_MODEL= "oauth.OauthGrantModel"
 
 
 
-################## api collector
+################## scrapy scripts 
 
-SPIDER_DIR = 'D:/code/python/scrapy-learn/'
+SPIDER_DIR = os.path.join(BASE_DIR,"scripts")
 
 
 
@@ -278,8 +273,8 @@ SPIDER_DIR = 'D:/code/python/scrapy-learn/'
 from datetime import timedelta
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=6),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=3),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': False,
     'UPDATE_LAST_LOGIN': False,
