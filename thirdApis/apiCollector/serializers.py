@@ -61,3 +61,5 @@ class ApiCollectorSpiderResourceSerializer(BaseSerializer):
         if obj.name in self.running_spider_names:
             return True
         return False
+
+

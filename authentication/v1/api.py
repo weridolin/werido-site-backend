@@ -164,6 +164,7 @@ from django_redis import get_redis_connection
 from redis.client import Redis
 import json
 import time
+from rbac.permission import get_user_perms
 
 
 @api_view(http_method_names=["POST"])
@@ -175,10 +176,11 @@ def login(request,**kwargs):
         _login(request, user)
         try:
             user_profile = UserProfile.objects.get(user_id = user.id)
-        # permissions = get_permission(user_profile=user_profile)
+            roles,groups,role_perms = get_user_perms(user=user)
         except UserProfile.DoesNotExist:
             user_profile = None
 
+        # 
         # 将permission缓存到redis
         # conn:Redis = get_redis_connection("default") # return redis client:<redis.client.Redis>
         # conn.set(UserBriefInfo.from_user(user).cache_permission_key,
@@ -190,8 +192,14 @@ def login(request,**kwargs):
             "access_token":str(refresh_token.access_token),
             "refresh_token":str(refresh_token),
             # "permissions_dict":permissions,
-            "profile":UserProfileSerializer(instance=user_profile).data if user_profile else None
+            "user_info":{
+                "profile":UserProfileSerializer(instance=user_profile).data if user_profile else None,
+                "permissions":role_perms,
+                "roles":[role.role_name for role in roles]
+            }
+        
         }
+        print(role_perms)
         return HTTPResponse(
             data=data,
             code=0,

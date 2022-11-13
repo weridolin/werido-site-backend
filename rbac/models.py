@@ -50,7 +50,7 @@ class UserPermissionShip(BaseModel):
         unique_together = ('permission_id', 'user_id') 
 
     
-    permission_id = models.IntegerField(null=False,help_text="权限id",verbose_name="权限id",db_index=True)
+    permission_id = models.IntegerField(null=False,help_text="对应权限内容表的id",verbose_name="对应权限内容表的id",db_index=True)
     user_id = models.IntegerField(null=False,help_text="用户id",verbose_name="用户id",db_index=True)    
 
 class GroupRoleShip(BaseModel):
@@ -82,9 +82,9 @@ class Permissions(BaseModel):
         db_table = "rbac_permission"
         verbose_name = "rbac_权限表"
         verbose_name_plural = "rbac_权限表" 
-        # unique_together = ('permission_id', 'permission_type') 
+        unique_together = ('permission_id', 'permission_type') 
     
-    # permission_id = models.IntegerField(null=False,help_text="对应权限种类表中的ID",verbose_name="对应权限种类表中的ID",db_index=True)
+    permission_id = models.IntegerField(null=False,help_text="对应权限种类表中的ID",verbose_name="对应权限种类表中的ID",db_index=True)
     permission_type = models.CharField(max_length=64,null=False,help_text="权限类型",verbose_name="权限类型",db_index=True)    
 
 
@@ -108,20 +108,24 @@ class Menu(BaseModel):
         verbose_name_plural = "rbac_菜单"
 
     menu_name = models.CharField(max_length=128,null=False,help_text="菜单名称",verbose_name="菜单名称")
-    menu_url = models.CharField(max_length=128,null=False,help_text="菜单url",verbose_name="菜单url")
-    p_id = models.IntegerField(null=False,help_text="父级菜单",verbose_name="父级菜单")
+    menu_url = models.CharField(max_length=128,null=False,help_text="菜单url",verbose_name="菜单url",unique=True)
+    menu_icon = models.CharField(max_length=128,null=True,help_text="菜单对应的vue-icon",verbose_name="菜单对应的Vue-icon")
+    menu_type = models.SmallIntegerField(null=False,default=0,help_text="菜单类型:0菜单 1按钮",verbose_name="菜单类型:0菜单 1按钮")
+    menu_view_path = models.CharField(max_length=128,null=True,help_text="菜单对应的page路径",verbose_name="菜单对应的page路径")
+    menu_route_name = models.CharField(max_length=128,null=True,help_text="路由名称",verbose_name="路由名称")
+    p_id = models.ForeignKey("Menu",null=True,help_text="父级菜单",verbose_name="父级菜单",on_delete=models.CASCADE)
+    # redirect = models.CharField(max_length=128,null=True,help_text="重定向到路由名称",verbose_name="重定向到路由名称")
 
-
-class MenuPermissionShip(BaseModel):
-    # 菜单权限关联到中间权限表
-    class Meta:
-        db_table = "rbac_permission_menu"
-        verbose_name = "rbac_菜单权限关联表"
-        verbose_name_plural = "rbac_菜单权限关联表"    
-        unique_together = ('menu_id', 'permission_id') 
+# class MenuPermissionShip(BaseModel):
+#     # 菜单权限关联到中间权限表
+#     class Meta:
+#         db_table = "rbac_permission_menu"
+#         verbose_name = "rbac_菜单权限关联表"
+#         verbose_name_plural = "rbac_菜单权限关联表"    
+#         unique_together = ('menu_id', 'permission_id') 
     
-    menu_id = models.IntegerField(null=False,help_text="菜单id",verbose_name="菜单id")
-    permission_id = models.IntegerField(null=False,help_text="对应的权限id",verbose_name="对应的权限id")
+#     menu_id = models.IntegerField(null=False,help_text="菜单id",verbose_name="菜单id")
+#     permission_id = models.IntegerField(null=False,help_text="对应的权限id",verbose_name="对应的权限id")
 
 
 class ModelOperation(BaseModel):
@@ -137,16 +141,16 @@ class ModelOperation(BaseModel):
     # op_model = models.IntegerField(null=False,help_text="操作的表",verbose_name="操作的表")
     op_model_name = models.CharField(max_length=128,null=False,help_text="操作表的名称",verbose_name="操作表的名称")
     description = models.TextField(null=True,help_text="操作的权限的描述",verbose_name="操作的权限的描述")
-    p_id = models.IntegerField(null=True,help_text="父操作ID",verbose_name="父操作ID")
+    p_id = models.ForeignKey("ModelOperation",null=True,help_text="父操作ID",verbose_name="父操作ID",on_delete=models.CASCADE)
 
 
 
-class OperationPermissionShip(BaseModel):
-    class Meta:
-        db_table = "rbac_operation_permission"
-        verbose_name = "rbac_表操作权限关联表"
-        verbose_name_plural = "rbac_表操作权限关联表"
-        unique_together = ('op_id', 'permission_id') 
+# class OperationPermissionShip(BaseModel):
+#     class Meta:
+#         db_table = "rbac_operation_permission"
+#         verbose_name = "rbac_表操作权限关联表"
+#         verbose_name_plural = "rbac_表操作权限关联表"
+#         unique_together = ('op_id', 'permission_id') 
 
-    op_id = models.IntegerField(null=False,help_text="操作id",verbose_name="操作id")
-    permission_id = models.IntegerField(null=False,help_text="对应的权限id",verbose_name="对应的权限id")
+#     op_id = models.IntegerField(null=False,help_text="操作id",verbose_name="操作id")
+#     permission_id = models.IntegerField(null=False,help_text="对应的权限id",verbose_name="对应的权限id")
