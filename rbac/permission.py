@@ -109,6 +109,12 @@ def get_roles_perms(roles):
             perms.update({
                 "menu": format_menu(MenuSerializer(menus,many=True).data,parent=None,cache=list())
             })
+    else:
+        perms.update({
+            "model_op":[],
+            "menu":[]
+
+        })
 
     return perms
 

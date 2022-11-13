@@ -71,6 +71,7 @@ class TaskOperationView(APIView):
         )
 
     def _start_spider(self,spider_name,unique_flag):
+        # import subprocess
         time =  datetime.datetime.strftime(datetime.datetime.now(),"%Y-%m-%d-%H-%M-%S")
         log_path = os.path.join(settings.LOG_ROOT,f"{time}_spider.log")
         pid_path = os.path.join(settings.LOG_ROOT,f"spider_pid.txt")
