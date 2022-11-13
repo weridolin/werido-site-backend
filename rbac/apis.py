@@ -34,3 +34,34 @@ def add_menu(menu_name,menu_url,menu_icon,menu_type,menu_view_path,menu_route_na
         permission.save()        
     return menu
 
+
+from rest_framework.views import APIView
+from utils.http_ import HTTPResponse
+from rbac.models import Menu
+from rbac.serializers import MenuSerializer
+from rest_framework import status
+from rest_framework_simplejwt.authentication import JWTAuthentication
+
+class MenuApis(APIView):
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes=[]
+
+    def get(self,request,pk=None):
+        if not pk:
+            menus=Menu.objects.all()
+            return HTTPResponse(
+                data=MenuSerializer(menus,many=True).data
+            )
+        else:
+            try:
+                menus=Menu.objects.get(id=pk)
+                return HTTPResponse(
+                    data=MenuSerializer(menus).data
+                )                
+            except Menu.DoesNotExist:
+                return HTTPResponse(
+                    status=status.HTTP_404_NOT_FOUND,
+                    message=f"can not find menu(id={pk})"
+                )
+

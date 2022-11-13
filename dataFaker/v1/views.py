@@ -52,7 +52,7 @@ class FakerRecord(APIView):
     def post(self,request):
         ## 初始化record生成信息
         if not request.user.is_authenticated:
-            user = User.objects.get(id=1)
+            user = User.objects.get(id=2)
         else:
             user = request.user
         ## 先判断是否已经存在，是的直接返回下载码:

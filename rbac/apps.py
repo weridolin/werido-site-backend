@@ -45,8 +45,8 @@ class RbacConfig(AppConfig):
         #     )
 
         # # 添加 菜单
-        print("添加默认菜单......")
-        self.add_default_menu()
+        # print("添加默认菜单......")
+        # self.add_default_menu()
 
         return super().ready()
 
@@ -56,23 +56,23 @@ class RbacConfig(AppConfig):
                 "menu_name": "管理后台",
                 "menu_url": "/admin",
                 "menu_route_name": "adminIndex",
-                "menu_icon": "icon",
+                "menu_icon": "Files",
                 "menu_type": 0,
-                "menu_view_path": "DashBoard.vue",  
+                "menu_view_path": "Index.vue",  
                 "children":[
                         {
                             "menu_name": "权限管理",
                             "menu_url": "/admin/permissions",
                             "menu_route_name": "adminPermissions",
-                            "menu_icon": "icon",
+                            "menu_icon": "Lock",
                             "menu_type": 0,
-                            "menu_view_path": "permissions.vue",
+                            "menu_view_path": "PermissionManager.vue",
                             "children": [
                                 {
                                     "menu_name": "菜单管理",
                                     "menu_url": "/admin/permissions/menus",
                                     "menu_route_name": "adminPermissionsMenus",
-                                    "menu_icon": "icon",
+                                    "menu_icon": "Menu",
                                     "menu_type": 0,
                                     "menu_view_path": "MenuManager.vue",
                                     "children": []
@@ -81,7 +81,7 @@ class RbacConfig(AppConfig):
                                     "menu_name": "数据库管理",
                                     "menu_url": "/admin/permissions/models",
                                     "menu_route_name": "adminPermissionsModelsOp",
-                                    "menu_icon": "icon",
+                                    "menu_icon": "List",
                                     "menu_type": 0,
                                     "menu_view_path": "ModelOpManager.vue",
                                     "children": []
@@ -90,7 +90,7 @@ class RbacConfig(AppConfig):
                                     "menu_name": "角色管理",
                                     "menu_url": "/admin/permissions/roles",
                                     "menu_route_name": "adminPermissionsRoles",
-                                    "menu_icon": "icon",
+                                    "menu_icon": "UserFilled",
                                     "menu_type": 0,
                                     "menu_view_path": "RoleManager.vue",
                                     "children": []
@@ -101,7 +101,7 @@ class RbacConfig(AppConfig):
                             "menu_name": "用户管理",
                             "menu_url": "/admin/users",
                             "menu_route_name": "adminUserManager",
-                            "menu_icon": "icon",
+                            "menu_icon": "User",
                             "menu_type": 0,
                             "menu_view_path": "UserManager.vue",
                             "children": []
