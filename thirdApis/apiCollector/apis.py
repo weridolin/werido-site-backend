@@ -71,20 +71,22 @@ class TaskOperationView(APIView):
         )
 
     def _start_spider(self,spider_name,unique_flag):
-        # import subprocess
         time =  datetime.datetime.strftime(datetime.datetime.now(),"%Y-%m-%d-%H-%M-%S")
         log_path = os.path.join(settings.LOG_ROOT,f"{time}_spider.log")
         pid_path = os.path.join(settings.LOG_ROOT,f"spider_pid.txt")
         scrapy_cmd = f"scrapy crawl {spider_name} --logfile {log_path} --pidfile {pid_path}"
         python_exc = sys.executable
         if sys.platform.lower()=="linux":
-            cmd = f"cd {settings.SPIDER_DIR}  && {python_exc} -m {scrapy_cmd} -a unique_flag={unique_flag}"
-            p = subprocess.Popen(args=cmd)
+            cmd =["python","-m","scrapy","crawl",spider_name,"--logfile",log_path,"--pidfile",pid_path,"-a",f"unique_flag={unique_flag}"]
+            print("exec command",cmd,settings.SPIDER_DIR)
+            p = subprocess.Popen(args=cmd,cwd=settings.SPIDER_DIR)
         else:
             cmd = f"{python_exc} -m {scrapy_cmd} -a unique_flag={unique_flag}"
+            print("exec command",cmd,settings.SPIDER_DIR)
             p = subprocess.Popen(args=cmd,cwd=settings.SPIDER_DIR)
-        print("exec command",cmd,settings.SPIDER_DIR)
+            
         return log_path,p.pid,cmd
+
 
 
 
