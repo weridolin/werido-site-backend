@@ -8,13 +8,16 @@ platform: windows 10
 LastEditors: lhj
 LastEditTime: 2021-10-02 18:19:03
 '''
+from rest_framework.pagination import PageNumberPagination
+from rest_framework import serializers
 from django.db import models
-from django.utils import timezone
+from utils.http_ import HTTPResponse
 
-TypesChoice=[
-    ("article","article"),
-    ("project","project")
+TypesChoice = [
+    ("article", "article"),
+    ("project", "project")
 ]
+
 
 class BaseModel(models.Model):
     created = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
@@ -22,23 +25,36 @@ class BaseModel(models.Model):
 
     class Meta:
         app_label = 'Base'
-        managed = False 
+        managed = False
         abstract = True
 
 
-from rest_framework import serializers
-
 class BaseSerializer(serializers.ModelSerializer):
-    created = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
-    updated = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
+    created = serializers.DateTimeField(
+        format="%Y-%m-%d %H:%M:%S", read_only=True)
+    updated = serializers.DateTimeField(
+        format="%Y-%m-%d %H:%M:%S", read_only=True)
 
 
+# class ResponseWithCallback(HttpResponse):
 
-from django.http import HttpResponse
+#     def close(self) -> None:
+#         super().close()
 
 
-class ResponseWithCallback(HttpResponse):
+class PageNumberPaginationWrapper(PageNumberPagination):
+    page_size=20
+    page_size_query_param="page_size"
+    max_page_size=50
 
-    def close(self) -> None:
-        super().close()
-        
+    def get_paginated_response(self, data):
+        response=super().get_paginated_response(data)
+        return HTTPResponse(
+            data=response.data
+        )
+
+
+from rest_framework.filters import OrderingFilter
+class  OrderingFilterWrapper(OrderingFilter):
+    ordering_fields = ordering = ['id']
+    ordering_param = "sort"

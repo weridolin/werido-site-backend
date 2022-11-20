@@ -109,10 +109,10 @@ class Menu(BaseModel):
 
     menu_name = models.CharField(max_length=128,null=False,help_text="菜单名称",verbose_name="菜单名称")
     menu_url = models.CharField(max_length=128,null=False,help_text="菜单url",verbose_name="菜单url",unique=True)
-    menu_icon = models.CharField(max_length=128,null=True,help_text="菜单对应的vue-icon",verbose_name="菜单对应的Vue-icon")
+    menu_icon = models.CharField(max_length=128,null=True,blank=True,help_text="菜单对应的vue-icon",verbose_name="菜单对应的Vue-icon")
     menu_type = models.SmallIntegerField(null=False,default=0,help_text="菜单类型:0菜单 1按钮",verbose_name="菜单类型:0菜单 1按钮")
-    menu_view_path = models.CharField(max_length=128,null=True,help_text="菜单对应的page路径",verbose_name="菜单对应的page路径")
-    menu_route_name = models.CharField(max_length=128,null=True,help_text="路由名称",verbose_name="路由名称")
+    menu_view_path = models.CharField(max_length=128,null=False,help_text="菜单对应的page路径",verbose_name="菜单对应的page路径")
+    menu_route_name = models.CharField(max_length=128,null=False,help_text="路由名称",verbose_name="路由名称")
     p_id = models.ForeignKey("Menu",null=True,help_text="父级菜单",verbose_name="父级菜单",on_delete=models.CASCADE)
     # redirect = models.CharField(max_length=128,null=True,help_text="重定向到路由名称",verbose_name="重定向到路由名称")
 
@@ -140,7 +140,7 @@ class ModelOperation(BaseModel):
     op_name = models.CharField(max_length=128,null=False,help_text="操作名称",verbose_name="操作名称")
     # op_model = models.IntegerField(null=False,help_text="操作的表",verbose_name="操作的表")
     op_model_name = models.CharField(max_length=128,null=False,help_text="操作表的名称",verbose_name="操作表的名称")
-    description = models.TextField(null=True,help_text="操作的权限的描述",verbose_name="操作的权限的描述")
+    description = models.TextField(null=True,blank=True,help_text="操作的权限的描述",verbose_name="操作的权限的描述")
     p_id = models.ForeignKey("ModelOperation",null=True,help_text="父操作ID",verbose_name="父操作ID",on_delete=models.CASCADE)
 
 

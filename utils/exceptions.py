@@ -17,10 +17,13 @@ def exceptions_handler(exc,content):
             app_code="auth"
         )
     if isinstance(exc,ValidationError):
-        err_messages= ""
-        for field,_ in exc.detail.items():
-            err_messages += f"[{field}] "
-        err_messages+=" not invalid value"
+        err_messages= "请求的参数错误,详细如下:"
+        for field,ErrorDetailList in exc.detail.items():
+            print(field,ErrorDetailList)
+            err_messages += f"[{field}]:"
+            for ErrorDetail in ErrorDetailList:
+                err_messages += f"{str(ErrorDetail)}  ."
+        # err_messages+=" not invalid value"
         return HTTPResponse(
             code=-1,
             status = status.HTTP_400_BAD_REQUEST,

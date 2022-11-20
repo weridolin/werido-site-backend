@@ -17,15 +17,18 @@ import uuid
 
 class UserSerializer(BaseSerializer):
     last_login = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
-    # updated = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
+    date_joined = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
     class Meta:
         model = User
         fields =[
+            "id",
             "last_login",
             "first_name",
             "username",
             "last_name",
-            "email"]
+            "email",
+            "is_superuser",
+            "date_joined"]
 
 
     def update(self, instance, validated_data):
@@ -97,3 +100,6 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class=CustomTokenObtainPairSerializer       
+
+
+# class UserSerializer
