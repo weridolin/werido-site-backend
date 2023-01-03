@@ -26,7 +26,6 @@ from django.http import HttpResponseForbidden, HttpResponseNotFound, HttpRespons
 from rest_framework import permissions
 from django.contrib.auth.models import Permission, User
 from authentication.models import UserProfile, ThirdOauthInfo
-from rest_framework.authentication import SessionAuthentication, TokenAuthentication, get_authorization_header
 from authentication.v1.serializers import UserProfileSerializer, OauthInfoSerializer
 from authentication.v1.singals import created_done
 from rest_framework.decorators import action
@@ -38,6 +37,7 @@ from rest_framework.throttling import UserRateThrottle, AnonRateThrottle
 from core.base import OrderingFilterWrapper
 from django_filters.rest_framework.backends import DjangoFilterBackend
 import django_filters
+from rbac.models import UserRoleShip
 
 
 @api_view(http_method_names=["POST"])
@@ -110,13 +110,12 @@ class UserInfoFilter(django_filters.FilterSet):
     email = django_filters.CharFilter(
         lookup_expr="iexact", field_name="email")
     # tags = django_filters.CharFilter(lookup_expr="icontains", field_name = "tags__name")
-    created = django_filters.DateTimeFromToRangeFilter(field_name="date_joined")
+    created = django_filters.DateTimeFromToRangeFilter(
+        field_name="date_joined")
 
     class Meta:
         model = User
         fields = ["username", "email", "created"]
-
-
 
 
 class UserProfileApis(viewsets.ModelViewSet):
@@ -129,15 +128,6 @@ class UserProfileApis(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     filter_backends = [OrderingFilterWrapper, DjangoFilterBackend]
     filterset_class = UserInfoFilter
-
-    # def retrieve(self, request, *args, **kwargs):
-    #     return HTTPResponse(
-    #         status=status.HTTP_405_METHOD_NOT_ALLOWED,
-    #         message="no permission!"
-    #     )
-
-    # def update(self, request, *args, **kwargs):
-    #     return super().update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
         super().destroy(request, *args, **kwargs)
@@ -238,14 +228,29 @@ class UserProfileApis(viewsets.ModelViewSet):
             payload = {"data": [], "code": 404}
             return Response(data=payload, status=status.HTTP_404_NOT_FOUND)
 
+    @action(
+        methods=["POST"], 
+        detail=False,
+        queryset=UserProfile.objects.all(),
+        serializer_class=UserProfileSerializer,
+        permission_classes=[permissions.IsAuthenticated,permissions.IsAdminUser])
+    def roles(self, request):
+        """
+            设置用户角色
+        """
+        user_id,role_ids = request.data.get("user_id"),request.data.get("role_id",list())
+        # print(">>> set roles",user_id,role_ids)
+        if not user_id:
+            return HTTPResponse(
+                status=status.HTTP_400_BAD_REQUEST,
+                message="请先选择用户"
+            )
+        for role_id in role_ids:
+            UserRoleShip.objects.update_or_create(role_id=role_id,user_id=user_id)
+        return HTTPResponse(
+            message="设置用户角色成功!"
+        )
 
-# class UserViewSet(ModelViewSet):
-
-#     authentication_classes = [JWTAuthentication]
-#     permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
-
-#     queryset = User.objects.all()
-#     serializer_class = UserSerializer
 
 
 def filter_profie(info: dict):

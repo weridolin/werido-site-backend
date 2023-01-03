@@ -25,6 +25,9 @@ env = environ.Env(
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+if not os.path.exists(os.path.join(BASE_DIR,".env")):
+    print("can not find .env file...")
+    
 environ.Env.read_env(os.path.join(BASE_DIR,".env"))
 
 EMAIL_PWD = env('EMAIL_PWD')
@@ -68,6 +71,7 @@ INSTALLED_APPS = [
     "celery_app.apps.CeleryAppConfig",
     "dataFaker.apps.DatafakerConfig",
     'oauth.apps.OauthConfig',
+    "covid19.apps.Covid19Config",
 ]
 
 ########## DJANGO CHANNELS

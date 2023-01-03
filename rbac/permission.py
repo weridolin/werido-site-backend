@@ -53,7 +53,7 @@ class RbacModelPermission(BasePermission):
             'model_name': orm._meta.model_name
         }
         perm_required = [perm %
-                         kwargs for perm in self.perms_map[request.method]]
+                        kwargs for perm in self.perms_map[request.method]]
 
         user_perms = self._get_perms_from_token(request)
 

@@ -1,6 +1,17 @@
 from django.db import models
-from core.base import BaseModel
+# from core.base import BaseModel
 # Create your models here.
+
+
+
+class BaseModel(models.Model):
+    created = models.DateField(auto_now_add=True, verbose_name='创建时间',unique=True,db_index=True)
+    updated = models.DateField(auto_now=True, verbose_name='修改时间',unique=True,db_index=True)
+
+    class Meta:
+        app_label = 'Covid'
+        managed = False
+        abstract = True
 
 class Country(BaseModel):
 
@@ -8,17 +19,17 @@ class Country(BaseModel):
         __tablename__="covid_country_data"
 
 
-    country_code= models.CharField(verbose_name="国家对应的高德地图里面的编码",max_length=32,unique=True,null=False,blank=False,help_text="国家对应的高德地图里面的编码")
-    country_code_cn= models.CharField(verbose_name="国家名称中文",max_length=32,unique=True,null=False,blank=False,help_text="国家名称中文")
-    country_code_en= models.CharField(verbose_name="国家名称英文",max_length=32,unique=True,null=False,blank=False,help_text="国家名称英文")
+    # country_code= models.CharField(verbose_name="国家对应的高德地图里面的编码",max_length=32,unique=True,null=False,blank=False,help_text="国家对应的高德地图里面的编码")
+    country_name_cn= models.CharField(verbose_name="国家名称中文",max_length=32,unique=True,null=False,blank=False,help_text="国家名称中文")
+    country_name_en= models.CharField(verbose_name="国家名称英文",max_length=32,unique=True,null=False,blank=False,help_text="国家名称英文")
 
-    current_confirmed_count = models.IntegerField(
-        verbose_name="新增确诊人数",null=False,blank=False,help_text="新增确诊人数",default=0)
+    # current_confirmed_count = models.IntegerField(
+    #     verbose_name="新增确诊人数",null=False,blank=False,help_text="新增确诊人数",default=0)
 
     confirmed_count = models.IntegerField(
         verbose_name="确诊总人数",null=False,blank=False,help_text="确诊总人数",default=0)
-    confirmed_count2 = models.IntegerField(
-        verbose_name="无症状确诊人数",null=False,blank=False,help_text="无症状确诊人数",default=0)
+    # current_confirmed_count_no_symptom = models.IntegerField(
+    #     verbose_name="新增无症状确诊人数",null=False,blank=False,help_text="新增无症状确诊人数",default=0)
     cured_count = models.IntegerField(
         verbose_name="治愈人数",null=False,blank=False,help_text="治愈人数",default=0)
     dead_count = models.IntegerField(
@@ -29,16 +40,17 @@ class Province(BaseModel):
     class Meta:
         __tablename__="covid_province_data"
 
-    country_code= models.CharField(verbose_name="省份对应的高德地图里面的编码",max_length=32,unique=True,null=False,blank=False,help_text="省份对应的高德地图里面的编码")
+    province_code= models.CharField(verbose_name="省份对应的高德地图里面的编码",max_length=32,unique=True,null=False,blank=False,help_text="省份对应的高德地图里面的编码")
 
+    province_name= models.CharField(verbose_name="省份名称",max_length=32,unique=True,null=False,blank=False,help_text="省份名称")
 
     current_confirmed_count = models.IntegerField(
         verbose_name="新增确诊人数",null=False,blank=False,help_text="新增确诊人数",default=0)
 
     confirmed_count = models.IntegerField(
         verbose_name="确诊总人数",null=False,blank=False,help_text="确诊总人数",default=0)
-    confirmed_count2 = models.IntegerField(
-        verbose_name="无症状确诊人数",null=False,blank=False,help_text="无症状确诊人数",default=0)
+    current_confirmed_count_no_symptom = models.IntegerField(
+        verbose_name="新增无症状确诊人数",null=False,blank=False,help_text="新增无症状确诊人数",default=0)
     cured_count = models.IntegerField(
         verbose_name="治愈人数",null=False,blank=False,help_text="治愈人数",default=0)
     dead_count = models.IntegerField(
@@ -49,15 +61,18 @@ class City(BaseModel):
     class Meta:
         __tablename__="covid_city_data"
 
-    country_code= models.CharField(verbose_name="城市对应的高德地图里面的编码",max_length=32,unique=True,null=False,blank=False,help_text="城市对应的高德地图里面的编码")
+    city_code= models.CharField(verbose_name="城市对应的高德地图里面的编码",max_length=32,unique=True,null=False,blank=False,help_text="城市对应的高德地图里面的编码")
+    
+    city_name= models.CharField(verbose_name="城市名称",max_length=32,unique=True,null=False,blank=False,help_text="城市名称")
+
 
     current_confirmed_count = models.IntegerField(
         verbose_name="新增确诊人数",null=False,blank=False,help_text="新增确诊人数",default=0)
 
     confirmed_count = models.IntegerField(
         verbose_name="确诊总人数",null=False,blank=False,help_text="确诊总人数",default=0)
-    confirmed_count2 = models.IntegerField(
-        verbose_name="无症状确诊人数",null=False,blank=False,help_text="无症状确诊人数",default=0)
+    current_confirmed_count_no_symptom = models.IntegerField(
+        verbose_name="新增无症状确诊人数",null=False,blank=False,help_text="新增无症状确诊人数",default=0)
     cured_count = models.IntegerField(
         verbose_name="治愈人数",null=False,blank=False,help_text="治愈人数",default=0)
     dead_count = models.IntegerField(

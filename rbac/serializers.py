@@ -1,5 +1,5 @@
 from core.base import BaseSerializer
-from rbac.models import Menu
+from rbac.models import Menu,Role,ModelOperation,Permissions
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
@@ -69,9 +69,66 @@ class MenuSerializer(BaseSerializer):
     #     return obj
 
     def create(self, validated_data):
-        print("create menu", validated_data)
-        return super().create(validated_data)
+        # print("create menu", validated_data)
+        instance =  super().create(validated_data)
+        # 插入到对用permission表中
+        Permissions.objects.update_or_create(
+            permission_id = instance.id,
+            permission_type="menu"
+        )
+        return instance
 
     def update(self, instance, validated_data):
-        print("update menu", validated_data)
+        # print("update men)
         return super().update(instance, validated_data)
+        # print(instance.id,"create menu success")
+        # return instance
+
+
+
+
+class RoleSerializer(BaseSerializer):
+    class Meta:
+        model = Role
+        fields = '__all__'
+        depth = 1
+        extra_kwargs = {
+            "role_name": {
+                "error_messages": {
+                    "required": _("角色名称不能为空!"),
+                    # "unique": _("菜单url已经存在") todo
+                }
+            }
+        }
+
+
+class PermissionSerializer(BaseSerializer):
+    ...
+
+
+class ModelAccessSerializer(BaseSerializer):
+
+    class Meta:
+        model = ModelOperation
+        fields = '__all__'
+        depth = 1
+        extra_kwargs = {
+            "app_label": {
+                "error_messages": {
+                    "required": _("所属模块不能为空!"),
+                    # "unique": _("菜单url已经存在") todo
+                }
+            },
+            "op_name": {
+                "error_messages": {
+                    "required": _("操作名称不能为空!"),
+                    # "unique": _("菜单url已经存在") todo
+                }
+            },
+            "op_model_name": {
+                "error_messages": {
+                    "required": _("操作的表不能为空!"),
+                    # "unique": _("菜单url已经存在") todo
+                }
+            }
+        }

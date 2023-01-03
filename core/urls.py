@@ -77,7 +77,8 @@ urlpatterns = [
     path("api/v1/third",include('thirdApis.urls')),
     path("api/oauth/test/",include('oauth2_provider.urls')),
     path("api/celeryTest",celery_test),
-    path("api/v1/rbac/",include('rbac.urls'))
+    path("api/v1/rbac/",include('rbac.urls')),
+    path("api/v1/covid19/",include('covid19.v1.urls'))
 
 ]
 

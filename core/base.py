@@ -41,7 +41,7 @@ class BaseSerializer(serializers.ModelSerializer):
 #     def close(self) -> None:
 #         super().close()
 
-
+## 统一下返回格式
 class PageNumberPaginationWrapper(PageNumberPagination):
     page_size=20
     page_size_query_param="page_size"

@@ -1,7 +1,8 @@
 from rest_framework.views import exception_handler
 from rest_framework_simplejwt.exceptions import InvalidToken
 from .http_ import HTTPResponse
-from rest_framework.exceptions import ValidationError,PermissionDenied,MethodNotAllowed
+from rest_framework.exceptions import \
+    ValidationError,PermissionDenied,MethodNotAllowed,UnsupportedMediaType,NotAcceptable
 from rest_framework import status
 import json
 
@@ -43,4 +44,23 @@ def exceptions_handler(exc,content):
             status = status.HTTP_405_METHOD_NOT_ALLOWED,
             message=f"请求方法不被允许"
         )   
+    if isinstance(exc,UnsupportedMediaType):
+        return HTTPResponse(
+            code=-1,
+            status = status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+            message=exc.detail
+        )  
+    if isinstance(exc,NotAcceptable):
+        return HTTPResponse(
+            code=-1,
+            status = status.HTTP_406_NOT_ACCEPTABLE,
+            message=exc.detail
+        ) 
+    if isinstance(exc,UnsupportedMediaType):
+        return HTTPResponse(
+            code=-1,
+            status = status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+            message=f"请求body的类型无法解析!"
+        )  
+    # print(">>>>>" ,exc,type(exc))
     return exception_handler(exc,content)

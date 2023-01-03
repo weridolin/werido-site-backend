@@ -58,3 +58,4 @@ class ApiInfosModel(DeclarativeBase):
     expire_time = sa.Column(sa.DateTime,nullable=False,comment="到期时间")
     api_price =sa.Column(sa.Float,nullable=False,comment="api价格")
     api_price_unit = sa.Column(sa.String(64),nullable=False,comment="api价格单位")
+

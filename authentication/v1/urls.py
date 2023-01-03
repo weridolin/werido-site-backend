@@ -30,3 +30,5 @@ urlpatterns = [
     path('token/blacklist/', TokenBlacklistView.as_view(), name='token_blacklist'), # 让refresh token失效
 ]
 urlpatterns += router.urls
+
+print("user routers --> ",urlpatterns)

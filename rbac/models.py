@@ -36,6 +36,7 @@ class Role(BaseModel):
         verbose_name_plural = "rbac_用户角色"
 
     role_name = models.CharField(max_length=128,null=False,help_text="用户角色",verbose_name="用户角色",unique=True)
+    role_descriptions = models.TextField(help_text="角色描述",verbose_name="角色描述",null=True,blank=True)
     # p_id = models.IntegerField(null=False,default=-1,help_text="父用户组名称",verbose_name="父用户组名称")   # 考虑角色继承？ RBAC1引入了角色继承
 
     # RBAC1，基于RBAC0模型，引入角色间的继承关系，即角色上有了上下级的区别，角色间的继承关系可分为一般继承关系和受限继承关系。

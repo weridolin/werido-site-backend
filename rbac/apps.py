@@ -23,14 +23,14 @@ class RbacConfig(AppConfig):
         #             add_model_op_permission(app_label=app_label,op_name=f"update",op_model_name=name,description=f"对表:{name}修改的权限")
 
         # # 添加 菜单
-        print("添加默认菜单......")
-        self.add_default_menu()
+        # print("添加默认菜单......")
+        # self.add_default_menu()
 
-        # ## 初始化角色
-        print("初始化角色信息...")
-        super_role,_ = Role.objects.update_or_create(role_name="超级管理员")
-        guest_role,_ = Role.objects.update_or_create(role_name="游客")
-        guest_role,_ = Role.objects.update_or_create(role_name="普通用户") 
+        # # ## 初始化角色
+        # print("初始化角色信息...")
+        # super_role,_ = Role.objects.update_or_create(role_name="超级管理员")
+        # guest_role,_ = Role.objects.update_or_create(role_name="游客")
+        # guest_role,_ = Role.objects.update_or_create(role_name="普通用户") 
 
         ## 为普通用户添加菜单权限
 
