@@ -18,7 +18,7 @@ from rbac.models import Role,UserRoleShip
 from django.dispatch import Signal
 
 created_done = Signal()
-from core.celery import send_welcome_mail
+from celery_app.tasks import send_welcome_mail
 
 #django 的signal是同步执行，如果耗时操作（发送邮件或者email,不建议用信号来处理）
 @receiver(created_done,sender=User,dispatch_uid="create-profile")

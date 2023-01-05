@@ -6,7 +6,6 @@ from rest_framework.response import Response
 import json
 from rest_framework import status
 
-
 CODE_DEFAULT_DESC_REF = {
     i.value:i.description for i in HTTPStatus
 }

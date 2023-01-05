@@ -64,3 +64,5 @@ def exceptions_handler(exc,content):
         )  
     # print(">>>>>" ,exc,type(exc))
     return exception_handler(exc,content)
+
+class ResponseError(Exception):pass

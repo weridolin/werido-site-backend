@@ -1,6 +1,15 @@
+
+import asyncio
+from celery.loaders.app import AppLoader
 import os
 
 from celery import Celery
+
+
+class CeleryLoader(AppLoader):
+    def on_worker_process_init(self):
+        asyncio.set_event_loop(asyncio.new_event_loop())
+        return super().on_worker_process_init()
 
 
 # Set the default Django settings module for the 'celery' program.
@@ -14,85 +23,47 @@ app = Celery('site')
 #   should have a `CELERY_` prefix.
 app.config_from_object('django.conf:settings', namespace='CELERY')
 
+
+## 配置队列
+# from kombu import Queue
+# app.conf.task_default_queue = 'default'  
+# app.conf.task_queues = (  
+#     Queue('default', routing_key='default'),
+#     Queue('wechat', routing_key='wechat'),
+#     Queue('weather', routing_key='weather'),
+
+# )
+
 # Load task modules from all registered Django apps.
 app.autodiscover_tasks()
 
-import smtplib
-import datetime
-from core import settings
-from email.mime.text import MIMEText
-from email.mime.image import MIMEImage
-from email.mime.multipart import MIMEMultipart
-from email.header import Header
-from jinja2 import Environment
 
-@app.task
-def send_welcome_mail(receiver,number):
-        # host = getattr(settings,"EMAIL_HOST","smtp.qq.com")  
-        # mail_user = getattr(settings,"EMAIL_USER","weridolin@qq.com")   # 密码(部分邮箱为授权码)
-        mail_pass = os.environ.get("EMAIL_PWD",None)   # 邮件发送方邮箱地址
-        host = "smtp.qq.com"
-        mail_user = "weridolin@qq.com"   
-        sender = mail_user
-        # receivers = ["359066432@qq.com;notification@ibrpa.com"]  # 邮件接受方邮箱地址，注意需要[]包裹，这意味着你可以写多个邮件地址群发
-        receiver =[f"{receiver};{sender}"]
-        with open(os.path.join(os.path.dirname(os.path.dirname(__file__)),"templates", "email_notice.html"), encoding="utf-8") as f:
-            mail_body = f.read()
-        
-        mail_body = Environment().from_string(mail_body).render(
-        date=datetime.datetime.now().strftime('%Y-%m-%d'),
-        number=number)
-    
-        message = MIMEMultipart("alternative")
-        message.attach(MIMEText(mail_body, _subtype='html', _charset='utf-8'))
-        
-        content_img_path = os.path.join(os.path.dirname(os.path.dirname(__file__)),"static", "content.jpg")
-        if os.path.exists(content_img_path):
-            with open(content_img_path, "rb") as f:
-                img = MIMEImage(f.read())
-            img.add_header("Content-ID", "<content>")
-            message.attach(img)
-
-        message['Subject'] = Header("注册成功","utf-8") # 发送方信息
-        message['From'] = Header("林叔叔是个怪叔叔","utf-8")  # 接受方信息
-        message['To'] = ','.join(receiver)   # 登录并发送邮件
-
-        # import time
-        # time.sleep(10)
-        try:
-            conn = smtplib.SMTP_SSL(host=host, port=465)  # 连接到服务器
-            # smtpObj.connect(host,25) #登录到服务器
-            conn.login(mail_user, mail_pass)  # 发送
-            conn.sendmail(sender, receiver, message.as_string())  # 退出
-        except Exception as e:
-            raise
-        finally:
-            conn.quit()
+from celery_app.tasks import refresh_wechat_token, get_city_weather
 
 
-# @app.on_after_configure.connect
-# def setup_periodic_tasks(sender, **kwargs):
-#     # Calls test('hello') every 10 seconds.
-#     sender.add_periodic_task(10.0, test.s('hello'), name='add every 10')
-
-#     # Calls test('world') every 30 seconds
-#     sender.add_periodic_task(30.0, test.s('world'), expires=10)
-
-
-@app.task
-def test(arg):
-    print(arg,"loop for every 10")
-
-@app.task
-def add(x, y):
-    z = x + y
-    print(z,"loop for every 30")
+@app.on_after_configure.connect
+def setup_periodic_tasks(sender, **kwargs):
+    ...
+    # 刷新 wechat token
+    # sender.add_periodic_task(7200-5*60, refresh_wechat_token.s(), name='refresh-wechat-token')
+    # sender.add_periodic_task(10, get_city_weather.s("101010100""101010100"), name='get-weather')
 
 
-@app.task(bind=True)
-def bindKey(self, a, b):
-    print(a,b)
-    print(self)
-    self.update_state(state="PROGRESS", meta={'progress': 50})
-    self.update_state(state="PROGRESS", meta={'progress': 90})
-    return 'hello world: %i' % (a+b)
+app.conf.beat_schedule = {
+    # 'scheduler1': {
+    #     'task': 'celeryTask.wechat.get_city_weather',
+    #     'schedule': 10.0,
+    #     'options':{
+    #         "queue":"get_weather"
+    #     },
+    #     # 'args':("101010100",)
+    # },
+    'scheduler2': {
+        'task': 'celeryTask.wechat.refresh_wechat_token',
+        'schedule': 6,
+        'options':{
+            "queue":"get_wechat_token"
+        },
+        # 'args':("101010100",)
+    },    
+}  

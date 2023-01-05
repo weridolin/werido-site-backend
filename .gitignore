@@ -116,6 +116,7 @@ env.bak/
 venv.bak/
 logs/*
 
+TODO.
 
 # Spyder project settings
 .spyderproject

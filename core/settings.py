@@ -307,3 +307,6 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
+
+################## WECHAT公众号相关
+WEATHER_APIS=["https://v0.yiketianqi.com/api","https://v1.yiketianqi.com/api","https://yiketianqi.com/api"]
