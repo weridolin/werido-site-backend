@@ -147,3 +147,5 @@ cython_debug/
 gunicorn.pid
 supervisord.pid
 TODO.md
+
+linuxvenv
