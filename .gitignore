@@ -143,3 +143,7 @@ dmypy.json
 cython_debug/
 
 ./test.py
+
+gunicorn.pid
+supervisord.pid
+TODO.md
