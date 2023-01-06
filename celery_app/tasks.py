@@ -146,9 +146,9 @@ def get_city_weather(self):
                     f"https://restapi.amap.com/v3/weather/weatherInfo",
                     {
                         "key": os.environ.get("GAODE_WEATHER_API_APP_ID"),
-                        "city": city["citycode"],
+                        "city": city["adcode"],
                         "extensions": "all",
                     }
                 )
-                gl.link_value(callback=partial(callback,city_id=city["citycode"]))
+                gl.link_value(callback=partial(callback,city_id=city["adcode"]))
     print(">>> finish get weather",datetime.datetime.now())

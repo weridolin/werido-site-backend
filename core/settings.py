@@ -72,6 +72,7 @@ INSTALLED_APPS = [
     "dataFaker.apps.DatafakerConfig",
     'oauth.apps.OauthConfig',
     "covid19.apps.Covid19Config",
+    "wechat.apps.WechatConfig",
 ]
 
 ########## DJANGO CHANNELS
@@ -308,5 +309,3 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
 
-################## WECHAT公众号相关
-WEATHER_APIS=["https://v0.yiketianqi.com/api","https://v1.yiketianqi.com/api","https://yiketianqi.com/api"]
