@@ -86,18 +86,7 @@ def refresh_wechat_token():
             "secret": os.environ.get("WECHAT_APP_SECRET")
         }
     )
-    if res.json().get("errcode") == 0:
-        access_token = res.json().get("access_token")
-        expire_in = res.json().get("expires_in")
-        conn: Redis = get_redis_connection()
-        access_token = conn.set(
-            name=WECHAT.access_token_key(),
-            value=access_token,
-            ex=expire_in-5*60
-        )
-        print(">>> refresh token success", access_token)
-
-    else:
+    if res.json().get("errcode") and  res.json().get("errcode") != 0:
         err_msg = {
             -1: "系统繁忙，此时请开发者稍候再试",
             40001: "AppSecret错误或者 AppSecret 不属于这个公众号，请开发者确认 AppSecret 的正确性",
@@ -108,11 +97,24 @@ def refresh_wechat_token():
             89506: "24小时内该 IP 被管理员拒绝调用两次,24小时内不可再使用该 IP 调用",
             89507: "1小时内该 IP 被管理员拒绝调用一次,1小时内不可再使用该 IP 调用"
         }
-        print(">>> celery task error", err_msg.get(res.json().get("errcode")))
+        print(f">>> celery task error:{res.json()}", err_msg.get(res.json().get("errcode")))
+    else:
+        access_token = res.json().get("access_token")
+        expire_in = res.json().get("expires_in")
+        conn: Redis = get_redis_connection()
+        _ = conn.set(
+            name=WECHAT.access_token_key(),
+            value=access_token,
+            ex=expire_in-5*60
+        )
+        print(">>> refresh token success", access_token)
 
 
 @app.task(name="celeryTask.wechat.get_city_weather",bind=True)
 def get_city_weather(self):
+    """
+        数据来源:@https://lbs.amap.com/api/webservice/guide/api/weatherinfo/
+    """
     import gevent
     from gevent import monkey
     monkey.patch_all()
@@ -127,7 +129,7 @@ def get_city_weather(self):
             print(">>> 请求失败")
             # raise self.retry("请求失败",countdown=1)
         else:
-            print(res.json())
+            # print(res.json())
             conn: Redis = get_redis_connection()
             conn.set(
                 name=Weather.get_city_weather_key(city_id),
@@ -135,18 +137,18 @@ def get_city_weather(self):
                 ex=24*60*60
         )
     print(">>> start get weather",datetime.datetime.now())
-    with open(os.path.join(os.path.dirname(__file__),"city.json"),"r") as f:
-        city_infos = json.load(f)
 
-        for city in city_infos:
-            gl = gevent.spawn(requests.get,
-                f"https://v0.yiketianqi.com/api",
-                {
-                    "appid": os.environ.get("WEATHER_API_APP_ID"),
-                    "appsecret": os.environ.get("WEATHER_API_APP_SECRET"),
-                    "version": "v62",
-                    "cityid": city["id"]
-                }
-            )
-            gl.link_value(callback=partial(callback,city_id=city["id"]))
+    with open(os.path.join(os.path.dirname(__file__),"city_code.json"),"r") as f:
+        city_infos = json.load(f)
+        for city in city_infos[:10]:
+            if city["citycode"]!="NaN":
+                gl = gevent.spawn(requests.get,
+                    f"https://restapi.amap.com/v3/weather/weatherInfo",
+                    {
+                        "key": os.environ.get("GAODE_WEATHER_API_APP_ID"),
+                        "city": city["citycode"],
+                        "extensions": "all",
+                    }
+                )
+                gl.link_value(callback=partial(callback,city_id=city["citycode"]))
     print(">>> finish get weather",datetime.datetime.now())

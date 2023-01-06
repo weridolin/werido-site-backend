@@ -144,4 +144,6 @@ cython_debug/
 
 ./test.py
 
-linuxvenv
+gunicorn.pid
+supervisord.pid
+TODO.md
