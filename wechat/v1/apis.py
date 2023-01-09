@@ -11,7 +11,7 @@ from rest_framework import status
 from rest_framework import renderers,parsers
 from rest_framework.response import Response
 # from django.http import request
-from wechat.v1.msg_handlers import text_msg_handler
+from wechat.v1.msg_handlers import text_msg_handler,DEFAULT_REPLY_CONTENT,TEXT_REPLY_XML_TEMPLATE
 
 class CheckTokenRender(renderers.JSONRenderer):
 
@@ -51,6 +51,17 @@ class PublicCountMessageApis(ModelViewSet):
                 "msg_type":request.data.get("MsgType"),
             }
         )
+        if msg_type =="event":
+            event_type = request.data.get("Event")
+            assert event_type is not None,"事件类型不能为空"
+            if event_type.lower() =="subscribe":
+                ...
+            if event_type.lower() =="unsubscribe":
+                ...
+            if event_type.lower() == "scan":
+                ...
+            if event_type.lower() == "click":
+                ...
         if msg_type=="text":
             serializer.is_valid(raise_exception=True)
             message = serializer.save(**{
@@ -64,9 +75,16 @@ class PublicCountMessageApis(ModelViewSet):
                 content=request.data.get("Content")
             )
             print(">>> get wechat message",request.data)
+        else:
+            reply = TEXT_REPLY_XML_TEMPLATE.format(
+                to=request.data.get("FromUserName"),
+                from_=request.data.get("ToUserName"),
+                content="除了文本之外的消息还在开发中...😊"
+            )
         return Response(
             data=reply #
         )
+        
     
 
     def get_renderers(self):

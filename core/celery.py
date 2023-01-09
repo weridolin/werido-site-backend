@@ -50,20 +50,20 @@ def setup_periodic_tasks(sender, **kwargs):
 
 
 app.conf.beat_schedule = {
-    'scheduler1': {
+    'celeryTask.wechat.get_city_weather': {
         'task': 'celeryTask.wechat.get_city_weather',
-        'schedule': 10.0,
+        'schedule': 60*60*6,
         'options':{
-            "queue":"get_weather"
+            "queue":"wechat"
         },
         # 'args':("101010100",)
     },
-    # 'scheduler2': {
-    #     'task': 'celeryTask.wechat.refresh_wechat_token',
-    #     'schedule': 6,
-    #     'options':{
-    #         "queue":"get_wechat_token"
-    #     },
+    'celeryTask.wechat.refresh_wechat_token': {
+        'task': 'celeryTask.wechat.refresh_wechat_token',
+        'schedule': 60*60,
+        'options':{
+            "queue":"wechat"
+        },
         # 'args':("101010100",)
-    # },    
+    },    
 }  
