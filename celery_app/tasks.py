@@ -140,7 +140,7 @@ def get_city_weather(self):
 
     with open(os.path.join(os.path.dirname(__file__),"city_code.json"),"r") as f:
         city_infos = json.load(f)
-        for city in city_infos[:10]:
+        for city in city_infos:
             if city["citycode"]!="NaN":
                 gl = gevent.spawn(requests.get,
                     f"https://restapi.amap.com/v3/weather/weatherInfo",
@@ -152,3 +152,13 @@ def get_city_weather(self):
                 )
                 gl.link_value(callback=partial(callback,city_id=city["adcode"]))
     print(">>> finish get weather",datetime.datetime.now())
+
+
+@app.task(name="celeryTask.wechat.message_callback",bind=True)
+def wechat_message_callback(self,handler,*args,**kwargs):
+    if callable(handler):
+        handler(*args,**kwargs)
+    else:
+        raise TypeError(
+            f"handler type:{type(handler)} is not callable"
+        )
