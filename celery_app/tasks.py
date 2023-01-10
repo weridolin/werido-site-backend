@@ -63,8 +63,6 @@ def send_welcome_mail(receiver, number):
     message['From'] = Header("林叔叔是个怪叔叔", "utf-8")  # 接受方信息
     message['To'] = ','.join(receiver)   # 登录并发送邮件
 
-    # import time
-    # time.sleep(10)
     try:
         conn = smtplib.SMTP_SSL(host=host, port=465)  # 连接到服务器
         # smtpObj.connect(host,25) #登录到服务器
@@ -99,7 +97,7 @@ def refresh_wechat_token():
             89507: "1小时内该 IP 被管理员拒绝调用一次,1小时内不可再使用该 IP 调用"
         }
         print(f">>> celery task error:{res.json()}",
-              err_msg.get(res.json().get("errcode")))
+            err_msg.get(res.json().get("errcode")))
     else:
         access_token = res.json().get("access_token")
         expire_in = res.json().get("expires_in")
@@ -146,13 +144,13 @@ def get_city_weather(self):
         for city in city_infos:
             if city["citycode"] != "NaN":
                 gl = gevent.spawn(requests.get,
-                                  f"https://restapi.amap.com/v3/weather/weatherInfo",
-                                  {
-                                      "key": os.environ.get("GAODE_WEATHER_API_APP_ID"),
-                                      "city": city["adcode"],
-                                      "extensions": "all",
-                                  }
-                                  )
+                    f"https://restapi.amap.com/v3/weather/weatherInfo",
+                        {
+                            "key": os.environ.get("GAODE_WEATHER_API_APP_ID"),
+                            "city": city["adcode"],
+                            "extensions": "all",
+                        }
+                    )
                 gl.link_value(callback=partial(
                     callback, city_id=city["adcode"], cn_name=city["中文名"]))
     print(">>> finish get weather", datetime.datetime.now())

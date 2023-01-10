@@ -149,3 +149,5 @@ supervisord.pid
 TODO.md
 
 linuxvenv
+
+celerybeat-schedule*
