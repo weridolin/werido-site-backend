@@ -19,6 +19,7 @@ from utils.redis_keys import WECHAT, Weather
 from utils.exceptions import ResponseError
 from functools import partial
 
+
 @app.task(name="celeryTask.resource.remove_file")
 def remove_file(file_path):
     if isinstance(file_path, list):
@@ -86,7 +87,7 @@ def refresh_wechat_token():
             "secret": os.environ.get("WECHAT_APP_SECRET")
         }
     )
-    if res.json().get("errcode") and  res.json().get("errcode") != 0:
+    if res.json().get("errcode") and res.json().get("errcode") != 0:
         err_msg = {
             -1: "系统繁忙，此时请开发者稍候再试",
             40001: "AppSecret错误或者 AppSecret 不属于这个公众号，请开发者确认 AppSecret 的正确性",
@@ -97,7 +98,8 @@ def refresh_wechat_token():
             89506: "24小时内该 IP 被管理员拒绝调用两次,24小时内不可再使用该 IP 调用",
             89507: "1小时内该 IP 被管理员拒绝调用一次,1小时内不可再使用该 IP 调用"
         }
-        print(f">>> celery task error:{res.json()}", err_msg.get(res.json().get("errcode")))
+        print(f">>> celery task error:{res.json()}",
+              err_msg.get(res.json().get("errcode")))
     else:
         access_token = res.json().get("access_token")
         expire_in = res.json().get("expires_in")
@@ -110,7 +112,7 @@ def refresh_wechat_token():
         print(">>> refresh token success", access_token)
 
 
-@app.task(name="celeryTask.wechat.get_city_weather",bind=True)
+@app.task(name="celeryTask.wechat.get_city_weather", bind=True)
 def get_city_weather(self):
     """
         数据来源:@https://lbs.amap.com/api/webservice/guide/api/weatherinfo/
@@ -120,12 +122,12 @@ def get_city_weather(self):
     monkey.patch_all()
     import requests
 
-    def callback(gl,city_id=None):
+    def callback(gl, city_id=None, cn_name=None):
         res = gl.value
-        if not isinstance(res,requests.Response):
+        if not isinstance(res, requests.Response):
             print(">>> 返回的响应类型错误")
             # raise self.retry("返回的响应类型错误",countdown=1)
-        if res.status_code>=300:
+        if res.status_code >= 300:
             print(">>> 请求失败")
             # raise self.retry("请求失败",countdown=1)
         else:
@@ -135,29 +137,31 @@ def get_city_weather(self):
                 name=Weather.get_city_weather_key(city_id),
                 value=json.dumps(res.json()),
                 ex=24*60*60
-        )
-    print(">>> start get weather",datetime.datetime.now())
+            )
+            print(f">>> save {cn_name} weather")
+    print(">>> start get weather", datetime.datetime.now())
 
-    with open(os.path.join(os.path.dirname(__file__),"city_code.json"),"r") as f:
+    with open(os.path.join(os.path.dirname(__file__), "city_code.json"), "r") as f:
         city_infos = json.load(f)
         for city in city_infos:
-            if city["citycode"]!="NaN":
+            if city["citycode"] != "NaN":
                 gl = gevent.spawn(requests.get,
-                    f"https://restapi.amap.com/v3/weather/weatherInfo",
-                    {
-                        "key": os.environ.get("GAODE_WEATHER_API_APP_ID"),
-                        "city": city["adcode"],
-                        "extensions": "all",
-                    }
-                )
-                gl.link_value(callback=partial(callback,city_id=city["adcode"]))
-    print(">>> finish get weather",datetime.datetime.now())
+                                  f"https://restapi.amap.com/v3/weather/weatherInfo",
+                                  {
+                                      "key": os.environ.get("GAODE_WEATHER_API_APP_ID"),
+                                      "city": city["adcode"],
+                                      "extensions": "all",
+                                  }
+                                  )
+                gl.link_value(callback=partial(
+                    callback, city_id=city["adcode"], cn_name=city["中文名"]))
+    print(">>> finish get weather", datetime.datetime.now())
 
 
-@app.task(name="celeryTask.wechat.message_callback",bind=True)
-def wechat_message_callback(self,handler,*args,**kwargs):
+@app.task(name="celeryTask.wechat.message_callback", bind=True)
+def wechat_message_callback(self, handler, *args, **kwargs):
     if callable(handler):
-        handler(*args,**kwargs)
+        handler(*args, **kwargs)
     else:
         raise TypeError(
             f"handler type:{type(handler)} is not callable"

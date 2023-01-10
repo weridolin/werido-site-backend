@@ -20,5 +20,5 @@ class Weather:
     
     @staticmethod
     def get_city_weather_key(city_id=None):
-        return f"weather.city-{city_id}"
+        return f"weather.city.{city_id}"
 
