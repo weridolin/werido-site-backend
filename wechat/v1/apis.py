@@ -11,7 +11,7 @@ from rest_framework import status
 from rest_framework import renderers,parsers
 from rest_framework.response import Response
 # from django.http import request
-from wechat.v1.msg_handlers import text_msg_handler,DEFAULT_REPLY_CONTENT,TEXT_REPLY_XML_TEMPLATE
+from wechat.v1.msg_handlers import text_msg_handler,DEFAULT_REPLY_CONTENT,TEXT_REPLY_XML_TEMPLATE,WELCOME_CONETENT
 
 class CheckTokenRender(renderers.JSONRenderer):
 
@@ -51,18 +51,23 @@ class PublicCountMessageApis(ModelViewSet):
                 "msg_type":request.data.get("MsgType"),
             }
         )
+        reply=""
         if msg_type =="event":
             event_type = request.data.get("Event")
             assert event_type is not None,"事件类型不能为空"
             if event_type.lower() =="subscribe":
-                ...
+                reply = TEXT_REPLY_XML_TEMPLATE.format(
+                    to=request.data.get("FromUserName"),
+                    from_=request.data.get("ToUserName"),
+                    content=WELCOME_CONETENT
+                )
             if event_type.lower() =="unsubscribe":
                 ...
             if event_type.lower() == "scan":
                 ...
             if event_type.lower() == "click":
                 ...
-        if msg_type=="text":
+        elif msg_type=="text":
             serializer.is_valid(raise_exception=True)
             message = serializer.save(**{
                 "content":request.data.get("Content"),
