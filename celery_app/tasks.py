@@ -146,13 +146,13 @@ def get_city_weather(self):
         for city in city_infos:
             if city["citycode"] != "NaN":
                 gl = gevent.spawn(requests.get,
-                                  f"https://restapi.amap.com/v3/weather/weatherInfo",
-                                  {
-                                      "key": os.environ.get("GAODE_WEATHER_API_APP_ID"),
-                                      "city": city["adcode"],
-                                      "extensions": "all",
-                                  }
-                                  )
+                    f"https://restapi.amap.com/v3/weather/weatherInfo",
+                        {
+                            "key": os.environ.get("GAODE_WEATHER_API_APP_ID"),
+                            "city": city["adcode"],
+                            "extensions": "all",
+                        }
+                    )
                 gl.link_value(callback=partial(
                     callback, city_id=city["adcode"], cn_name=city["中文名"]))
     print(">>> finish get weather", datetime.datetime.now())

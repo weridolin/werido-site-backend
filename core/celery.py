@@ -52,7 +52,7 @@ def setup_periodic_tasks(sender, **kwargs):
 app.conf.beat_schedule = {
     'celeryTask.wechat.get_city_weather': {
         'task': 'celeryTask.wechat.get_city_weather',
-        'schedule': 60,
+        'schedule': 60*60*6,
         'options':{
             "queue":"wechat"
         },
@@ -60,7 +60,7 @@ app.conf.beat_schedule = {
     },
     'celeryTask.wechat.refresh_wechat_token': {
         'task': 'celeryTask.wechat.refresh_wechat_token',
-        'schedule': 60,
+        'schedule': 60*60,
         'options':{
             "queue":"wechat"
         },
