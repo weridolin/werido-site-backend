@@ -5,7 +5,6 @@ import os
 
 from celery import Celery
 
-
 class CeleryLoader(AppLoader):
     def on_worker_process_init(self):
         asyncio.set_event_loop(asyncio.new_event_loop())

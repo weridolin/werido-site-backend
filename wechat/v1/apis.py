@@ -11,7 +11,9 @@ from rest_framework import status
 from rest_framework import renderers,parsers
 from rest_framework.response import Response
 # from django.http import request
-from wechat.v1.msg_handlers import text_msg_handler,DEFAULT_REPLY_CONTENT,TEXT_REPLY_XML_TEMPLATE,WELCOME_CONETENT
+from wechat.v1.msg_handlers import text_msg_handler,DEFAULT_REPLY_CONTENT,TEXT_REPLY_XML_TEMPLATE,WELCOME_CONETENT,get_chatGPT_response
+import openai
+
 
 class CheckTokenRender(renderers.JSONRenderer):
 
@@ -69,11 +71,6 @@ class PublicCountMessageApis(ModelViewSet):
                 ...
         elif msg_type=="text":
             serializer.is_valid(raise_exception=True)
-            message = serializer.save(**{
-                "content":request.data.get("Content"),
-                "msg_data_id":request.data.get("MsgDataId"),
-                "idx":request.data.get("Idx")
-            })
             reply = text_msg_handler(
                 to=request.data.get("FromUserName"),
                 from_=request.data.get("ToUserName"),
@@ -86,11 +83,15 @@ class PublicCountMessageApis(ModelViewSet):
                 from_=request.data.get("ToUserName"),
                 content="除了文本之外的消息还在开发中...😊"
             )
+        serializer.save(**{
+                "content":request.data.get("Content"),
+                "msg_data_id":request.data.get("MsgDataId"),
+                "idx":request.data.get("Idx"),
+                "reply_content":reply
+            })
         return Response(
             data=reply #
         )
-        
-    
 
     def get_renderers(self):
         if self.request.path=="/api/v1/wechat/public/message/" and self.request.method in ["GET","POST"] :

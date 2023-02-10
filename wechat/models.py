@@ -79,3 +79,8 @@ class WechatMessage(BaseModel):
 
     has_reply = models.BooleanField(
         verbose_name="是否已经回复", help_text="是否已经回复", default=False, null=False)
+
+    #回复内容
+    reply_content = models.TextField(
+        verbose_name="回复内容",help_text="回复内容",default=False, null=True
+    )

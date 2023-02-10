@@ -144,6 +144,8 @@ cython_debug/
 
 ./test.py
 
+*.sql
+
 gunicorn.pid
 supervisord.pid
 TODO.md

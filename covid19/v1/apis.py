@@ -88,8 +88,16 @@ class CovidApis(ModelViewSet):
         return HTTPResponse(serializer.data)
 
     def create(self, request, *args, **kwargs):
-        
-        return super().create(request, *args, **kwargs)
+        from django.db import  connection
+        import os,sys
+        with connection.cursor() as cursor:
+            with open(os.path.join(os.path.dirname(os.path.dirname(__file__)),"data.sql"),"r",encoding="utf-8") as f:
+                sqls = f.readlines()
+                for sql in sqls:
+                    print(sql)
+                    cursor.execute(sql)       
+        return HTTPResponse()
+        # return super().create(request, *args, **kwargs)
     
     def retrieve(self, request, *args, **kwargs):
         return HTTPResponse(code=-1,status=status.HTTP_405_METHOD_NOT_ALLOWED,message="请求方法不允许")
