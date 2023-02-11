@@ -153,3 +153,6 @@ TODO.md
 linuxvenv
 
 celerybeat-schedule*
+
+*.log
+*.log.*

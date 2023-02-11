@@ -76,7 +76,7 @@ class PublicCountMessageApis(ModelViewSet):
                 from_=request.data.get("ToUserName"),
                 content=request.data.get("Content")
             )
-            print(">>> get wechat message",request.data)
+            print(">>> get wechat message",reply)
         else:
             reply = TEXT_REPLY_XML_TEMPLATE.format(
                 to=request.data.get("FromUserName"),
