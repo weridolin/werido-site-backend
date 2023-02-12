@@ -19,6 +19,7 @@ class WECHAT:
         return f"wechat.public.chatGPTModeTimeRemain.{wechat_id}"
 
 
+
 class Weather:
     
     @staticmethod

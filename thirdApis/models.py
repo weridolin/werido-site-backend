@@ -3,6 +3,7 @@ import datetime
 # Create your models here.
 from core.base import BaseModel
 from django.contrib.auth.models import User
+import uuid
 
 TYPE_ALIAS = {
 
@@ -105,8 +106,10 @@ class ApiCollectorSpiderRunRecord(BaseModel):
         max_length=128, null=False, help_text="脚本运行记录唯一标识", verbose_name="脚本运行记录唯一标识")
     err_reason = models.TextField(
         null=True, help_text="错误信息", verbose_name="错误信息")
-    
-    run_command = models.TextField(null=False, help_text="运行命令", verbose_name="运行命令",default="echo no-command")
+
+    run_command = models.TextField(
+        null=False, help_text="运行命令", verbose_name="运行命令", default="echo no-command")
+
 
 class ApiCollectorSpiderResourceModel(BaseModel):
     class Meta:
@@ -125,8 +128,52 @@ class ApiCollectorSpiderResourceModel(BaseModel):
     is_forbidden = models.BooleanField(
         null=False, help_text="该脚本是否被禁用", verbose_name="该脚本是否被禁用", default=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE,
-                            verbose_name="创建者", null=False, help_text="创建者")
+                             verbose_name="创建者", null=False, help_text="创建者")
     run_command = models.CharField(
         max_length=256, null=True, help_text="运行指令", verbose_name="运行指令")
     description = models.TextField(
         null=True, help_text="脚本描述", verbose_name="脚本描述")
+
+
+def get_uuid():
+    return str(uuid.uuid4())
+
+class ChatGPTConversation(BaseModel):
+    class Meta:
+        db_table = "chatGPT_conversation"
+        verbose_name = "chatGPT聊天会谈"
+        verbose_name_plural = "chatGPT聊天会谈"
+
+    title = models.CharField(null=False, max_length=128,
+                             help_text="会话名称", verbose_name="会话名称")
+    uuid = models.UUIDField(help_text="会话ID", verbose_name="会话ID",
+                            db_index=True, default=get_uuid)
+    user = models.ForeignKey(User, on_delete=models.CASCADE,
+                             verbose_name="会话创建者", null=False, help_text="会话创建者")
+
+
+MESSAGE_ROLE = (
+    (0, "query"),
+    (1, "answer")
+)
+
+
+class ChatGPTMessage(BaseModel):
+    class Meta:
+        db_table = "chatGPT_message"
+        verbose_name = "chatGPT聊天消息"
+        verbose_name_plural = "chatGPT聊天消息"
+
+    uuid = models.UUIDField(default=get_uuid,
+        help_text="消息UUID", verbose_name="消息UU会话ID", db_index=True)
+    conversation_id = models.BigIntegerField(
+        verbose_name="所属会话ID", help_text="所属会话ID", null=False)
+    role = models.SmallIntegerField(
+        choices=MESSAGE_ROLE, verbose_name="消息发送者角色", help_text="消息发送者角色")
+    content = models.TextField(verbose_name="消息内容", help_text="消息内容")
+    content_type = models.CharField(
+        max_length=16, verbose_name="消息类别", help_text="消息类型")
+    parent_message_uuid = models.UUIDField(null=True,
+        help_text="上一条消息UUID,主要记录会话里面的顺序", verbose_name="上一条消息ID",default="0")
+    children_message_uuid = models.UUIDField(
+        help_text="下一条消息UUID,主要记录会话里面的顺序", null=True,verbose_name="下一条消息ID",default="-1")
