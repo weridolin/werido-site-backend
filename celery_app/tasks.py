@@ -164,3 +164,9 @@ def wechat_message_callback(self, handler, *args, **kwargs):
         raise TypeError(
             f"handler type:{type(handler)} is not callable"
         )
+
+
+@app.task(name="celeryTask.wechat.update_chatGPT_remain_time")
+def update_chatGPT_mode_time_remain(user_id):
+    conn: Redis = get_redis_connection()
+    conn.set(WECHAT.chatGpt_time_remain(wechat_id=user_id), "1", ex=5*60)

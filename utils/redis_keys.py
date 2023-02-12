@@ -18,6 +18,19 @@ class WECHAT:
         """
         return f"wechat.public.chatGPTModeTimeRemain.{wechat_id}"
 
+    @staticmethod
+    def chatGpt_result(wechat_id):
+        """
+            存放最近一次chatGpt查询结果
+        """
+        return f"wechat.public.chatGptResult.{wechat_id}"
+
+    @staticmethod
+    def chatGpt_request_num(wechat_id):
+        """
+            chatgpt模式下第几次回调
+        """
+        return f"wechat.public.chatGptResult.{wechat_id}"
 
 
 class Weather:
