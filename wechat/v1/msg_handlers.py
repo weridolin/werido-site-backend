@@ -80,10 +80,10 @@ def text_msg_handler(to: str, from_: str, content: str):
                         exit_chatGPT_mode(user_id=to)
                         content = CHATGPT_MODE_EXIT_SUCCESS_REPLY
             except:
-                    """
-                        微信公众号的限制:因为微信公众号的回调超时是5秒,重试3次,这里跑够12秒.即第一次回调中调用openai API.在第三次回调10秒左右回复.12秒如果还无完整
-                        答案,返回跳转到网页版本的链接.如果公众号有认证，可以通过客户接口来实现 #todo 
-                    """
+                """
+                    微信公众号的限制:因为微信公众号的回调超时是5秒,重试3次,这里跑够12秒.即第一次回调中调用openai API.在第三次回调10秒左右回复.12秒如果还无完整
+                    答案,返回跳转到网页版本的链接.如果公众号有认证，可以通过客户接口来实现 #todo 
+                """
                 content = get_chatGPT_response(content=content)
                 update_chatGPT_mode_time_remain.delay(user_id=to) # todo  async?
     except Exception as exc:
