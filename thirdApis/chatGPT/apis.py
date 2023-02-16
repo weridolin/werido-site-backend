@@ -5,12 +5,20 @@ from rest_framework.permissions import IsAuthenticated
 from thirdApis.chatGPT.serializers import ChatGPTConversationSerializer,ChatGPTMessageSerializer
 from utils.http_ import HTTPResponse
 from rest_framework import status
+from core.base import PageNumberPaginationWrapper
+import django_filters
+class ChatGPTPagination(PageNumberPaginationWrapper):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 1000
+
 
 class ChatGPTConversationViewsSet(ModelViewSet):
     queryset = ChatGPTConversation.objects.all()    
     serializer_class = ChatGPTConversationSerializer
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+    pagination_class = ChatGPTPagination
 
 
     def retrieve(self, request, *args, **kwargs):
@@ -24,11 +32,14 @@ class ChatGPTConversationViewsSet(ModelViewSet):
 
     
     def destroy(self, request,pk=None):
-        super().destroy(request, pk)
+        if pk:
+            super().destroy(request, pk)
+        else:
+            self.queryset.delete()
         return HTTPResponse(
             message="删除成功!"
         )
-    
+
 
     def create(self, request, *args, **kwargs):
         serializer = ChatGPTConversationSerializer(data=request.data)
@@ -40,12 +51,26 @@ class ChatGPTConversationViewsSet(ModelViewSet):
         res = super().update(request, *args, **kwargs)
         return HTTPResponse(data=res.data)
 
+class ChatGPTMessageFilterSet(django_filters.FilterSet):
+    #  省份信息筛选字段
+    # title 为 request get的字段
+
+    conversation_uuid = django_filters.CharFilter(
+        lookup_expr="iexact", field_name="conversation_uuid")
+
+    class Meta:
+        model = ChatGPTMessage
+        fields = ["conversation_uuid"]
+
 
 class ChatGPTMessageViewSet(ModelViewSet):
     queryset=ChatGPTMessage.objects.all()
     serializer_class = ChatGPTMessageSerializer
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+    pagination_class = ChatGPTPagination
+    filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
+    filterset_class = ChatGPTMessageFilterSet
 
     def create(self, request, *args, **kwargs):
         res = super().create(request, *args, **kwargs)

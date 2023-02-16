@@ -8,10 +8,10 @@ import openai
 import os
 
 @sync_to_async
-def create_record(query_content, conversation_id, parent_message_uuid,role=None,children_message_uuid=None):
+def create_record(query_content, conversation_uuid, parent_message_uuid,role=None,children_message_uuid=None):
     return ChatGPTMessage.objects.create(
         content=query_content,
-        conversation_id=conversation_id,
+        conversation_uuid=conversation_uuid,
         parent_message_uuid=parent_message_uuid,
         children_message_uuid=children_message_uuid,
         role=role or 0,
@@ -24,11 +24,11 @@ async def chatGPT_create_request(
         ws=None):
     if isinstance(data,str):
         data = json.loads(data)
-    query_content, conversation_id, msg_id, parent_message_uuid = data.get("query_content"), data.get("conversation_id"),\
-        data.get("msg_id"), data.get("parent_message_id")
+    query_content, conversation_uuid, msg_id, parent_message_uuid = data.get("query_content"), data.get("conversation_uuid"),\
+        data.get("msg_id"), data.get("parent_message_uuid")
 
     
-    query_message = await create_record(query_content=query_content, conversation_id=conversation_id, parent_message_uuid=parent_message_uuid)
+    query_message = await create_record(query_content=query_content, conversation_uuid=conversation_uuid, parent_message_uuid=parent_message_uuid)
     openai.api_key=os.environ["OPENAPI_SECRET"]
     prompt = "\nHuman:{content}.\nAI:".format(
         content=query_content)  # todo 上下文
@@ -58,7 +58,7 @@ async def chatGPT_create_request(
             "reply_content": response["choices"][0]['text'],
             "uuid": reply_message_uuid,
             "id": "",
-            "conversation_id": conversation_id,
+            "conversation_uuid": conversation_uuid,
         },
     }
     await ws.send(text_data=json.dumps(reply,ensure_ascii=False))
@@ -73,7 +73,7 @@ def chatGPT_callback(future):
     ## 更新回答到数据库
     ChatGPTMessage.objects.create(
         content=reply_data["reply_content"],
-        conversation_id=reply_data["conversation_id"],
+        conversation_uuid=reply_data["conversation_uuid"],
         parent_message_uuid=query_message.uuid,
         uuid = reply_data["uuid"],
         children_message_uuid= None,

@@ -9,11 +9,11 @@ class ChatGPTMessageConsumer(AsyncWebsocketConsumer):
                 "type":WSMessageType,
                 "data":{
                     "query_content":"",
-                    "parent_message_id":"",
+                    "parent_message_uuid":"",
                     "reply_content":"",
                     "uuid":"",
                     "id":"", 
-                    "conversation_id":"",
+                    "conversation_uuid":"",
                 }
             }    
     """
