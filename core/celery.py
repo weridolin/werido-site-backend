@@ -4,7 +4,7 @@ from celery.loaders.app import AppLoader
 import os
 
 from celery import Celery
-
+from celery.schedules import crontab
 class CeleryLoader(AppLoader):
     def on_worker_process_init(self):
         asyncio.set_event_loop(asyncio.new_event_loop())
@@ -51,7 +51,7 @@ def setup_periodic_tasks(sender, **kwargs):
 app.conf.beat_schedule = {
     'celeryTask.wechat.get_city_weather': {
         'task': 'celeryTask.wechat.get_city_weather',
-        'schedule': 60*60*6,
+        'schedule': crontab(minute=0,hour=6),
         'options':{
             "queue":"wechat"
         },

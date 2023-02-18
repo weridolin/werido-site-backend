@@ -3,6 +3,7 @@ from thirdApis.models import ChatGPTMessage,ChatGPTConversation
 
 @app.task(name="celeryTask.chatGPT.clearMessage")
 def clear_message(conversation_id):
+    print(">>> clear message",conversation_id)
     if isinstance(conversation_id,str):
         conversation_id = int(conversation_id)
     if isinstance(conversation_id,list):
