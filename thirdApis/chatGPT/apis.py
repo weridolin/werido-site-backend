@@ -7,19 +7,28 @@ from utils.http_ import HTTPResponse
 from rest_framework import status
 from core.base import PageNumberPaginationWrapper
 import django_filters
+from thirdApis.chatGPT.celery_tasks import clear_message
+
 class ChatGPTPagination(PageNumberPaginationWrapper):
     page_size = 10
     page_size_query_param = 'page_size'
     max_page_size = 1000
 
 
+
 class ChatGPTConversationViewsSet(ModelViewSet):
-    queryset = ChatGPTConversation.objects.all()    
+    # queryset = ChatGPTConversation.objects.all()    
     serializer_class = ChatGPTConversationSerializer
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
     pagination_class = ChatGPTPagination
 
+    def get_queryset(self):
+        query_set =  ChatGPTConversation.objects.all()
+        if self.request.user:
+            return query_set.filter(user=self.request.user)
+        else:
+            return query_set
 
     def retrieve(self, request, *args, **kwargs):
         return HTTPResponse(
@@ -34,12 +43,15 @@ class ChatGPTConversationViewsSet(ModelViewSet):
     def destroy(self, request,pk=None):
         if pk:
             super().destroy(request, pk)
+            clear_message.delay(conversation_id=pk)
         else:
-            self.queryset.delete()
+            conversations = ChatGPTConversation.objects.filter(user=request.user).all()
+            conversation_ids = [conversation.id for conversation in conversations]
+            clear_message.delay(conversation_id=conversation_ids)
+            conversations.delete()
         return HTTPResponse(
             message="删除成功!"
         )
-
 
     def create(self, request, *args, **kwargs):
         serializer = ChatGPTConversationSerializer(data=request.data)
@@ -55,12 +67,12 @@ class ChatGPTMessageFilterSet(django_filters.FilterSet):
     #  省份信息筛选字段
     # title 为 request get的字段
 
-    conversation_uuid = django_filters.CharFilter(
-        lookup_expr="iexact", field_name="conversation_uuid")
+    conversation_id = django_filters.CharFilter(
+        lookup_expr="iexact", field_name="conversation_id")
 
     class Meta:
         model = ChatGPTMessage
-        fields = ["conversation_uuid"]
+        fields = ["conversation_id"]
 
 
 class ChatGPTMessageViewSet(ModelViewSet):

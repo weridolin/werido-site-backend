@@ -166,7 +166,7 @@ class ChatGPTMessage(BaseModel):
 
     uuid = models.UUIDField(default=get_uuid,
         help_text="消息UUID", verbose_name="消息UU会话ID", db_index=True)
-    conversation_uuid = models.UUIDField(
+    conversation_id = models.SmallIntegerField(
         verbose_name="所属会话ID", help_text="所属会话ID", null=False)
     role = models.SmallIntegerField(
         choices=MESSAGE_ROLE, verbose_name="消息发送者角色", help_text="消息发送者角色")

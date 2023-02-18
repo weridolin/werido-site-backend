@@ -13,7 +13,7 @@ class ChatGPTMessageConsumer(AsyncWebsocketConsumer):
                     "reply_content":"",
                     "uuid":"",
                     "id":"", 
-                    "conversation_uuid":"",
+                    "conversation_id":1,
                 }
             }    
     """
