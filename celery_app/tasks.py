@@ -20,7 +20,15 @@ from utils.exceptions import ResponseError
 from functools import partial
 
 
-@app.task(name="celeryTask.resource.remove_file")
+@app.task(name="celeryTask.resource.remove_file",    
+queue="site",
+    retry=True, 
+    retry_policy={
+    'max_retries': 3,
+    'interval_start': 0,
+    'interval_step': 0.2,
+    'interval_max': 0.2,
+})
 def remove_file(file_path):
     if isinstance(file_path, list):
         for path in file_path:
@@ -31,7 +39,15 @@ def remove_file(file_path):
             os.remove(file_path)
 
 
-@app.task(name="celeryTask.auth.send_welcome_email_after_register")
+@app.task(name="celeryTask.auth.send_welcome_email_after_register",    
+    queue="site",
+    retry=True, 
+    retry_policy={
+    'max_retries': 3,
+    'interval_start': 0,
+    'interval_step': 0.2,
+    'interval_max': 0.2,
+})
 def send_welcome_mail(receiver, number):
     # host = getattr(settings,"EMAIL_HOST","smtp.qq.com")
     # mail_user = getattr(settings,"EMAIL_USER","weridolin@qq.com")   # 密码(部分邮箱为授权码)
