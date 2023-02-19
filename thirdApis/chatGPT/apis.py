@@ -63,6 +63,12 @@ class ChatGPTConversationViewsSet(ModelViewSet):
         res = super().update(request, *args, **kwargs)
         return HTTPResponse(data=res.data)
 
+class ChatGPTMessagePagination(PageNumberPaginationWrapper):
+    page_size = 1000
+    page_size_query_param = 'page_size'
+    max_page_size = 1000
+
+
 class ChatGPTMessageFilterSet(django_filters.FilterSet):
     #  省份信息筛选字段
     # title 为 request get的字段
@@ -80,7 +86,7 @@ class ChatGPTMessageViewSet(ModelViewSet):
     serializer_class = ChatGPTMessageSerializer
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
-    pagination_class = ChatGPTPagination
+    pagination_class = ChatGPTMessagePagination
     filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
     filterset_class = ChatGPTMessageFilterSet
 

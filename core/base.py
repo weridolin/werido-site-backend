@@ -11,7 +11,9 @@ LastEditTime: 2021-10-02 18:19:03
 from rest_framework.pagination import PageNumberPagination
 from rest_framework import serializers
 from django.db import models
+from rest_framework.response import Response
 from utils.http_ import HTTPResponse
+from collections import OrderedDict
 
 TypesChoice = [
     ("article", "article"),
@@ -48,7 +50,14 @@ class PageNumberPaginationWrapper(PageNumberPagination):
     max_page_size=50
 
     def get_paginated_response(self, data):
-        response=super().get_paginated_response(data)
+        response= Response(OrderedDict([
+            ('count', self.page.paginator.count),
+            ('next', self.get_next_link()),
+            ('previous', self.get_previous_link()),
+            ('results', data),
+            ('page', self.request.query_params.get(self.page_query_param, 1))
+        ]))
+
         return HTTPResponse(
             data=response.data
         )
