@@ -51,7 +51,7 @@ def setup_periodic_tasks(sender, **kwargs):
 app.conf.beat_schedule = {
     'celeryTask.wechat.get_city_weather': {
         'task': 'celeryTask.wechat.get_city_weather',
-        'schedule': crontab(minute=0,hour=6),
+        'schedule': crontab(minute=0,hour=0),
         'options':{
             "queue":"wechat"
         },
