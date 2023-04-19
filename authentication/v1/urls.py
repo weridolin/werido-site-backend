@@ -31,4 +31,5 @@ urlpatterns = [
 ]
 urlpatterns += router.urls
 
-print("user routers --> ",urlpatterns)
+# print("user routers --> ",urlpatterns)
+# print(">>><<<<<<<<",router.get_urls())
