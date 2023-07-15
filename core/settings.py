@@ -14,7 +14,7 @@ from pathlib import Path
 import os
 import environ
 
-
+print(os.environ)
 # initialize env
 env = environ.Env(
     # # set casting, default value
@@ -26,10 +26,12 @@ env = environ.Env(
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-if not os.path.exists(os.path.join(BASE_DIR,".env")):
-    print("can not find .env file...")
+
+if not os.path.exists(os.path.join(os.path.dirname(BASE_DIR),".env")):
+    print("can not find .env file...",os.path.join(os.path.dirname(BASE_DIR),".env"))
+
     
-environ.Env.read_env(os.path.join(BASE_DIR,".env"))
+environ.Env.read_env(os.path.join(os.path.dirname(BASE_DIR),".env"))
 
 EMAIL_PWD = env('EMAIL_PWD')
 
@@ -56,22 +58,22 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
-    "oauth2_provider",
+    # "oauth2_provider",
     'django_filters',
     "channels",
     "django_celery_beat",
     "rest_framework_simplejwt.token_blacklist",
 
-    'authentication.apps.AuthenticationConfig',    
+    # 'authentication.apps.AuthenticationConfig',     # 移动到usercenter
     "thirdApis.apps.ThirdapisConfig",
-    "rbac.apps.RbacConfig",
+    # "rbac.apps.RbacConfig", # 移动到usercenter
     'articles.apps.ArticlesConfig',
     'drug.apps.DrugConfig',
     'home.apps.HomeConfig',
     "filebroker.apps.FilebrokerConfig",
     "celery_app.apps.CeleryAppConfig",
     "dataFaker.apps.DatafakerConfig",
-    'oauth.apps.OauthConfig',
+    # 'oauth.apps.OauthConfig',
     "covid19.apps.Covid19Config",
     "wechat.apps.WechatConfig",
 ]
@@ -253,18 +255,18 @@ REST_FRAMEWORK = {
 ################# oauth provider
 
 
-OAUTH2_PROVIDER = {
-    'ACCESS_TOKEN_EXPIRE_SECONDS': 3600,
-    # 'SCOPES_BACKEND_CLASS': 'oauth2_provider.oauth2_backends.JSONOAuthLibCore',
-    'APPLICATION_MODEL': 'oauth.OauthApplicationModel',
-    'ACCESS_TOKEN_MODEL': 'oauth.AccessTokenModel',
-    # "ACCESS_TOKEN_GENERATOR": "oauth.utils.oauth_token_generator"
-}
-OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth.OauthApplicationModel'
-OAUTH2_PROVIDER_ACCESS_TOKEN_MODEL = 'oauth.AccessTokenModel'
-OAUTH2_PROVIDER_REFRESH_TOKEN_MODEL = "oauth.RefreshTokenModel"
-OAUTH2_PROVIDER_ID_TOKEN_MODEL = "oauth.IDTokenModel"
-OAUTH2_PROVIDER_GRANT_MODEL= "oauth.OauthGrantModel"
+# OAUTH2_PROVIDER = {
+#     'ACCESS_TOKEN_EXPIRE_SECONDS': 3600,
+#     # 'SCOPES_BACKEND_CLASS': 'oauth2_provider.oauth2_backends.JSONOAuthLibCore',
+#     'APPLICATION_MODEL': 'oauth.OauthApplicationModel',
+#     'ACCESS_TOKEN_MODEL': 'oauth.AccessTokenModel',
+#     # "ACCESS_TOKEN_GENERATOR": "oauth.utils.oauth_token_generator"
+# }
+# OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth.OauthApplicationModel'
+# OAUTH2_PROVIDER_ACCESS_TOKEN_MODEL = 'oauth.AccessTokenModel'
+# OAUTH2_PROVIDER_REFRESH_TOKEN_MODEL = "oauth.RefreshTokenModel"
+# OAUTH2_PROVIDER_ID_TOKEN_MODEL = "oauth.IDTokenModel"
+# OAUTH2_PROVIDER_GRANT_MODEL= "oauth.OauthGrantModel"
 
 
 

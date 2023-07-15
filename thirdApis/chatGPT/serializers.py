@@ -1,10 +1,10 @@
 from core.base import BaseSerializer
 from thirdApis.models import ChatGPTMessage,ChatGPTConversation
-from authentication.v1.serializers import UserSerializer
+# from authentication.v1.serializers import UserSerializer
 from rest_framework import serializers
  
 class ChatGPTConversationSerializer(BaseSerializer):
-    user = UserSerializer(required=False)
+    # user = UserSerializer(required=False)
 
     class Meta:
         model = ChatGPTConversation

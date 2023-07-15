@@ -8,7 +8,7 @@ from django.conf import settings
 import subprocess
 from rest_framework.permissions import IsAuthenticated,AllowAny
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from rbac.permission import RbacModelPermission
+# from rbac.permission import RbacModelPermission
 from rest_framework.decorators import action
 from rest_framework import status
 
@@ -17,7 +17,9 @@ class TaskOperationView(APIView):
 
     # permission默认view,即为get不加权限限制.
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated,RbacModelPermission]
+    # permission_classes = [IsAuthenticated,RbacModelPermission]
+    permission_classes = [IsAuthenticated]
+
     queryset = ApiCollectorSpiderRunRecord.objects.all()
 
     def get(self, request, format=None):

@@ -12,4 +12,4 @@ router.register("/chatGPT/message",viewset=ChatGPTMessageViewSet,basename="chatG
 chatGPT_urls = []
 chatGPT_urls+=router.urls
 
-print(">>>>>>>>> chatGPT urls",chatGPT_urls)
+urlpatterns = chatGPT_urls

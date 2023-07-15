@@ -33,39 +33,44 @@ services:
 
   django:
     container_name: site-backend
-    build: 
-      context: .
-      dockerfile: Dockerfile
+    image: python:3.9
+    # build: 
+    #   context: .
+    #   dockerfile: Dockerfile
+    working_dir: /app
     command:       
       - /bin/bash
       - -c
       - |
+        mkdir /root/.pip/
+        cp pip.conf /root/.pip/pip.conf
+        pip install -r requirements.txt
         supervisord  -c celery.conf
         python manage.py makemigrations
         python manage.py migrate
-        python manage.py runserver 0.0.0.0:8000
-    # volumes:
-    #   - /pythons/blogNew/werido-site-backend/:/var/www/html/weridoBlog/
+        gunicorn -c gunicorn.py core.asgi:application
+    volumes:
+      - .:/app
     ports:
       - "8000:8000"
     depends_on:
       - sitedb
       - redis
 
-  front:
-    # build: 
-    #   context: .
-    #   dockerfile: Dockerfilefront
-    container_name: site-front
-    image: nginx
-    ports:
-      - 80:80
-    restart: unless-stopped
-    volumes:
-      - F:/PYTHON_CODE/myblogs/werido-blog-front/dist/home:/usr/share/nginx/html/
-      - F:/PYTHON_CODE/myblogs/werido-blog-front/nginx:/etc/nginx/conf.d/ 
-    depends_on:
-      - django
+  # front:
+  #   # build: 
+  #   #   context: .
+  #   #   dockerfile: Dockerfilefront
+  #   container_name: site-front
+  #   image: nginx
+  #   ports:
+  #     - 80:80
+  #   restart: unless-stopped
+  #   volumes:
+  #     - F:/PYTHON_CODE/myblogs/werido-blog-front/dist/home:/usr/share/nginx/html/
+  #     - F:/PYTHON_CODE/myblogs/werido-blog-front/nginx:/etc/nginx/conf.d/ 
+  #   depends_on:
+  #     - django
 
 volumes:
   pgdata:
