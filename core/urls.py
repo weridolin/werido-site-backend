@@ -69,20 +69,20 @@ urlpatterns = [
     path("blogs/api/v1/", include("articles.v1.urls")),
     path("blogs/api/v2/", include("articles.v2.urls")),
     # path("api/v1/auth/",include("authentication.v1.urls")),
-    path("alinlab/drug/api/v1/",include("drug.urls")),
+    path("drug/api/v1/",include("drug.urls")),
     path("home/api/v1/",include("home.urls")),
-    path("alinlab/fileBroker/api/v1/",include("filebroker.v1.urls")),
-    path("alinlab/dataFaker/api/v1/",include("dataFaker.v1.urls")),
+    path("fileBroker/api/v1/",include("filebroker.v1.urls")),
+    path("dataFaker/api/v1/",include("dataFaker.v1.urls")),
     # path("api/v1/oauth", include('oauth.v1.urls')),
     # path("third/api/v1",include('thirdApis.urls')),
     # path("api/oauth/test/",include('oauth2_provider.urls')),
     # path("api/celeryTest",celery_test),
     # path("api/v1/rbac/",include('rbac.urls')),
-    path("alinlab/covid19/api/v1/",include('covid19.v1.urls')),
-    path("alinlab/wechat/api/v1/",include('wechat.v1.urls')),
-    path("alinlab/shortUrl/api/v1/",include('thirdApis.shortUrls.urls')),
-    path("alinlab/apiCollector/api/v1/",include('thirdApis.apiCollector.urls')),
-    path("alinlab/chatGPT/api/v1/",include('thirdApis.chatGPT.urls'))
+    path("covid19/api/v1/",include('covid19.v1.urls')),
+    path("wechat/api/v1/",include('wechat.v1.urls')),
+    path("shortUrl/api/v1/",include('thirdApis.shortUrls.urls')),
+    path("apiCollector/api/v1/",include('thirdApis.apiCollector.urls')),
+    path("chatGPT/api/v1/",include('thirdApis.chatGPT.urls'))
 
 
 ]
