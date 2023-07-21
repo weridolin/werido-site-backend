@@ -21,7 +21,6 @@ from rest_framework.decorators import action
 from rest_framework import permissions
 from rbac.models import RolePermissionShip
 
-
 def add_model_op_permission(app_label=None, op_name=None, op_model_name=None, description=None, p_id=None):
     op, is_exits = ModelOperation.objects.update_or_create(op_model_name=op_model_name, op_name=op_name, app_label=app_label, defaults={
         "description": description,

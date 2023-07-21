@@ -44,7 +44,7 @@ from home.serializers import *
 from home.models import *
 from utils.helper import parse_ip
 
-
+from authentication import V1Authentication
 
 class SiteCommentSetPagination(PageNumberPagination):
     page_size = 6
@@ -70,6 +70,8 @@ class SiteCommentSetPagination(PageNumberPagination):
 class SiteCommentViewsSet(viewsets.ModelViewSet):
     serializer_class = SiteCommentsSerializer
     pagination_class = SiteCommentSetPagination
+    authentication_classes = [V1Authentication]
+    
 
     def get_queryset(self):
         comments_list = SiteComments.objects.filter(is_valid=True).all()
@@ -80,7 +82,7 @@ class SiteCommentViewsSet(viewsets.ModelViewSet):
 
 
     def create(self, request, *args, **kwargs):
-        print(request.data)
+        print(request.user,">>>>")
         x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
         if x_forwarded_for:
             self.ip = x_forwarded_for.split(',')[0]

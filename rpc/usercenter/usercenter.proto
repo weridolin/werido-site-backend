@@ -1,0 +1,73 @@
+syntax = "proto3";
+
+option go_package = "./pb";
+
+package pb;
+
+message GetUserInfoReq {
+    int64 userId = 1;
+}
+
+message GetUserInfoResp {
+    int64 userId = 1;
+    string userName = 2;
+    string password = 3;
+    string userMobile = 4;
+    string userEmail = 5;
+    string userAvatar = 6;
+    int64 age = 7;
+    int32 gender = 8;
+    bool isSuperAdmin = 9;
+}
+message GetUserResourcePermissionReq {
+    int64 userId = 1;
+}
+
+message ResourcePermissions {
+    int64  id = 1;
+    string serverName = 2;
+    string url = 3;
+    string method = 4;
+    string description = 5;
+    string version = 6;
+}
+
+message GetUserResourcePermissionResp {
+    repeated ResourcePermissions resourcePermissions = 1;
+}
+
+
+message GetUserMenuPermissionReq {
+    int64 userId = 1;
+}
+
+message MenuPermissions {
+    int64  id = 1;
+    string menuName = 2;
+    string menuComponent = 3;
+    string menuIcon = 4;
+    string menuUrl = 5;
+    string menuRouteName= 6;
+    int64 parentId = 7;
+    int32 menuType = 8;
+}
+
+message GetUserMenuPermissionResp {
+    repeated MenuPermissions menuPermissions = 1;
+}
+
+message TokenValidateReq {
+    string token = 1;
+}
+
+message TokenValidateResp {
+    bool isValid = 1;
+    
+}
+
+service usercenter {
+    rpc getUserInfo(GetUserInfoReq) returns(GetUserInfoResp);
+    rpc getUserResourcePermission(GetUserResourcePermissionReq) returns(GetUserResourcePermissionResp);
+    rpc getUserMenuPermission(GetUserMenuPermissionReq) returns(GetUserMenuPermissionResp);
+    rpc tokenValidate(TokenValidateReq) returns(TokenValidateResp);
+}
