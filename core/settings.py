@@ -14,7 +14,6 @@ from pathlib import Path
 import os
 import environ
 
-print(os.environ)
 # initialize env
 env = environ.Env(
     # # set casting, default value
@@ -311,4 +310,9 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
+
+
+########### ETCD
+ETCD_HOST = os.environ.get("ETCD_HOST","etcd")
+ETCD_PORT = os.environ.get("ETCD_PORT",2379)
 

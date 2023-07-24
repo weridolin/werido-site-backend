@@ -44,7 +44,7 @@ from home.serializers import *
 from home.models import *
 from utils.helper import parse_ip
 
-from authentication import V1Authentication
+from authenticationV1 import V1Authentication
 
 class SiteCommentSetPagination(PageNumberPagination):
     page_size = 6
