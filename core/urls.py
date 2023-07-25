@@ -66,8 +66,8 @@ routers = routers.DefaultRouter()
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("api/v1/",include(routers.urls)),
-    path("blogs/api/v1/", include("articles.v1.urls")),
-    path("blogs/api/v2/", include("articles.v2.urls")),
+    path("blog/api/v1/", include("articles.v1.urls")),
+    path("blog/api/v2/", include("articles.v2.urls")),
     # path("api/v1/auth/",include("authentication.v1.urls")),
     path("drug/api/v1/",include("drug.urls")),
     path("home/api/v1/",include("home.urls")),
