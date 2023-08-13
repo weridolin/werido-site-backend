@@ -32,3 +32,9 @@ def is_token_valid(token,host,port) -> usercenter_pb2.TokenValidateResp:
         stub = usercenter_pb2_grpc.usercenterStub(channel)
         response = stub.tokenValidate(usercenter_pb2.TokenValidateReq(token=token)) 
         return response
+    
+def get_multiple_user_info(user_ids,host,port) -> usercenter_pb2.GetMutipleUserInfoResp:
+    with grpc.insecure_channel(f"{host}:{port}") as channel:
+        stub = usercenter_pb2_grpc.usercenterStub(channel)
+        response = stub.getMultipleUserInfo(usercenter_pb2.GetMultipleUserInfoReq(user_ids=user_ids)) 
+        return response

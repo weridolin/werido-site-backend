@@ -36,7 +36,11 @@ class BackGroundMusicSerializer(serializers.ModelSerializer):
 
 class SiteCommentsSerializer(serializers.ModelSerializer):
 
-    created  = serializers.SerializerMethodField()
+    created  = serializers.SerializerMethodField("get_created")
+    # updated = serializers.SerializerMethodField("get_updated")
+
+    # created = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S")
+    updated = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S")
 
     class Meta:
         model = SiteComments
@@ -45,3 +49,9 @@ class SiteCommentsSerializer(serializers.ModelSerializer):
     def get_created(self,obj):
         date_str = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S").to_internal_value(value=obj.created)
         return int(date_str.timestamp())
+
+    # def get_updated(self,obj):
+    #     date_str = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S").to_internal_value(value=obj.updated)
+    #     # return int(date_str.timestamp())
+    #     print(date_str,">>> after format time ")
+    #     return date_str

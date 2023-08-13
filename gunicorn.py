@@ -30,7 +30,7 @@ loglevel = 'info'
 
 APP_KEYS = {
     "drug":F"/site/withoutauth/drug/rest/{str(uuid.uuid4())}",
-    "home":f"/site/withoutauth/home/rest/{str(uuid.uuid4())}",
+    "home":f"/site/withauth/home/rest/{str(uuid.uuid4())}",
     "blog":f"/site/withauth/blog/rest/{str(uuid.uuid4())}",
     "fileBroker":f"/site/withoutauth/fileBroker/rest/{str(uuid.uuid4())}",
     "dataFaker":f"/site/withoutauth/dataFaker/rest/{str(uuid.uuid4())}",
@@ -82,7 +82,7 @@ def etcd_keep_alive(lease,stop_event:threading.Event):
             if stop_event.isSet():
                 break
             stop_event.wait(1)
-        print("oldbackend refresh etcd lease ...")
+        # print("oldbackend refresh etcd lease ...")
 
     print("gunicorn server exit ... keep alive thread stop...")
 

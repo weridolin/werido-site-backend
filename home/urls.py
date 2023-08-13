@@ -22,3 +22,5 @@ urlpatterns=[
     path(r"bglist",BackGroundMusicViews.as_view(),name="backgroundmusiclist")
     ]
 urlpatterns += router.urls
+
+print(urlpatterns,">>>")

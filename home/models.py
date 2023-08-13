@@ -114,6 +114,8 @@ class SiteComments(BaseModel):
     name = models.CharField(max_length=64, help_text="留言用户姓名",
                             verbose_name="留言用户姓名", default="游客")
 
+    user_id = models.IntegerField(help_text="留言用户ID", verbose_name="留言用户ID", null=True,blank=True)
+
     ip = models.GenericIPAddressField(
         verbose_name="调用的IP地址", null=True, blank=True)
 
@@ -124,4 +126,11 @@ class SiteComments(BaseModel):
     loc_city = models.CharField(
         max_length=256, verbose_name="调用地址(城市)", null=True)
 
-    replay_to =models.ForeignKey("self",on_delete=models.CASCADE,related_name="sitecomment_replay_to",null=True,blank=True)
+    # replay_to =models.ForeignKey("self",on_delete=models.CASCADE,related_name="sitecomment_replay_to",null=False,default=-1)
+
+    replay_to =models.IntegerField(null=False,default=-1,verbose_name="回复的评论ID",help_text="回复的评论ID(-1表示父节点)")
+
+    ## 冗余字段
+    gender = models.SmallIntegerField(verbose_name="性别",default=0)
+
+    avatar = models.CharField(verbose_name="头像链接",max_length=256,null=True,blank=True)

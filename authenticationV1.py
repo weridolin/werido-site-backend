@@ -7,6 +7,7 @@ import os
 class V1Authentication(authentication.BaseAuthentication):
     def authenticate(self, request):
         user_id = request.META.get('HTTP_X_USER_ID')
+        print(">>>",request.META)
         if not user_id:
             raise exceptions.AuthenticationFailed('user auth failed')
         return (user_id, None)

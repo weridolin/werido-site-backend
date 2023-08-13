@@ -73,16 +73,29 @@ class SiteCommentViewsSet(viewsets.ModelViewSet):
     authentication_classes = [V1Authentication]
     
 
+    def get_authenticators(self):
+        if self.request.method == "GET":
+            return []
+        return super().get_authenticators()
+
     def get_queryset(self):
-        comments_list = SiteComments.objects.filter(is_valid=True).all()
+        comments_list = SiteComments.objects.filter(is_valid=True,replay_to=-1).all()
         return comments_list
 
     def list(self, request, *args, **kwargs):
-        return super().list(request, *args, **kwargs)
+        print(">>>get comment list")
+        # queryset = SiteComments.objects.filter(is_valid=True,replay_to=-1).all()
 
+        # page = self.paginate_queryset(queryset)
+        # if page is not None:
+        #     serializer = self.get_serializer(page, many=True)
+        #     return self.get_paginated_response(serializer.data)
+
+        # serializer = self.get_serializer(queryset, many=True)
+        # return Response(serializer.data)
+        return super().list(request,*args,**kwargs)
 
     def create(self, request, *args, **kwargs):
-        print(request.user,">>>>")
         x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
         if x_forwarded_for:
             self.ip = x_forwarded_for.split(',')[0]
@@ -106,6 +119,12 @@ class SiteCommentViewsSet(viewsets.ModelViewSet):
         new_comment.save()
         return Response("created success!", status=status.HTTP_201_CREATED)
 
+    @action(url_path="/reply",methods=["get"],detail=True)
+    def get_reply(self,pk,request):
+        print("get reply list",pk)
+        queryset = SiteComments.objects.filter(is_valid=True,replay_to=pk).all()
+        serializer = SiteCommentsSerializer(queryset,many=True)
+        return Response(serializer.data,status=status.HTTP_200_OK)
 
 class UpdateLogViewSet(viewsets.ModelViewSet):
     serializer_class = UpdateLogSerializer

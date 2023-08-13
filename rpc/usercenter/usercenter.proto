@@ -65,9 +65,18 @@ message TokenValidateResp {
     
 }
 
+message GetMutipleUserInfoReq {
+    repeated int64 userIds = 1;       
+}
+
+message GetMutipleUserInfoResp {
+    repeated GetUserInfoResp userInfos = 1;
+}
+
 service usercenter {
     rpc getUserInfo(GetUserInfoReq) returns(GetUserInfoResp);
     rpc getUserResourcePermission(GetUserResourcePermissionReq) returns(GetUserResourcePermissionResp);
     rpc getUserMenuPermission(GetUserMenuPermissionReq) returns(GetUserMenuPermissionResp);
     rpc tokenValidate(TokenValidateReq) returns(TokenValidateResp);
+    rpc getMutipleUserInfo(GetMutipleUserInfoReq) returns(GetMutipleUserInfoResp);
 }

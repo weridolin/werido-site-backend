@@ -104,3 +104,15 @@ class TokenValidateResp(_message.Message):
     ISVALID_FIELD_NUMBER: _ClassVar[int]
     isValid: bool
     def __init__(self, isValid: bool = ...) -> None: ...
+
+class GetMutipleUserInfoReq(_message.Message):
+    __slots__ = ["userIds"]
+    USERIDS_FIELD_NUMBER: _ClassVar[int]
+    userIds: _containers.RepeatedScalarFieldContainer[int]
+    def __init__(self, userIds: _Optional[_Iterable[int]] = ...) -> None: ...
+
+class GetMutipleUserInfoResp(_message.Message):
+    __slots__ = ["userInfos"]
+    USERINFOS_FIELD_NUMBER: _ClassVar[int]
+    userInfos: _containers.RepeatedCompositeFieldContainer[GetUserInfoResp]
+    def __init__(self, userInfos: _Optional[_Iterable[_Union[GetUserInfoResp, _Mapping]]] = ...) -> None: ...

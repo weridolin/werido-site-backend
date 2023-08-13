@@ -164,7 +164,6 @@ CACHES = {
             # "PASSWORD": "mysecret",
             "REDIS_CLIENT_CLASS": "redis.client.StrictRedis",
             "REDIS_CLIENT_KWARGS": {"decode_responses": True, "charset":"utf-8"},
-            
         }
     },
     # "redis":{
