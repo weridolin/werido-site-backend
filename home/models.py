@@ -130,6 +130,8 @@ class SiteComments(BaseModel):
 
     replay_to =models.IntegerField(null=False,default=-1,verbose_name="回复的评论ID",help_text="回复的评论ID(-1表示父节点)")
 
+    root_id = models.IntegerField(null=False,default=-1,verbose_name="根评论ID",help_text="根评论ID(-1表示父节点)")
+
     ## 冗余字段
     gender = models.SmallIntegerField(verbose_name="性别",default=0)
 

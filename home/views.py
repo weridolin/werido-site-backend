@@ -31,7 +31,6 @@ from rest_framework import mixins, viewsets
 from django.shortcuts import render
 
 # Create your views here.
-from django.shortcuts import render, get_object_or_404, redirect
 
 from articles.v1.serializers import *
 from articles.models import *
@@ -43,6 +42,8 @@ from rest_framework import status
 from home.serializers import *
 from home.models import *
 from utils.helper import parse_ip
+from utils.http_ import HTTPResponse
+
 
 from authenticationV1 import V1Authentication
 
@@ -71,7 +72,7 @@ class SiteCommentViewsSet(viewsets.ModelViewSet):
     serializer_class = SiteCommentsSerializer
     pagination_class = SiteCommentSetPagination
     authentication_classes = [V1Authentication]
-    
+
 
     def get_authenticators(self):
         if self.request.method == "GET":
@@ -93,7 +94,8 @@ class SiteCommentViewsSet(viewsets.ModelViewSet):
 
         # serializer = self.get_serializer(queryset, many=True)
         # return Response(serializer.data)
-        return super().list(request,*args,**kwargs)
+        response =  super().list(request,*args,**kwargs)
+        return HTTPResponse(response.data,status=status.HTTP_200_OK)
 
     def create(self, request, *args, **kwargs):
         x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
@@ -117,19 +119,30 @@ class SiteCommentViewsSet(viewsets.ModelViewSet):
             loc_city = location.get("city","未知城市")
         )
         new_comment.save()
-        return Response("created success!", status=status.HTTP_201_CREATED)
+        return HTTPResponse("created success!", status=status.HTTP_201_CREATED)
 
-    @action(url_path="/reply",methods=["get"],detail=True)
-    def get_reply(self,pk,request):
+    @action(url_path="reply",methods=["get"],detail=True)
+    def get_reply(self,request,pk=None):
         print("get reply list",pk)
-        queryset = SiteComments.objects.filter(is_valid=True,replay_to=pk).all()
-        serializer = SiteCommentsSerializer(queryset,many=True)
-        return Response(serializer.data,status=status.HTTP_200_OK)
+        queryset = SiteComments.objects.filter(is_valid=True,root_id=pk).order_by("created").all()
+        
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            res =  self.get_paginated_response(serializer.data)
+            return HTTPResponse(res.data,status=status.HTTP_200_OK)
+
+        serializer = self.get_serializer(queryset, many=True)
+        # serializer = SiteCommentsSerializer(queryset,many=True)
+        return HTTPResponse(serializer.data,status=status.HTTP_200_OK)
 
 class UpdateLogViewSet(viewsets.ModelViewSet):
     serializer_class = UpdateLogSerializer
     queryset = UpdateLog.objects.all() # 这里是针对所有的请求都会以这个为标准
 
+    def list(self, request, *args, **kwargs):
+        response =  super().list(request, *args, **kwargs)
+        return HTTPResponse(data=response.data,status=status.HTTP_200_OK)
 
 
 class FriendsLinksViewsApi(APIView):
@@ -137,10 +150,7 @@ class FriendsLinksViewsApi(APIView):
     def get(self, request):
         links = FriendsLink.objects.filter(is_show=True)
         links_json = FriendsLinkSerializer(links, many=True)
-        res = {
-            "data": links_json.data
-        }
-        return Response(res, status=status.HTTP_200_OK)
+        return HTTPResponse(links_json.data, status=status.HTTP_200_OK)
 
 
 class BackGroundMusicViews(APIView):
@@ -148,8 +158,5 @@ class BackGroundMusicViews(APIView):
     def get(self, request):
         musicList = BackGroundMusic.objects.all()
         serializer = BackGroundMusicSerializer(musicList, many=True)
+        return HTTPResponse(data=serializer.data, status=status.HTTP_200_OK)
 
-        res = {
-            "data": serializer.data
-        }
-        return Response(res, status=status.HTTP_200_OK)
