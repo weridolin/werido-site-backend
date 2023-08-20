@@ -246,7 +246,8 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         
     ),
-    'EXCEPTION_HANDLER': 'utils.exceptions.exceptions_handler'
+    'EXCEPTION_HANDLER': 'utils.exceptions.exceptions_handler',
+    'DEFAULT_DATETIME_FORMAT': '%Y-%m-%d %H:%M:%S',  #
 }
 
 

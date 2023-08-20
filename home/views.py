@@ -136,21 +136,36 @@ class SiteCommentViewsSet(viewsets.ModelViewSet):
         # serializer = SiteCommentsSerializer(queryset,many=True)
         return HTTPResponse(serializer.data,status=status.HTTP_200_OK)
 
+weekdays = ["星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"]
+
 class UpdateLogViewSet(viewsets.ModelViewSet):
     serializer_class = UpdateLogSerializer
     queryset = UpdateLog.objects.all() # 这里是针对所有的请求都会以这个为标准
 
     def list(self, request, *args, **kwargs):
-        response =  super().list(request, *args, **kwargs)
-        return HTTPResponse(data=response.data,status=status.HTTP_200_OK)
+        logs = UpdateLog.objects.all().order_by('-updated')
+        res = dict()
+        for log in logs:
+            year_month = str(log.updated.year)+"-"+str(log.updated.month)
+            day_weekday = str(log.updated.day)+"-"+weekdays[log.updated.weekday()]
+            if year_month not in res:
+                res[year_month] = dict()
+            if day_weekday not in res[year_month]:
+                res[year_month][day_weekday] = list()
+
+            res[year_month][day_weekday].append(UpdateLogSerializer(log).data)
+    
+        return HTTPResponse(data=res,status=status.HTTP_200_OK)
+
+
 
 
 class FriendsLinksViewsApi(APIView):
 
-    def get(self, request):
-        links = FriendsLink.objects.filter(is_show=True)
-        links_json = FriendsLinkSerializer(links, many=True)
-        return HTTPResponse(links_json.data, status=status.HTTP_200_OK)
+    def get(self, request,*args, **kwargs):
+        links = FriendsLink.objects.all().order_by('updated')
+        links_json = FriendsLinkSerializer(links, many=True).data
+        return HTTPResponse(data=links_json,status=status.HTTP_200_OK)
 
 
 class BackGroundMusicViews(APIView):

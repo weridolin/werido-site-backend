@@ -38,6 +38,8 @@ APP_KEYS = {
     "apiCollector":f"/site/withauth/apiCollector/rest/{str(uuid.uuid4())}",
     "chatGPT":f"/site/withauth/chatGPT/rest/{str(uuid.uuid4())}",
     "covid19":f"/site/withoutauth/covid19/rest/{str(uuid.uuid4())}",
+    "dataFakerWs":f"/site/withoutauth/dataFaker/ws/{str(uuid.uuid4())}",
+    
 }
 
 ## 注册到 etcd  #todo ETCD集群？ 

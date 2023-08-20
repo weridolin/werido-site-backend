@@ -16,9 +16,10 @@ class DataFakerConsumer(AsyncWebsocketConsumer):
             }    
     """
     async def connect(self):
+        ##
         self.key = self.scope['url_route']['kwargs']['key']
         self.key_group_name = 'dataFaker_%s' % self.key ## socket连接的唯一标识？
-        # Join room group
+        print(">>> data faker accept a new ws connection",self.key)
         await self.channel_layer.group_add(
             self.key_group_name,
             self.channel_name
