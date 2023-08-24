@@ -7,18 +7,18 @@ import datetime,os,sys
 from django.conf import settings
 import subprocess
 from rest_framework.permissions import IsAuthenticated,AllowAny
-from rest_framework_simplejwt.authentication import JWTAuthentication
+# from rest_framework_simplejwt.authentication import JWTAuthentication
 # from rbac.permission import RbacModelPermission
 from rest_framework.decorators import action
 from rest_framework import status
-
+from authenticationV1 import V1Authentication
 import uuid
 class TaskOperationView(APIView):
-
+    
     # permission默认view,即为get不加权限限制.
-    authentication_classes = [JWTAuthentication]
+    authentication_classes = [V1Authentication]
     # permission_classes = [IsAuthenticated,RbacModelPermission]
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated] # 放在网关做了
 
     queryset = ApiCollectorSpiderRunRecord.objects.all()
 
@@ -95,7 +95,7 @@ class ApiInfoViews(ModelViewSet):
 
     queryset = ApiCollector.objects.all()
     authentication_classes = []
-    permission_classes = [AllowAny]
+    # permission_classes = [AllowAny]
     serializer_class  = ApiInfoSerializer
     
 
@@ -123,7 +123,7 @@ class ApiInfoViews(ModelViewSet):
             }
         )
 
-    @action(methods=["POST"],url_name="api-search",detail=False)
+    @action(methods=["POST","GET"],url_name="api-search",detail=False)
     def search(self,request):
         types = request.data.get("types",[])
         prices = request.data.get("price",[])
@@ -143,9 +143,9 @@ class ApiInfoViews(ModelViewSet):
         if platform:
             query_params.update({"platform__in":platform})    
         
-        
+        print("search api condition:",query_params)
         api_infos = ApiCollector.objects.filter(**query_params).all()
-        print("search api condition:",request.data,api_infos)
+        # print("search api condition:",request.data,api_infos)
 
         return HTTPResponse(
             data={
@@ -160,8 +160,8 @@ class ApiInfoViews(ModelViewSet):
 class ApisSpiderResourceViews(APIView):
 
     queryset = ApiCollectorSpiderResourceModel.objects.all()
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    authentication_classes = [V1Authentication]
+    # permission_classes = [IsAuthenticated]
     serializer_class  = ApiCollectorSpiderResourceSerializer
 
 
