@@ -315,4 +315,4 @@ SIMPLE_JWT = {
 ########### ETCD
 ETCD_HOST = os.environ.get("ETCD_HOST","etcd1")
 ETCD_PORT = os.environ.get("ETCD_PORT",2379)
-
+USERCENTER_KEY = "/site/usercenter/rpc"

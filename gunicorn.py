@@ -1,4 +1,7 @@
 # gunicorn.conf
+#GRPC 跨进程使用: #https://github.com/grpc/grpc/blob/master/doc/fork_support.md#111
+import os
+os.environ.setdefault("GRPC_ENABLE_FORK_SUPPORT","1")
 import multiprocessing
 import threading
 import uuid
@@ -61,6 +64,7 @@ def when_ready(server):
         etcd.put(value, f'{ip}:8000',lease)
     stop_event = threading.Event()
     stop_event.clear()
+    # print(list(etcd.get_prefix(settings.USERCENTER_KEY)),">>>>>>>")
     keep_alive_thread = threading.Thread(target=etcd_keep_alive, args=(lease,stop_event))
     keep_alive_thread.start()
     setattr(server, "keep_alive_thread", keep_alive_thread)

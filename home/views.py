@@ -43,9 +43,10 @@ from home.serializers import *
 from home.models import *
 from utils.helper import parse_ip
 from utils.http_ import HTTPResponse
-
-
+from rpc.usercenter.client import get_user_info
 from authenticationV1 import V1Authentication
+from core.settings import ETCD_HOST,ETCD_PORT,USERCENTER_KEY
+from utils.etcd_client import ETCDClient
 
 class SiteCommentSetPagination(PageNumberPagination):
     page_size = 6
@@ -107,12 +108,18 @@ class SiteCommentViewsSet(viewsets.ModelViewSet):
             # 获取本地的IP
             import socket
             self.ip = socket.gethostbyname(socket.gethostname())
+
         location = parse_ip(ip=self.ip)
+        user_id =  request.user
+
+        user_center = ETCDClient().get(USERCENTER_KEY)
+        user_info = get_user_info(user_id=user_id,target=user_center)
+        print("user info: ",user_info)
         new_comment = SiteComments.objects.create(
             body = request.data.get("body",""),
-            qq = request.data.get("qq",""),
-            email = request.data.get("email",""),
-            name = request.data.get("name",""),
+            # qq = user_info.qq,
+            email = user_info.userEmail,
+            name = user_info.userName,
             ip = self.ip,
             loc_province = location.get("regionName","未知省份"),
             loc_country = location.get("country","未知国家"),
@@ -121,20 +128,53 @@ class SiteCommentViewsSet(viewsets.ModelViewSet):
         new_comment.save()
         return HTTPResponse("created success!", status=status.HTTP_201_CREATED)
 
-    @action(url_path="reply",methods=["get"],detail=True)
+    @action(url_path="reply",methods=["get","post"],detail=True)
     def get_reply(self,request,pk=None):
-        print("get reply list",pk)
-        queryset = SiteComments.objects.filter(is_valid=True,root_id=pk).order_by("created").all()
-        
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            res =  self.get_paginated_response(serializer.data)
-            return HTTPResponse(res.data,status=status.HTTP_200_OK)
+        if request.method.lower() == "get":
+            # print("get reply list",pk)
+            queryset = SiteComments.objects.filter(is_valid=True,root_id=pk).order_by("created").all()
+            
+            page = self.paginate_queryset(queryset)
+            if page is not None:
+                serializer = self.get_serializer(page, many=True)
+                res =  self.get_paginated_response(serializer.data)
+                return HTTPResponse(res.data,status=status.HTTP_200_OK)
 
-        serializer = self.get_serializer(queryset, many=True)
-        # serializer = SiteCommentsSerializer(queryset,many=True)
-        return HTTPResponse(serializer.data,status=status.HTTP_200_OK)
+            serializer = self.get_serializer(queryset, many=True)
+            # serializer = SiteCommentsSerializer(queryset,many=True)
+            return HTTPResponse(serializer.data,status=status.HTTP_200_OK)
+        elif request.method.lower()=="post":
+            # print("回复评论",request.data)
+            x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+            if x_forwarded_for:
+                self.ip = x_forwarded_for.split(',')[0]
+            else:
+                self.ip = request.META.get('REMOTE_ADDR')
+            if self.ip =="127.0.0.1":
+                # 获取本地的IP
+                import socket
+                self.ip = socket.gethostbyname(socket.gethostname())
+
+            location = parse_ip(ip=self.ip)
+            user_id =  request.user
+
+            user_center = ETCDClient().get(USERCENTER_KEY)
+            user_info = get_user_info(user_id=user_id,target=user_center)
+            print("user info: ",user_info)
+            new_comment = SiteComments.objects.create(
+                body = request.data.get("body",""),
+                root_id = pk,
+                replay_to = request.data.get("replay_to",-1),
+                # qq = user_info.qq,
+                email = user_info.userEmail,
+                name = user_info.userName,
+                ip = self.ip,
+                loc_province = location.get("regionName","未知省份"),
+                loc_country = location.get("country","未知国家"),
+                loc_city = location.get("city","未知城市")
+            )
+            new_comment.save()
+            return HTTPResponse(message="评论成功!")
 
 weekdays = ["星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"]
 
