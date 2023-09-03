@@ -139,6 +139,8 @@ ASGI_APPLICATION = 'core.asgi.application'
 ######################################  Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
+print( env("POSTGRES_HOST"),">>>>>")
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',

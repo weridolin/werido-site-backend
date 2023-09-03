@@ -14,12 +14,21 @@ from home.models import *
 
 class UpdateLogSerializer(serializers.ModelSerializer):
     finish_time = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S")  # postgres 存的是带时区TZ，这里把它格式化一下
-    updated = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S") 
+    updated = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S",default=datetime.datetime.now) 
 
     class Meta:
         model = UpdateLog
         fields = "__all__"
         depth = 1
+
+
+    def create(self, validated_data):
+        # print(validated_data,">>>>>>")
+        return super().create(validated_data)
+
+
+    def validate(self, attrs):
+        return super().validate(attrs)
 
 class FriendsLinkSerializer(serializers.ModelSerializer):
     updated = serializers.DateTimeField(format="%Y-%m-%d") 

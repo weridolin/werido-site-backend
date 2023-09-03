@@ -47,6 +47,7 @@ from rpc.usercenter.client import get_user_info
 from authenticationV1 import V1Authentication
 from core.settings import ETCD_HOST,ETCD_PORT,USERCENTER_KEY
 from utils.etcd_client import ETCDClient
+import re
 
 class SiteCommentSetPagination(PageNumberPagination):
     page_size = 6
@@ -181,6 +182,13 @@ weekdays = ["星期一", "星期二", "星期三", "星期四", "星期五", "�
 class UpdateLogViewSet(viewsets.ModelViewSet):
     serializer_class = UpdateLogSerializer
     queryset = UpdateLog.objects.all() # 这里是针对所有的请求都会以这个为标准
+    authentication_classes = [V1Authentication]
+
+    def get_authenticators(self):
+        if self.request.method == "GET":
+            return []
+        return super().get_authenticators()
+
 
     def list(self, request, *args, **kwargs):
         logs = UpdateLog.objects.all().order_by('-updated')
@@ -198,6 +206,32 @@ class UpdateLogViewSet(viewsets.ModelViewSet):
         return HTTPResponse(data=res,status=status.HTTP_200_OK)
 
 
+    def create(self, request, *args, **kwargs):
+        """
+            提交一个更新日志
+            {
+                "repo_uri":"更新日志仓库",
+                "commit_content":"更新日志内容",
+                "author":"更新日志作者",
+                "is_finish":false,
+                "commit_id":"提交的commit_id",
+                "finish_time":"2023-09-03 01:03:11"
+            }
+
+            commit_content: 提交内容的格式:
+                message:Xxx
+                author:xxx
+        """
+        commit_content = request.data.pop("commit_content",None)
+        if not commit_content:
+            return HTTPResponse(message="提价内容不能为空!",status=status.HTTP_400_BAD_REQUEST)
+        message,author = re.findall(r"message:(.*)\nauthor:(.*)",commit_content)[0]
+        serializer = UpdateLogSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(**{"commit_content":message,"user_name":author})
+            return HTTPResponse(data=serializer.data,status=status.HTTP_201_CREATED)
+        print("create update log error",serializer.errors)
+        return HTTPResponse(message="提交失败!",status=status.HTTP_400_BAD_REQUEST)
 
 
 class FriendsLinksViewsApi(APIView):

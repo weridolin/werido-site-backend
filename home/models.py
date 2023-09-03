@@ -12,19 +12,19 @@ LastEditTime: 2021-10-05 18:10:09
 from django.db import models
 from core.base import BaseModel
 from django.contrib.auth.models import User
-
+import datetime
 class UpdateLog(BaseModel):
     class Meta:
         db_table="site_update_log"
         verbose_name = "更新日志"
         verbose_name_plural = "更新日志"
 
-    update_content = models.TextField(verbose_name="更新内容",null=False,blank=False)
+    # update_content = models.TextField(verbose_name="更新内容",null=False,blank=False)
     is_finish = models.BooleanField(verbose_name="完成",default=True,null=False)
     # is_custom = models.BooleanField(verbose_name="是否为用户自定义",default=False,null=False)
     # author = models.ForeignKey(User,on_delete=models.CASCADE,related_name="update_author")
     repo_uri = models.CharField(max_length=256,verbose_name="仓库地址",null=True,blank=False)
-    finish_time = models.DateTimeField(verbose_name='完成时间')
+    finish_time = models.DateTimeField(verbose_name='完成时间',default=datetime.datetime.now)
     commit_message = models.CharField(max_length=256,verbose_name="提交信息",null=True,blank=True)
     commit_id = models.CharField(max_length=256,verbose_name="提交ID",null=True,blank=True)
     commit_content = models.TextField(verbose_name="提交详细内容",null=True,blank=True)

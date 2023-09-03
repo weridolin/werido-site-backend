@@ -14,6 +14,7 @@ from django.db import models
 from rest_framework.response import Response
 from utils.http_ import HTTPResponse
 from collections import OrderedDict
+import datetime
 
 TypesChoice = [
     ("article", "article"),
@@ -22,8 +23,8 @@ TypesChoice = [
 
 
 class BaseModel(models.Model):
-    created = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
-    updated = models.DateTimeField(auto_now=True, verbose_name='修改时间')
+    created = models.DateTimeField(auto_now_add=True, verbose_name='创建时间',default=datetime.datetime.now)
+    updated = models.DateTimeField(auto_now=True, verbose_name='修改时间',default=datetime.datetime.now)
 
     class Meta:
         app_label = 'Base'
