@@ -225,10 +225,10 @@ class UpdateLogViewSet(viewsets.ModelViewSet):
         commit_content = request.data.pop("commit_content",None)
         if not commit_content:
             return HTTPResponse(message="提价内容不能为空!",status=status.HTTP_400_BAD_REQUEST)
-        message,author = re.findall(r"message:(.*)\nauthor:(.*)",commit_content)[0]
+        message,author = re.findall(r"message:([\s\S]*)author:([\s\S]*)",commit_content)[0]
         serializer = UpdateLogSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save(**{"commit_content":message,"user_name":author})
+            serializer.save(**{"commit_content":message.replace('\n', '').replace('\r', ''),"user_name":author.replace('\n', '').replace('\r', '')})
             return HTTPResponse(data=serializer.data,status=status.HTTP_201_CREATED)
         print("create update log error",serializer.errors)
         return HTTPResponse(message="提交失败!",status=status.HTTP_400_BAD_REQUEST)
