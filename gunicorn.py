@@ -51,7 +51,7 @@ def when_ready(server):
     print("gunicorn server started ... begin to register to etcd")
     from core import settings
     etcd = etcd3.client(host=settings.ETCD_HOST, port=settings.ETCD_PORT)
-    lease = etcd.lease(10)
+    lease = etcd.lease(20)
     lease.refresh()
     ## 获取服务所在的IP
     # 获取本机计算机名称
@@ -65,7 +65,7 @@ def when_ready(server):
     stop_event = threading.Event()
     stop_event.clear()
     # print(list(etcd.get_prefix(settings.USERCENTER_KEY)),">>>>>>>")
-    keep_alive_thread = threading.Thread(target=etcd_keep_alive, args=(lease,stop_event))
+    keep_alive_thread = threading.Thread(target=etcd_keep_alive, args=(etcd,lease,stop_event))
     keep_alive_thread.start()
     setattr(server, "keep_alive_thread", keep_alive_thread)
     setattr(server, "keep_alive_thread_stop_event", stop_event)
@@ -81,14 +81,20 @@ def on_exit(server):
         getattr(server,"keep_alive_thread_stop_event").set()
 
 
-def etcd_keep_alive(lease,stop_event:threading.Event):
+def etcd_keep_alive(etcd_client,lease,stop_event:threading.Event):
+    lease_id=lease.id 
+    print("lease",lease_id)  
     while not stop_event.isSet():
-        lease.refresh()
-        for _ in range(3):
-            if stop_event.isSet():
-                break
-            stop_event.wait(1)
-        # print("oldbackend refresh etcd lease ...")
-
+        try:
+            etcd_client.refresh_lease(lease_id)
+            for _ in range(3):
+                if stop_event.isSet():
+                    break
+                stop_event.wait(1)
+        except Exception as e:
+            from core import settings   
+            print("refresh leave error -> ",e,type(e))
+            etcd_client = etcd3.client(host=settings.ETCD_HOST, port=settings.ETCD_PORT)
+            continue
     print("gunicorn server exit ... keep alive thread stop...")
 
