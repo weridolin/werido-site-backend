@@ -93,7 +93,8 @@ def etcd_keep_alive(etcd_client,lease,stop_event:threading.Event):
                 stop_event.wait(1)
         except Exception as e:
             from core import settings   
-            print("refresh leave error -> ",e,type(e))
+            print("refresh leave error,retry after 3 seconds -> ",e,type(e))
+            stop_event.wait(3)
             etcd_client = etcd3.client(host=settings.ETCD_HOST, port=settings.ETCD_PORT)
             continue
     print("gunicorn server exit ... keep alive thread stop...")
