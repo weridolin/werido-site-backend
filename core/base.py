@@ -23,8 +23,8 @@ TypesChoice = [
 
 
 class BaseModel(models.Model):
-    created = models.DateTimeField(auto_now_add=True, verbose_name='创建时间',default=datetime.datetime.now)
-    updated = models.DateTimeField(auto_now=True, verbose_name='修改时间',default=datetime.datetime.now)
+    created = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
+    updated = models.DateTimeField(auto_now=True, verbose_name='修改时间')
 
     class Meta:
         app_label = 'Base'
