@@ -223,6 +223,9 @@ class UpdateLogViewSet(viewsets.ModelViewSet):
                 author:xxx
         """
         commit_content = request.data.pop("commit_content",None)
+        
+        # user_center = ETCDClient().get(USERCENTER_KEY)
+        # user_info = get_user_info(user_id=user_id,target=user_center)
         print("commit_content",commit_content,"request body",request.data)
         if not commit_content:
             return HTTPResponse(message="提价内容不能为空!",status=status.HTTP_400_BAD_REQUEST)
@@ -230,7 +233,10 @@ class UpdateLogViewSet(viewsets.ModelViewSet):
         print("message",message,"author",author)
         serializer = UpdateLogSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save(**{"commit_content":message.replace('\n', '').replace('\r', ''),"user_name":author.replace('\n', '').replace('\r', '')})
+            serializer.save(**{"commit_content":message.replace('\n', '').replace('\r', ''),
+                "user_name":author.replace('\n', '').replace('\r', ''),
+                "commit_message":message.replace('\n', '').replace('\r', ''),
+                "user_id":1})
             return HTTPResponse(data=serializer.data,status=status.HTTP_201_CREATED)
         print("create update log error",serializer.errors)
         return HTTPResponse(message="提交失败!",status=status.HTTP_400_BAD_REQUEST)

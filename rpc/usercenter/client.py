@@ -20,7 +20,7 @@ def get_user_menu_permission(user_id,target) -> usercenter_pb2.GetUserMenuPermis
         return response
 
 
-def get_user_resource_permission(user_id) -> usercenter_pb2.GetUserResourcePermissionResp:
+def get_user_resource_permission(user_id,target) -> usercenter_pb2.GetUserResourcePermissionResp:
     with grpc.insecure_channel(target) as channel:
         stub = usercenter_pb2_grpc.usercenterStub(channel)
         response = stub.getUserResourcePermission(usercenter_pb2.GetUserResourcePermissionReq(user_id=user_id)) 
