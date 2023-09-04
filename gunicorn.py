@@ -64,8 +64,7 @@ def when_ready(server):
         etcd.put(value, f'{ip}:8000',lease)
     stop_event = threading.Event()
     stop_event.clear()
-    # print(list(etcd.get_prefix(settings.USERCENTER_KEY)),">>>>>>>")
-    keep_alive_thread = threading.Thread(target=etcd_keep_alive, args=(etcd,lease,stop_event))
+    keep_alive_thread = threading.Thread(target=etcd_keep_alive, args=(lease,stop_event))
     keep_alive_thread.start()
     setattr(server, "keep_alive_thread", keep_alive_thread)
     setattr(server, "keep_alive_thread_stop_event", stop_event)
@@ -81,12 +80,15 @@ def on_exit(server):
         getattr(server,"keep_alive_thread_stop_event").set()
 
 
-def etcd_keep_alive(etcd_client,lease,stop_event:threading.Event):
-    lease_id=lease.id 
-    print("lease",lease_id)  
+def etcd_keep_alive(lease,stop_event:threading.Event):
+    # lease_id=lease.id 
+    # print("lease",lease_id)  
     while not stop_event.isSet():
         try:
-            etcd_client.refresh_lease(lease_id)
+            # print("refresh lease -> ",lease.id)
+            # res = etcd_client.refresh_lease(lease_id)
+            # print(list(res))
+            lease.refresh()
             for _ in range(3):
                 if stop_event.isSet():
                     break
@@ -96,6 +98,7 @@ def etcd_keep_alive(etcd_client,lease,stop_event:threading.Event):
             print("refresh leave error,retry after 3 seconds -> ",e,type(e))
             stop_event.wait(3)
             etcd_client = etcd3.client(host=settings.ETCD_HOST, port=settings.ETCD_PORT)
+            lease.etcd_client = etcd_client
             continue
     print("gunicorn server exit ... keep alive thread stop...")
 
