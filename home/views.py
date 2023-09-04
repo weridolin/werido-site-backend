@@ -223,9 +223,11 @@ class UpdateLogViewSet(viewsets.ModelViewSet):
                 author:xxx
         """
         commit_content = request.data.pop("commit_content",None)
+        print("commit_content",commit_content,"request body",request.data)
         if not commit_content:
             return HTTPResponse(message="提价内容不能为空!",status=status.HTTP_400_BAD_REQUEST)
         message,author = re.findall(r"message:([\s\S]*)author:([\s\S]*)",commit_content)[0]
+        print("message",message,"author",author)
         serializer = UpdateLogSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(**{"commit_content":message.replace('\n', '').replace('\r', ''),"user_name":author.replace('\n', '').replace('\r', '')})
