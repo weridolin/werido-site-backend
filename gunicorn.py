@@ -7,7 +7,7 @@ import threading
 import uuid
 import socket
 import etcd3
-
+from etcd3 import exceptions 
 
 # 并行工作进程数
 # workers = multiprocessing.cpu_count() * 2 + 1
@@ -87,6 +87,7 @@ def etcd_keep_alive(lease,stop_event:threading.Event,local_ip=None):
             lease.refresh()
             if retry_time_count > 6:
                 ## 重新注册下key
+                print("retry register to etcd")
                 for _,value in APP_KEYS.items():
                     print(f"register {value} to etcd,value -> http://{local_ip}:8000")
                     etcd_client.put(value, f'{local_ip}:8000',lease)
@@ -95,9 +96,11 @@ def etcd_keep_alive(lease,stop_event:threading.Event,local_ip=None):
                 if stop_event.isSet():
                     break
                 stop_event.wait(1)
-        except Exception as e:
+        except exceptions.ConnectionFailedError as e:
             from core import settings   
+            import traceback
             print("refresh leave error,retry after 3 seconds -> ",e,type(e))
+            print(traceback.format_exc())
             stop_event.wait(3)
             etcd_client = etcd3.client(host=settings.ETCD_HOST, port=settings.ETCD_PORT)
             lease.etcd_client = etcd_client
