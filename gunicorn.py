@@ -64,7 +64,7 @@ def when_ready(server):
         etcd.put(value, f'{ip}:8000',lease)
     stop_event = threading.Event()
     stop_event.clear()
-    keep_alive_thread = threading.Thread(target=etcd_keep_alive, args=(lease,stop_event))
+    keep_alive_thread = threading.Thread(target=etcd_keep_alive, args=(lease,stop_event,ip))
     keep_alive_thread.start()
     setattr(server, "keep_alive_thread", keep_alive_thread)
     setattr(server, "keep_alive_thread_stop_event", stop_event)
@@ -80,15 +80,17 @@ def on_exit(server):
         getattr(server,"keep_alive_thread_stop_event").set()
 
 
-def etcd_keep_alive(lease,stop_event:threading.Event):
-    # lease_id=lease.id 
-    # print("lease",lease_id)  
+def etcd_keep_alive(lease,stop_event:threading.Event,local_ip=None):
+    retry_time_count = 0
     while not stop_event.isSet():
         try:
-            # print("refresh lease -> ",lease.id)
-            # res = etcd_client.refresh_lease(lease_id)
-            # print(list(res))
             lease.refresh()
+            if retry_time_count > 6:
+                ## 重新注册下key
+                for _,value in APP_KEYS.items():
+                    print(f"register {value} to etcd,value -> http://{local_ip}:8000")
+                    etcd_client.put(value, f'{local_ip}:8000',lease)
+            retry_time_count = 0
             for _ in range(3):
                 if stop_event.isSet():
                     break
@@ -99,6 +101,7 @@ def etcd_keep_alive(lease,stop_event:threading.Event):
             stop_event.wait(3)
             etcd_client = etcd3.client(host=settings.ETCD_HOST, port=settings.ETCD_PORT)
             lease.etcd_client = etcd_client
+            retry_time_count+=3
             continue
     print("gunicorn server exit ... keep alive thread stop...")
 
