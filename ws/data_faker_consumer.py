@@ -2,7 +2,7 @@ import json,asyncio
 from channels.generic.websocket import AsyncWebsocketConsumer
 from ws.const import WSMessageType
 from dataFaker.dfaker import create_task_async
-
+import os
 ## 所有的 WS连接都是一个线程里面的 receive
 class DataFakerConsumer(AsyncWebsocketConsumer):
     """
@@ -19,7 +19,7 @@ class DataFakerConsumer(AsyncWebsocketConsumer):
         ##
         self.key = self.scope['url_route']['kwargs']['key']
         self.key_group_name = 'dataFaker_%s' % self.key ## socket连接的唯一标识？
-        print(">>> data faker accept a new ws connection",self.key)
+        print(">>> data faker accept a new ws connection",self.key,os.getpid())
         await self.channel_layer.group_add(
             self.key_group_name,
             self.channel_name
@@ -71,5 +71,5 @@ class DataFakerConsumer(AsyncWebsocketConsumer):
 
 def _on_done_callback(future):
     target_path,ws = future.result()
-    print(">>>>>>>>>> on done callback","target_path:",target_path,ws)
+    print("fake data created done callback","target_path:",target_path,ws)
     
