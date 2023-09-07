@@ -19,7 +19,7 @@ router.register("updatelog",UpdateLogViewSet,basename="updatelog")
 router.register("comments",SiteCommentViewsSet,basename="comments")
 urlpatterns=[  
     path(r"friendslinks",FriendsLinksViewsApi.as_view(),name="friendslinks"),
-    path(r"bglist",BackGroundMusicViews.as_view(),name="backgroundmusiclist")
+    path(r"backgroundImage",BackGroundMusicViews.as_view(),name="backgroundmusiclist")
     ]
 urlpatterns += router.urls
 
