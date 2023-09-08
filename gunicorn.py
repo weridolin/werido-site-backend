@@ -12,7 +12,11 @@ from etcd3 import exceptions
 
 
 # 并行工作进程数
-# workers = multiprocessing.cpu_count() * 2 + 1
+if os.environ.get('STANDLONE',None) == '1':
+    print("only start one worker")
+    workers = 1
+else:
+    workers = multiprocessing.cpu_count() * 2 + 1
 workers = 5
 # 指定每个工作者的线程数
 threads = 2
