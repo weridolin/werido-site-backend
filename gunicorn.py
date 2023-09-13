@@ -8,8 +8,34 @@ import uuid
 import socket
 import etcd3
 from etcd3 import exceptions 
-# from uvicorn.workers import UvicornWorker
+# import opentelemetry.trace as trace
+from opentelemetry import trace
+# from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+from opentelemetry.sdk.resources import Resource
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
+from opentelemetry.exporter.jaeger.thrift import JaegerExporter
+from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
 
+def post_fork(server, worker):
+    print("post fork worker...")
+    jaeger_exporter = JaegerExporter(
+        agent_host_name="jaeger",
+        agent_port= 6831,
+    )
+    resource = Resource.create(attributes={
+        "service.name": "api-old-backend"
+    })
+
+    trace.set_tracer_provider(TracerProvider(resource=resource))
+    span_processor = BatchSpanProcessor(
+        jaeger_exporter
+    )
+    trace.get_tracer_provider().add_span_processor(span_processor)
+
+    # tracer = trace.get_tracer(__name__)
+    # with tracer.start_as_current_span('foo'):
+    #     print('Hello world!')
 
 # 并行工作进程数
 if os.environ.get('STANDLONE',None) == '1':
@@ -17,7 +43,6 @@ if os.environ.get('STANDLONE',None) == '1':
     workers = 1
 else:
     workers = multiprocessing.cpu_count() * 2 + 1
-workers = 5
 # 指定每个工作者的线程数
 threads = 2
 # 监听内网端口5000

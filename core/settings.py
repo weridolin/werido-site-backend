@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
+from datetime import timedelta
 from pathlib import Path
 import os
 import environ
@@ -26,11 +27,12 @@ env = environ.Env(
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-if not os.path.exists(os.path.join(os.path.dirname(BASE_DIR),".env")):
-    print("can not find .env file...",os.path.join(os.path.dirname(BASE_DIR),".env"))
+if not os.path.exists(os.path.join(os.path.dirname(BASE_DIR), ".env")):
+    print("can not find .env file...", os.path.join(
+        os.path.dirname(BASE_DIR), ".env"))
 
-    
-environ.Env.read_env(os.path.join(os.path.dirname(BASE_DIR),".env"))
+
+environ.Env.read_env(os.path.join(os.path.dirname(BASE_DIR), ".env"))
 
 EMAIL_PWD = env('EMAIL_PWD')
 
@@ -77,7 +79,7 @@ INSTALLED_APPS = [
     "wechat.apps.WechatConfig",
 ]
 
-########## DJANGO CHANNELS
+# DJANGO CHANNELS
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels.layers.InMemoryChannelLayer",
@@ -85,9 +87,8 @@ CHANNEL_LAYERS = {
 }
 
 
-
-
 MIDDLEWARE = [
+    'middleswares.trace.OpenTracingMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -100,21 +101,12 @@ MIDDLEWARE = [
 
 # # 跨域配置
 CORS_ORIGIN_WHITELIST = (
-    'http://127.0.0.1:8000',
-    'http://127.0.0.1:8888',
-    'http://localhost:8000',
-    'http://localhost:8080',
-    'http://localhost:8085',
-    'http://localhost:8888',
-    'http://localhost:3000',
-    'http://localhost:8081', #凡是出现在白名单中的域名，都可以访问后端接口
 )
 
 CORS_ALLOW_CREDENTIALS = True  # 允许携带cookie
 
 ROOT_URLCONF = 'core.urls'
 
-import os
 os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 
 TEMPLATES = [
@@ -122,7 +114,7 @@ TEMPLATES = [
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [],
         'APP_DIRS': True,
-        'OPTIONS': { 
+        'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
@@ -136,10 +128,8 @@ TEMPLATES = [
 # WSGI_APPLICATION = 'core.wsgi.application'
 ASGI_APPLICATION = 'core.asgi.application'
 
-######################################  Database
+# Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
-
-print( env("POSTGRES_HOST"),">>>>>")
 
 DATABASES = {
     'default': {
@@ -148,13 +138,13 @@ DATABASES = {
         'USER': env("POSTGRES_USER"),  # 拥有者，这个一般没修改
         'PASSWORD': env("POSTGRES_PASSWORD"),  # 密码，自己设定的
         'HOST': env("POSTGRES_HOST"),  # 默认的就没写
-        'PORT': env("POSTGRES_PORT"),        
+        'PORT': env("POSTGRES_PORT"),
         # 'HOST': 'sitedb',
         # 'PORT': '5432',
     }
 }
 
-######################################### cache
+# cache
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
@@ -162,10 +152,10 @@ CACHES = {
         # "LOCATION": f"redis://:{os.environ.get('REDIS_PASSWORD','werido')}@localhost:6379/0",
         "LOCATION": f"redis://:{env('REDIS_PASSWORD')}@{env('REDIS_HOST')}:{env('REDIS_PORT')}/0",
         "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient", 
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
             # "PASSWORD": "mysecret",
             "REDIS_CLIENT_CLASS": "redis.client.StrictRedis",
-            "REDIS_CLIENT_KWARGS": {"decode_responses": True, "charset":"utf-8"},
+            "REDIS_CLIENT_KWARGS": {"decode_responses": True, "charset": "utf-8"},
         }
     },
     # "redis":{
@@ -199,10 +189,10 @@ ADMIN_SITE_HEADER = 'werido blog'
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
 # LANGUAGE_CODE = 'en-us'
-LANGUAGE_CODE ='zh-hans'
+LANGUAGE_CODE = 'zh-hans'
 
 # TIME_ZONE = 'UTC'
-TIME_ZONE = 'Asia/Shanghai'  ##修改时区
+TIME_ZONE = 'Asia/Shanghai'  # 修改时区
 
 USE_I18N = True
 
@@ -229,11 +219,11 @@ if not os.path.exists(LOG_ROOT):
 
 # 过期时间
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
-SESSION_COOKIE_AGE = 200 #
+SESSION_COOKIE_AGE = 200
 
 
-############## CELERY ################3333
-CELERY_BROKER_URL =  f"redis://:{env('REDIS_PASSWORD')}@{env('REDIS_HOST')}:{env('REDIS_PORT')}/1"
+# CELERY ################3333
+CELERY_BROKER_URL = f"redis://:{env('REDIS_PASSWORD')}@{env('REDIS_HOST')}:{env('REDIS_PORT')}/1"
 CELERY_RESULT_BACKEND = CELERY_BROKER_URL
 #: Only add pickle to this list if your broker is secured
 #: from unwanted access (see userguide/security.html)
@@ -241,19 +231,18 @@ CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 
 
-
-########################### rest framework
+# rest framework
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-        
+
     ),
     'EXCEPTION_HANDLER': 'utils.exceptions.exceptions_handler',
     'DEFAULT_DATETIME_FORMAT': '%Y-%m-%d %H:%M:%S',  #
 }
 
 
-################# oauth provider
+# oauth provider
 
 
 # OAUTH2_PROVIDER = {
@@ -270,16 +259,12 @@ REST_FRAMEWORK = {
 # OAUTH2_PROVIDER_GRANT_MODEL= "oauth.OauthGrantModel"
 
 
+# scrapy scripts
 
-################## scrapy scripts 
-
-SPIDER_DIR = os.path.join(BASE_DIR,"scripts")
-
+SPIDER_DIR = os.path.join(BASE_DIR, "scripts")
 
 
-
-####################### jwt
-from datetime import timedelta
+# jwt
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(hours=6),
@@ -314,11 +299,26 @@ SIMPLE_JWT = {
 }
 
 
-########### ETCD
-ETCD_HOST = os.environ.get("ETCD_HOST","etcd1")
-ETCD_PORT = os.environ.get("ETCD_PORT",2379)
+# ETCD
+ETCD_HOST = os.environ.get("ETCD_HOST", "etcd1")
+ETCD_PORT = os.environ.get("ETCD_PORT", 2379)
 USERCENTER_KEY = "/site/usercenter/rpc"
 
 
-############ RabbitMq
-RABBITMQ_HOST = os.environ.get("RABBITMQ_HOST","siterabbitmq")
+# RabbitMq
+RABBITMQ_HOST = os.environ.get("RABBITMQ_HOST", "siterabbitmq")
+
+# jaeger
+SERVICE_NAME = 'site-old-backend'
+
+OPENTRACING_TRACER_CONFIG = {
+    'sampler': {
+        'type': 'const',
+        'param': 1,
+    },
+    'local_agent': {
+        'reporting_host': 'jaeger',
+        'reporting_port': '4318',
+    },
+    'logging': True,
+}
