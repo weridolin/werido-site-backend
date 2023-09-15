@@ -19,7 +19,8 @@ import json
 from rest_framework.decorators import action
 from rest_framework import status
 from rest_framework.views import APIView
-
+from opentelemetry import trace
+from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
 from collections import OrderedDict
 from rest_framework.pagination import PageNumberPagination
 import json
@@ -113,8 +114,17 @@ class SiteCommentViewsSet(viewsets.ModelViewSet):
         location = parse_ip(ip=self.ip)
         user_id =  request.user
 
+        # tracer = trace.get_tracer(__name__)
+        # with tracer.start_as_current_span('begin-call-rpc'):
+        #     carrier = dict()
+        # TraceContextTextMapPropagator().inject(carrier)
+        # ctx = (("traceparent",carrier.get('traceparent',None) or request.traceparent),)
+        ctx = (("traceparent",request.traceparent),)
         user_center = ETCDClient().get(USERCENTER_KEY)
-        user_info = get_user_info(user_id=user_id,target=user_center)
+        request.span.add_event("begin-call-rpc",attributes={"user_center":user_center,"rpc-path":"/user/info","user_id":user_id})
+        user_info = get_user_info(user_id=user_id,target=user_center,ctx=ctx)
+        request.span.add_event("end-call-rpc")
+
         print("user info: ",user_info)
         new_comment = SiteComments.objects.create(
             body = request.data.get("body",""),

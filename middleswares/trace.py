@@ -5,7 +5,6 @@ try:
 except ImportError:
     MiddlewareMixin = object
 from middleswares.utils import *
-from opentelemetry.sdk.trace import Tracer
 
 """
 00-480e22a2781fe54d992d878662248d94-b4b37b64bb3f6141-00
@@ -19,8 +18,6 @@ trace-flags: 8 位，调用者的建议标志，可以考虑为调用者的建�
 """
 
 from opentelemetry import trace
-from rest_framework.response import Response
-from django.http import HttpRequest
 from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
 from opentelemetry.trace.propagation import _SPAN_KEY
 from opentelemetry import context as context_api
@@ -74,7 +71,12 @@ class OpenTracingMiddleware(MiddlewareMixin):
         headers = format_request_headers(request.META)
         ctx = TraceContextTextMapPropagator().extract(headers)
         self.span = self.tracer.start_span(name=request.path, context=ctx)
+        # self.span.add_event()
         self.token = use_span(self.span)
+        carrier = dict()
+        TraceContextTextMapPropagator().inject(carrier)
+        if 'traceparent' in carrier.keys():
+            request.traceparent=carrier.get('traceparent')
         request.span = self.span
         self.span.set_attributes({
             "http.method": request.method,
