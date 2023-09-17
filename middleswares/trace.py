@@ -85,7 +85,8 @@ class OpenTracingMiddleware(MiddlewareMixin):
             "host.port": 8000,
             "http.host": request.get_host(),
             "http.url": request.get_full_path(),
-            "http.peer.addr":headers.get("x-real-ip","")
+            "http.peer.addr":headers.get("x-real-ip",""),
+            "span.kind": SpanKind.INTERNAL,
         })
         
 
@@ -94,7 +95,8 @@ class OpenTracingMiddleware(MiddlewareMixin):
             process a exception
         """
         # print(">>>>",exception,type(exception))
-        self.span.set_attribute("http.status_code",500)
+        self.span.set_attribute("error",True)
+        self.span.set_attribute("otel.status_code",StatusCode.ERROR)
         self.span.set_attribute("http.err_msg",str(exception) or "")
         import traceback
         self.span.set_attribute("http_err_stack",traceback.format_exc())
@@ -103,7 +105,7 @@ class OpenTracingMiddleware(MiddlewareMixin):
 
     def process_response(self, request, response: HTTPResponse):
         if isinstance(response,HTTPResponse):
-            self.span.set_attribute("http.status_code",response.status_code)
+            self.span.set_attribute("otel.status_code	",StatusCode.OK)
             self.span.set_attribute("http.res_msg",response.data.get('message',None) or "")    
             self.span.set_attribute("http.response.data",json.dumps(response.data) if response.data else "")   
         carrier = dict()
