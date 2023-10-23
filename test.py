@@ -1,3 +1,3 @@
-from distutils.sysconfig import get_config_var
+from distutils.sysconfig import get_config_vars,PREFIX
 
-print(get_config_var('EXT_SUFFIX'))
+print(get_config_vars())

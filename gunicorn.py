@@ -18,7 +18,7 @@ from opentelemetry.exporter.jaeger.thrift import JaegerExporter
 from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
 
 def post_fork(server, worker):
-    print("post fork worker...")
+    print("post fork worker...setting jaeger exporter")
     jaeger_exporter = JaegerExporter(
         agent_host_name="jaeger",
         agent_port= 6831,
@@ -62,6 +62,7 @@ errorlog = '/usr/gunicorn_error.log'
 # 设置日志记录水平
 loglevel = 'info'
 
+# docker 部署下，服务注册到ETCD 
 APP_KEYS = {
     "drug":F"/site/withoutauth/drug/rest/{str(uuid.uuid4())}",
     "home":f"/site/withauth/home/rest/{str(uuid.uuid4())}",
@@ -76,39 +77,42 @@ APP_KEYS = {
     
 }
 
-## 注册到 etcd  #todo ETCD集群？ 
+## 注册到 etcd  
 #   为什么不放在app的ready中 -> 用gunicorn部署时启动多个worker去运行APP,会产生注册多次的情况
-def when_ready(server):
-    print("gunicorn server started ... begin to register to etcd")
-    from core import settings
-    etcd = etcd3.client(host=settings.ETCD_HOST, port=settings.ETCD_PORT)
-    lease = etcd.lease(20)
-    lease.refresh()
-    ## 获取服务所在的IP
-    # 获取本机计算机名称
-    hostname = socket.gethostname()
-    # 获取本机ip
-    ip = socket.gethostbyname(hostname)
-    print(f"local machine ip -> :{ip}")
-    for _,value in APP_KEYS.items():
-        print(f"register {value} to etcd,value -> http://{ip}:8000")
-        etcd.put(value, f'{ip}:8000',lease)
-    stop_event = threading.Event()
-    stop_event.clear()
-    keep_alive_thread = threading.Thread(target=etcd_keep_alive, args=(lease,stop_event,ip))
-    keep_alive_thread.start()
-    setattr(server, "keep_alive_thread", keep_alive_thread)
-    setattr(server, "keep_alive_thread_stop_event", stop_event)
+if os.environ.get('K8S',None) != '1':
+    def when_ready(server):
+        print("gunicorn server started ... begin to register to etcd")
+        from core import settings
+        etcd = etcd3.client(host=settings.ETCD_HOST, port=settings.ETCD_PORT)
+        lease = etcd.lease(20)
+        lease.refresh()
+        ## 获取服务所在的IP
+        # 获取本机计算机名称
+        hostname = socket.gethostname()
+        # 获取本机ip
+        ip = socket.gethostbyname(hostname)
+        print(f"local machine ip -> :{ip}")
+        for _,value in APP_KEYS.items():
+            print(f"register {value} to etcd,value -> http://{ip}:8000")
+            etcd.put(value, f'{ip}:8000',lease)
+        stop_event = threading.Event()
+        stop_event.clear()
+        keep_alive_thread = threading.Thread(target=etcd_keep_alive, args=(lease,stop_event,ip))
+        keep_alive_thread.start()
+        setattr(server, "keep_alive_thread", keep_alive_thread)
+        setattr(server, "keep_alive_thread_stop_event", stop_event)
+else:
+    print("k8s env,not register to etcd")
 
-
-def on_exit(server):
-    print("gunicorn server exit ... begin to stop keep alive thread")
-    from core import settings
-    etcd = etcd3.client(host=settings.ETCD_HOST, port=settings.ETCD_PORT)
-    for key in APP_KEYS:
-        etcd.delete(key)
-    if hasattr(server, "keep_alive_thread_stop_event"):
-        getattr(server,"keep_alive_thread_stop_event").set()
+if os.environ.get('K8S',None) != '1':
+    def on_exit(server):
+        print("gunicorn server exit ... begin to stop keep alive thread")
+        from core import settings
+        etcd = etcd3.client(host=settings.ETCD_HOST, port=settings.ETCD_PORT)
+        for key in APP_KEYS:
+            etcd.delete(key)
+        if hasattr(server, "keep_alive_thread_stop_event"):
+            getattr(server,"keep_alive_thread_stop_event").set()
 
 
 def etcd_keep_alive(lease,stop_event:threading.Event,local_ip=None):

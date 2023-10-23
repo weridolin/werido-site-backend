@@ -134,13 +134,12 @@ ASGI_APPLICATION = 'core.asgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': env("POSTGRES_DB"),  # 数据库名称
-        'USER': env("POSTGRES_USER"),  # 拥有者，这个一般没修改
-        'PASSWORD': env("POSTGRES_PASSWORD"),  # 密码，自己设定的
-        'HOST': env("POSTGRES_HOST"),  # 默认的就没写
-        'PORT': env("POSTGRES_PORT"),
-        # 'HOST': 'sitedb',
-        # 'PORT': '5432',
+        'NAME': env("SITE_DATA_DB"),  # 数据库名称
+        'USER': env("SITE_USER"),  # 拥有者，这个一般没修改
+        'PASSWORD': env("SITE_PASSWORD"),  # 密码，自己设定的
+        # 默认的就没写
+        'HOST': env("POSTGRES_HOST") if env("K8S") != 1 else f"{env('REDIS_SVC_NAME')}.{env('REDIS_SVC_NAME_NAMESPACE')}",
+        'PORT': env("POSTGRES_PORT") if env("K8S") != 1 else f"{env('REDIS_SVC_PORT')}",
     }
 }
 
@@ -150,7 +149,8 @@ CACHES = {
         "BACKEND": "django_redis.cache.RedisCache",
         # "LOCATION": f"redis://:{os.environ.get('REDIS_PASSWORD','werido')}@{os.environ.get('REDIS_HOST','8.131.78.84')}:{os.environ.get('REDIS_PORT','6379')}/0",
         # "LOCATION": f"redis://:{os.environ.get('REDIS_PASSWORD','werido')}@localhost:6379/0",
-        "LOCATION": f"redis://:{env('REDIS_PASSWORD')}@{env('REDIS_HOST')}:{env('REDIS_PORT')}/0",
+        "LOCATION": f"redis://:{env('REDIS_PASSWORD')}@{env('REDIS_HOST')}:{env('REDIS_PORT')}/0" if env("K8S") != 1 else \
+        f"redis://:{env('REDIS_PASSWORD')}@{env('REDIS_SVC_NAME')}.{env('REDIS_SVC_NAME_NAMESPACE')}:{env('REDIS_SVC_PORT')}/1",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
             # "PASSWORD": "mysecret",
@@ -223,7 +223,11 @@ SESSION_COOKIE_AGE = 200
 
 
 # CELERY ################3333
-CELERY_BROKER_URL = f"redis://:{env('REDIS_PASSWORD')}@{env('REDIS_HOST')}:{env('REDIS_PORT')}/1"
+if env("K8S") != 1:
+    CELERY_BROKER_URL = f"redis://:{env('REDIS_PASSWORD')}@{env('REDIS_HOST')}:{env('REDIS_PORT')}/1"
+else:
+    CELERY_BROKER_URL = f"redis://:{env('REDIS_PASSWORD')}@{env('REDIS_SVC_NAME')}.{env('REDIS_SVC_NAME_NAMESPACE')}:{env('REDIS_SVC_PORT')}/1"
+
 CELERY_RESULT_BACKEND = CELERY_BROKER_URL
 #: Only add pickle to this list if your broker is secured
 #: from unwanted access (see userguide/security.html)
@@ -303,6 +307,12 @@ SIMPLE_JWT = {
 ETCD_HOST = os.environ.get("ETCD_HOST", "etcd1")
 ETCD_PORT = os.environ.get("ETCD_PORT", 2379)
 USERCENTER_KEY = "/site/usercenter/rpc"
+
+
+# srv in k8s
+USERCENTER_SVC_NAME = os.environ.get("USERCENTER_SVC_NAME", None)
+USERCENTER_SVC_NAME_NAMESPACE = os.environ.get(
+    "USERCENTER_SVC_NAME_NAMESPACE", None)
 
 
 # RabbitMq

@@ -1,6 +1,6 @@
 from core.settings import  ETCD_HOST,ETCD_PORT,USERCENTER_KEY
 import etcd3,time
-
+import os
 class ETCDClient:
     __cache_map={}
     _instance=None
@@ -32,3 +32,8 @@ class ETCDClient:
             print(e,type(e))
             return None
     
+def get_srv(etcd_key=None,srv_name=None,namespace=None):
+    if os.environ.get('K8S',None) == '1':
+        return f"{srv_name}.{namespace}"
+    else:
+        return ETCDClient().get(etcd_key)

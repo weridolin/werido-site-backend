@@ -46,8 +46,8 @@ from utils.helper import parse_ip
 from utils.http_ import HTTPResponse
 from rpc.usercenter.client import get_user_info
 from authenticationV1 import V1Authentication
-from core.settings import ETCD_HOST,ETCD_PORT,USERCENTER_KEY
-from utils.etcd_client import ETCDClient
+from core.settings import ETCD_HOST,ETCD_PORT,USERCENTER_KEY,USERCENTER_SVC_NAME,USERCENTER_SVC_NAME_NAMESPACE
+from utils.etcd_client import get_srv
 import re
 
 class SiteCommentSetPagination(PageNumberPagination):
@@ -120,7 +120,8 @@ class SiteCommentViewsSet(viewsets.ModelViewSet):
         # TraceContextTextMapPropagator().inject(carrier)
         # ctx = (("traceparent",carrier.get('traceparent',None) or request.traceparent),)
         ctx = (("traceparent",request.traceparent),)
-        user_center = ETCDClient().get(USERCENTER_KEY)
+        user_center = get_srv(etcd_key=USERCENTER_KEY,srv_name=USERCENTER_SVC_NAME,namespace=USERCENTER_SVC_NAME_NAMESPACE)
+        
         request.span.add_event("begin-call-rpc",attributes={"user_center":user_center,"rpc-path":"/user/info","user_id":user_id})
         user_info = get_user_info(user_id=user_id,target=user_center,ctx=ctx)
         request.span.add_event("end-call-rpc")
@@ -169,7 +170,7 @@ class SiteCommentViewsSet(viewsets.ModelViewSet):
             location = parse_ip(ip=self.ip)
             user_id =  request.user
 
-            user_center = ETCDClient().get(USERCENTER_KEY)
+            user_center = get_srv(etcd_key=USERCENTER_KEY,srv_name=USERCENTER_SVC_NAME,namespace=USERCENTER_SVC_NAME_NAMESPACE)
             user_info = get_user_info(user_id=user_id,target=user_center)
             print("user info: ",user_info)
             new_comment = SiteComments.objects.create(
@@ -234,8 +235,7 @@ class UpdateLogViewSet(viewsets.ModelViewSet):
         """
         commit_content = request.data.pop("commit_content",None)
         
-        # user_center = ETCDClient().get(USERCENTER_KEY)
-        # user_info = get_user_info(user_id=user_id,target=user_center)
+
         print("commit_content",commit_content,"request body",request.data)
         if not commit_content:
             return HTTPResponse(message="提价内容不能为空!",status=status.HTTP_400_BAD_REQUEST)
