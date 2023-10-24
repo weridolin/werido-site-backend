@@ -27,9 +27,9 @@ env = environ.Env(
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-if not os.path.exists(os.path.join(os.path.dirname(BASE_DIR), ".env")):
+if not os.path.exists(os.path.join(os.path.dirname(os.path.dirname(BASE_DIR)), ".env")):
     print("can not find .env file...", os.path.join(
-        os.path.dirname(BASE_DIR), ".env"))
+        os.path.dirname(os.path.dirname(BASE_DIR)), ".env"))
 
 
 environ.Env.read_env(os.path.join(os.path.dirname(BASE_DIR), ".env"))
