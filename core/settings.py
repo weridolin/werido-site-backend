@@ -138,8 +138,8 @@ DATABASES = {
         'USER': env("SITE_USER"),  # 拥有者，这个一般没修改
         'PASSWORD': env("SITE_PASSWORD"),  # 密码，自己设定的
         # 默认的就没写
-        'HOST': env("POSTGRES_HOST") if env("K8S") != 1 else f"{env('REDIS_SVC_NAME')}.{env('REDIS_SVC_NAME_NAMESPACE')}",
-        'PORT': env("POSTGRES_PORT") if env("K8S") != 1 else f"{env('REDIS_SVC_PORT')}",
+        'HOST': env("POSTGRES_HOST") if env("K8S") != 1 else f"{env('SITEDB_SVC_NAME')}.{env('SITEDB_SVC_NAME_NAMESPACE')}",
+        'PORT': env("POSTGRES_PORT") if env("K8S") != 1 else f"{env('SITEDB_SVC_NAME_PORT')}",
     }
 }
 
