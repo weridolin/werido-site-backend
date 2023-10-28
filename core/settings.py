@@ -138,8 +138,8 @@ DATABASES = {
         'USER': env("SITE_USER"),  # 拥有者，这个一般没修改
         'PASSWORD': env("SITE_PASSWORD"),  # 密码，自己设定的
         # 默认的就没写
-        'HOST': env("POSTGRES_HOST") if env("K8S") != 1 else f"{env('SITEDB_SVC_NAME')}.{env('SITEDB_SVC_NAME_NAMESPACE')}",
-        'PORT': env("POSTGRES_PORT") if env("K8S") != 1 else f"{env('SITEDB_SVC_NAME_PORT')}",
+        'HOST': env("POSTGRES_HOST") if env("K8S") != "1" else f"{env('SITEDB_SVC_NAME')}.{env('SITEDB_SVC_NAME_NAMESPACE')}",
+        'PORT': env("POSTGRES_PORT") if env("K8S") != "1" else f"{env('SITEDB_SVC_NAME_PORT')}",
     }
 }
 
@@ -149,7 +149,7 @@ CACHES = {
         "BACKEND": "django_redis.cache.RedisCache",
         # "LOCATION": f"redis://:{os.environ.get('REDIS_PASSWORD','werido')}@{os.environ.get('REDIS_HOST','8.131.78.84')}:{os.environ.get('REDIS_PORT','6379')}/0",
         # "LOCATION": f"redis://:{os.environ.get('REDIS_PASSWORD','werido')}@localhost:6379/0",
-        "LOCATION": f"redis://:{env('REDIS_PASSWORD')}@{env('REDIS_HOST')}:{env('REDIS_PORT')}/0" if env("K8S") != 1 else \
+        "LOCATION": f"redis://:{env('REDIS_PASSWORD')}@{env('REDIS_HOST')}:{env('REDIS_PORT')}/0" if env("K8S") != "1" else \
         f"redis://:{env('REDIS_PASSWORD')}@{env('REDIS_SVC_NAME')}.{env('REDIS_SVC_NAME_NAMESPACE')}:{env('REDIS_SVC_PORT')}/1",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
@@ -223,7 +223,7 @@ SESSION_COOKIE_AGE = 200
 
 
 # CELERY ################3333
-if env("K8S") != 1:
+if env("K8S") != "1":
     CELERY_BROKER_URL = f"redis://:{env('REDIS_PASSWORD')}@{env('REDIS_HOST')}:{env('REDIS_PORT')}/1"
 else:
     CELERY_BROKER_URL = f"redis://:{env('REDIS_PASSWORD')}@{env('REDIS_SVC_NAME')}.{env('REDIS_SVC_NAME_NAMESPACE')}:{env('REDIS_SVC_PORT')}/1"
