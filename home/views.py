@@ -276,7 +276,7 @@ class BackImagesViews(APIView):
         return HTTPResponse(data=serializer.data, status=status.HTTP_200_OK)
     
 
-    @action(url_path="image/<str:file_name>",methods=["get"],detail=False,url_name="GetImage")
+    @action(url_path="/detail/<str:file_name>",methods=["get"],detail=False,url_name="GetImage")
     def get_image(self,request,file_name=None):
         print("get image",file_name)
         if not file_name:
