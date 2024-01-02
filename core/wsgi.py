@@ -8,14 +8,7 @@ platform: windows 10
 LastEditors: lhj
 LastEditTime: 2021-09-04 12:21:34
 '''
-"""
-WSGI config for weridoBlog project.
 
-It exposes the WSGI callable as a module-level variable named ``application``.
-
-For more information on this file, see
-https://docs.djangoproject.com/en/3.1/howto/deployment/wsgi/
-"""
 
 import os
 

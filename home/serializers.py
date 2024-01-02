@@ -65,3 +65,9 @@ class SiteCommentsSerializer(serializers.ModelSerializer):
     #     # return int(date_str.timestamp())
     #     print(date_str,">>> after format time ")
     #     return date_str
+
+
+class BackGroundImagesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BackGroundImages
+        fields = "__all__"

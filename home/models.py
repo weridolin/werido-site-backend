@@ -31,7 +31,7 @@ class UpdateLog(BaseModel):
     user_id = models.IntegerField(verbose_name="用户ID",null=True,blank=True)
     user_name=models.CharField(max_length=64,verbose_name="用户名称",null=True,blank=True)
 
-class HomePictures(BaseModel):
+class BackGroundImages(BaseModel):
     class Meta:
         db_table = "site_back_pic"
         verbose_name = "网站主页照片显示"

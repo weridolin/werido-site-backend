@@ -10,7 +10,7 @@ LastEditTime: 2021-10-05 15:26:27
 '''
 
 # from rest_framework import urlpatterns
-from home.views import *
+from home.views import UpdateLogViewSet,FriendsLinksViewsApi,BackGroundMusicViews,BackImagesViews,SiteCommentViewsSet
 from django.urls import path,re_path
 from rest_framework.routers import SimpleRouter
 
@@ -18,8 +18,10 @@ router = SimpleRouter(trailing_slash=False)
 router.register("updatelog",UpdateLogViewSet,basename="updatelog")
 router.register("comments",SiteCommentViewsSet,basename="comments")
 urlpatterns=[  
-    path(r"friendslinks",FriendsLinksViewsApi.as_view(),name="friendslinks"),
-    path(r"backgroundImage",BackGroundMusicViews.as_view(),name="backgroundmusiclist")
+    path(r"friendLinks",FriendsLinksViewsApi.as_view(),name="friendslinks"),
+    path(r"backGroundMusic",BackGroundMusicViews.as_view(),name="backGroundMusic"),
+    path(r"backGroundImages",BackImagesViews.as_view(),name="backGroundImages")
+    # path(r"image/<str:filename>",BackImagesViews.as_view(),name="backGroundImages)
     ]
 urlpatterns += router.urls
 

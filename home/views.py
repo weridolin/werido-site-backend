@@ -35,7 +35,6 @@ from django.shortcuts import render
 
 from articles.v1.serializers import *
 from articles.models import *
-
 from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -265,5 +264,34 @@ class BackGroundMusicViews(APIView):
     def get(self, request):
         musicList = BackGroundMusic.objects.all()
         serializer = BackGroundMusicSerializer(musicList, many=True)
+
+
         return HTTPResponse(data=serializer.data, status=status.HTTP_200_OK)
+
+class BackImagesViews(APIView):
+
+    def get(self, request):
+        imagesList = BackGroundImages.objects.filter(is_able=True).all()
+        serializer = BackGroundImagesSerializer(imagesList, many=True)
+        return HTTPResponse(data=serializer.data, status=status.HTTP_200_OK)
+    
+
+    @action(url_path="image/<str:file_name>",methods=["get"],detail=False,url_name="GetImage")
+    def get_image(self,request,file_name=None):
+        print("get image",file_name)
+        if not file_name:
+            return HTTPResponse(message="图片名称不能为空!",status=status.HTTP_400_BAD_REQUEST)
+        # 判断文件是否存在
+        import os
+        if not os.path.exists(os.path.join(os.path.dirname(__file__),"bgList",file_name)):
+            return HTTPResponse(message="图片不存在!",status=status.HTTP_404_NOT_FOUND)
+        else:
+            with open(os.path.join(os.path.dirname(__file__),"bgList",file_name),"rb") as f:
+                image = f.read()
+            return HTTPResponse(data=image,status=status.HTTP_200_OK,content_type="image/png")
+        # redis_conn:Redis = get_redis_connection("default")
+        # image = redis_conn.get(file_name)
+        # if not image:
+        #     return HTTPResponse(message="图片不存在!",status=status.HTTP_404_NOT_FOUND)
+        # return HTTPResponse(data=image,status=status.HTTP_200_OK)
 
