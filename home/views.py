@@ -268,9 +268,12 @@ class BackGroundMusicViews(APIView):
 
         return HTTPResponse(data=serializer.data, status=status.HTTP_200_OK)
 
-class BackImagesViews(APIView):
+class BackImagesViews(viewsets.ModelViewSet):
+    serializer_class = BackGroundImagesSerializer
+    queryset = BackGroundImages.objects.all()
+    authentication_classes = []
 
-    def get(self, request):
+    def list(self, request):
         imagesList = BackGroundImages.objects.filter(is_able=True).all()
         serializer = BackGroundImagesSerializer(imagesList, many=True)
         return HTTPResponse(data=serializer.data, status=status.HTTP_200_OK)
