@@ -267,6 +267,7 @@ class BackGroundMusicViews(APIView):
 
         return HTTPResponse(data=serializer.data, status=status.HTTP_200_OK)
 
+from django.http import HttpResponse
 class BackImagesViews(viewsets.ModelViewSet):
     serializer_class = BackGroundImagesSerializer
     queryset = BackGroundImages.objects.all()
@@ -291,7 +292,7 @@ class BackImagesViews(viewsets.ModelViewSet):
             with open(os.path.join(os.path.dirname(__file__),"bgList",file_name),"rb") as f:
                 image = f.read()
             
-                return Response(image,content_type='image/png')
+        return HttpResponse(image,content_type='image/*')
         # redis_conn:Redis = get_redis_connection("default")
         # image = redis_conn.get(file_name)
         # if not image:
