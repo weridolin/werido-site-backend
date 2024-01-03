@@ -27,10 +27,9 @@ import json
 from utils.models import CommentBrief
 from django_redis import get_redis_connection
 from redis.client import Redis
-
 from rest_framework import mixins, viewsets
 from django.shortcuts import render
-
+from django.http import FileResponse
 # Create your views here.
 
 from articles.v1.serializers import *
@@ -279,7 +278,7 @@ class BackImagesViews(viewsets.ModelViewSet):
         return HTTPResponse(data=serializer.data, status=status.HTTP_200_OK)
     
 
-    @action(url_path="/detail/<str:file_name>",methods=["get"],detail=False,url_name="GetImage")
+    @action(url_path="detail/(?P<file_name>\w+)",methods=["get"],detail=False,url_name="GetImage")
     def get_image(self,request,file_name=None):
         print("get image",file_name)
         if not file_name:
@@ -291,7 +290,8 @@ class BackImagesViews(viewsets.ModelViewSet):
         else:
             with open(os.path.join(os.path.dirname(__file__),"bgList",file_name),"rb") as f:
                 image = f.read()
-            return HTTPResponse(data=image,status=status.HTTP_200_OK,content_type="image/png")
+            
+                return Response(image,content_type='image/png')
         # redis_conn:Redis = get_redis_connection("default")
         # image = redis_conn.get(file_name)
         # if not image:

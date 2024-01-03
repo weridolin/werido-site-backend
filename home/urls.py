@@ -17,7 +17,7 @@ from rest_framework.routers import SimpleRouter
 router = SimpleRouter(trailing_slash=False)
 router.register("updatelog",UpdateLogViewSet,basename="updatelog")
 router.register("comments",SiteCommentViewsSet,basename="comments")
-router.register("backGroundImages",BackGroundMusicViews,basename="backGroundImages")
+router.register("backGroundImages",BackImagesViews,basename="backGroundImages")
 urlpatterns=[  
     path(r"friendLinks",FriendsLinksViewsApi.as_view(),name="friendslinks"),
     path(r"backGroundMusic",BackGroundMusicViews.as_view(),name="backGroundMusic"),
