@@ -279,7 +279,7 @@ class BackImagesViews(viewsets.ModelViewSet):
         return HTTPResponse(data=serializer.data, status=status.HTTP_200_OK)
     
 
-    @action(url_path="detail/(?P<file_name>\w+)",methods=["get"],detail=False,url_name="GetImage")
+    @action(url_path="detail/(?P<file_name>\S+)",methods=["get"],detail=False,url_name="GetImage")
     def get_image(self,request,file_name=None):
         print("get image",file_name)
         if not file_name:
