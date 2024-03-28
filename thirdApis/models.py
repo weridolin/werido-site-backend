@@ -138,42 +138,61 @@ class ApiCollectorSpiderResourceModel(BaseModel):
 def get_uuid():
     return str(uuid.uuid4())
 
-class ChatGPTConversation(BaseModel):
+
+### GPT 相关
+
+PLATFORM = (    
+    ("chatGPT","chatGPT"),
+    ("通义千问","通义千问")
+)
+
+class GptConversation(BaseModel):
     class Meta:
-        db_table = "chatGPT_conversation"
-        verbose_name = "chatGPT聊天会谈"
+        db_table = "gpt_conversation"
+        verbose_name = "chatGPT聊天会谈" 
         verbose_name_plural = "chatGPT聊天会谈"
 
-    title = models.CharField(null=False, max_length=128,
-                             help_text="会话名称", verbose_name="会话名称")
-    uuid = models.UUIDField(help_text="会话ID", verbose_name="会话ID",
-                            db_index=True, default=get_uuid)
-    user = models.ForeignKey(User, on_delete=models.CASCADE,
-                             verbose_name="会话创建者", null=False, help_text="会话创建者")
-
+    title = models.CharField(null=False, max_length=128,help_text="会话名称", verbose_name="会话名称")
+    uuid = models.UUIDField(help_text="会话ID", verbose_name="会话ID",db_index=True, default=get_uuid,primary_key=True)
+    user_id = models.SmallIntegerField(verbose_name="会话创建者", null=False, help_text="会话创建者")
+    model = models.CharField(max_length=64, null=False, help_text="模型名称", verbose_name="模型名称")
+    description = models.TextField(null=True, help_text="会话描述", verbose_name="会话描述")
+    platform = models.CharField(max_length=64, null=False, help_text="平台名称", verbose_name="平台名称",choices=PLATFORM)   
+    key = models.CharField(max_length=256, null=False, help_text="当前会话使用的API KEY", verbose_name="API-KEY",default="")    
+    deleted = models.BooleanField(help_text="是否删除", verbose_name="是否删除",default=False)
 
 MESSAGE_ROLE = (
-    (0, "query"),
-    (1, "answer")
+    ("system", "system"),
+    ("user", "user")
+)
+
+STOP_TYPE = (
+    ("interrupt", "interrupt"), # 中断 
+    ("timeout", "timeout") # 中断
 )
 
 
-class ChatGPTMessage(BaseModel):
+class GptMessage(BaseModel):
     class Meta:
-        db_table = "chatGPT_message"
-        verbose_name = "chatGPT聊天消息"
-        verbose_name_plural = "chatGPT聊天消息"
+        db_table = "gpt_message"
+        verbose_name = "GPT聊天消息"
+        verbose_name_plural = "GPT聊天消息"
 
-    uuid = models.UUIDField(default=get_uuid,
-        help_text="消息UUID", verbose_name="消息UU会话ID", db_index=True)
-    conversation_id = models.SmallIntegerField(
-        verbose_name="所属会话ID", help_text="所属会话ID", null=False)
-    role = models.SmallIntegerField(
-        choices=MESSAGE_ROLE, verbose_name="消息发送者角色", help_text="消息发送者角色")
-    content = models.TextField(verbose_name="消息内容", help_text="消息内容")
-    content_type = models.CharField(
-        max_length=16, verbose_name="消息类别", help_text="消息类型")
-    parent_message_uuid = models.UUIDField(null=True,
-        help_text="上一条消息UUID,主要记录会话里面的顺序", verbose_name="上一条消息ID",default="0")
-    children_message_uuid = models.UUIDField(
-        help_text="下一条消息UUID,主要记录会话里面的顺序", null=True,verbose_name="下一条消息ID",default="-1")
+    uuid = models.UUIDField(default=get_uuid,help_text="消息UUID", verbose_name="消息UU会话ID", db_index=True,primary_key=True)
+    conversation_id = models.UUIDField(verbose_name="所属会话ID", help_text="所属会话ID", null=False)
+    # role = models.CharField(max_length=16,choices=MESSAGE_ROLE, verbose_name="消息发送者角色", help_text="消息发送者角色")
+    query_content = models.TextField(verbose_name="消息内容", help_text="消息内容")
+    query_content_type = models.CharField(max_length=16, verbose_name="消息类别", help_text="消息类型",default="text")
+    reply_content_type = models.CharField(max_length=16, verbose_name="消息类别", help_text="消息类型",default="text")
+    parent_message_uuid = models.UUIDField(null=True,help_text="上一条消息UUID,主要记录会话里面的顺序", verbose_name="上一条消息ID")
+    children_message_uuid = models.UUIDField(help_text="下一条消息UUID,主要记录会话里面的顺序", null=True,verbose_name="下一条消息ID")
+    reply_content = models.TextField(null=True,help_text="回复内容", verbose_name="回复内容",blank=True)
+    reply_finish = models.BooleanField(help_text="是否回复完成", verbose_name="是否回复完成",default=False)
+    user_id = models.SmallIntegerField(verbose_name="消息发送者", null=False, help_text="消息发送者")
+    interrupt = models.BooleanField(help_text="是否半途停止", verbose_name="是否半途停止",default=False)
+    interrupt_reason = models.CharField(max_length=16, verbose_name="停止类型", help_text="停止类型",null=True,blank=True)
+    websocket_id = models.CharField(max_length=64, verbose_name="websocketID", help_text="该次对话对应的websocketID",default=get_uuid,db_index=True) # 
+    has_sended = models.BooleanField(help_text="是否已经发送给客户端", verbose_name="是否已经发送给客户端",default=False)
+    error = models.BooleanField(help_text="是否出错", verbose_name="是否出错",default=False)
+    error_code = models.CharField(max_length=64, null=True,help_text="错误代码", verbose_name="错误代码",blank=True)
+    error_detail = models.CharField(max_length=256,null=True,help_text="错误详情", verbose_name="错误详情",blank=True)

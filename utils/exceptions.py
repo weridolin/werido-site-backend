@@ -1,5 +1,5 @@
 from rest_framework.views import exception_handler
-from rest_framework_simplejwt.exceptions import InvalidToken
+from rest_framework_simplejwt.exceptions import InvalidToken,AuthenticationFailed
 from .http_ import HTTPResponse
 from rest_framework.exceptions import \
     ValidationError,PermissionDenied,MethodNotAllowed,UnsupportedMediaType,NotAcceptable
@@ -8,7 +8,7 @@ import json
 
 def exceptions_handler(exc,content):
     # print(exc,type(exc),">>")
-    if isinstance(exc,InvalidToken):
+    if isinstance(exc,(InvalidToken,AuthenticationFailed)):
         # exc.detail
         return HTTPResponse(
             code=-1,

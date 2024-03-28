@@ -1,7 +1,7 @@
 import openai
-from ws.const import ChatGPTMessageType
+from ws.const import GptMessageType
 from asgiref.sync import sync_to_async
-from thirdApis.models import ChatGPTMessage
+from thirdApis.models import GptMessage
 import json
 import uuid
 import openai
@@ -9,7 +9,7 @@ import os
 
 @sync_to_async
 def create_record(query_content, conversation_id, parent_message_uuid,role=None,children_message_uuid=None):
-    return ChatGPTMessage.objects.create(
+    return GptMessage.objects.create(
         content=query_content,
         conversation_id=conversation_id,
         parent_message_uuid=parent_message_uuid,
@@ -19,7 +19,7 @@ def create_record(query_content, conversation_id, parent_message_uuid,role=None,
     )
 
 
-async def chatGPT_create_request(
+async def Gpt_create_request(
         data=None,
         ws=None):
     try:
@@ -28,8 +28,8 @@ async def chatGPT_create_request(
         query_content, conversation_id, msg_id, parent_message_uuid = data.get("query_content"), data.get("conversation_id"),\
             data.get("msg_id"), data.get("parent_message_uuid")
 
-        
-        query_message = await create_record(query_content=query_content, conversation_id=conversation_id, parent_message_uuid=parent_message_uuid)
+        query_message = await create_record(query_content=query_content, conversation_id=conversation_id, 
+            parent_message_uuid=parent_message_uuid)
         openai.api_key=os.environ["OPENAPI_SECRET"]
         prompt = "\nHuman:{content}.\nAI:".format(
             content=query_content)  # todo 上下文
@@ -50,9 +50,9 @@ async def chatGPT_create_request(
         #     parent_message_id=query_message.id,
         #     role=1
         # )
-        print(">>>>>>>>>>>",response["choices"][0]['text'])
+        # print(">>>>>>>>>>>",response["choices"][0]['text'])
         reply = {
-            "type": ChatGPTMessageType.reply,
+            "type": GptMessageType.reply,
             "data": {
                 "query_content": "",
                 "parent_message_uuid": query_message.uuid,
@@ -66,20 +66,20 @@ async def chatGPT_create_request(
 
     except Exception as exc:
         reply = {
-            "type": ChatGPTMessageType.error,
+            "type": GptMessageType.error,
             "data": {
             },
         }
         await ws.send(text_data=json.dumps(reply,ensure_ascii=False))
 
 
-def chatGPT_callback(future):
+def Gpt_callback(future):
     ## 更新下此次查询和回复的上下文信息
     query_message,reply_data = future.result()
     query_message.children_message_uuid=reply_data["uuid"]
     query_message.save()
     ## 更新回答到数据库
-    ChatGPTMessage.objects.create(
+    GptMessage.objects.create(
         content=reply_data["reply_content"],
         conversation_id=reply_data["conversation_id"],
         parent_message_uuid=query_message.uuid,

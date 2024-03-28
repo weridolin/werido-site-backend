@@ -1,10 +1,11 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 import json,asyncio
-from ws.const import ChatGPTMessageType
-from thirdApis.chatGPT.chat_async_tasks import chatGPT_create_request,chatGPT_callback
-class ChatGPTMessageConsumer(AsyncWebsocketConsumer):
+from ws.const import GptMessageType
+from thirdApis.gpt.chat_async_tasks import Gpt_create_request,Gpt_callback
+
+class GptMessageConsumer(AsyncWebsocketConsumer):
     """
-        chatGPT-ws:
+        Gpt-ws:
             {
                 "type":WSMessageType,
                 "data":{
@@ -19,7 +20,7 @@ class ChatGPTMessageConsumer(AsyncWebsocketConsumer):
     """
     async def connect(self):
         self.user_id = self.scope['url_route']['kwargs']['user_id']
-        self.key_group_name = 'chatGPT_%s' % self.user_id ## socket连接的唯一标识？
+        self.key_group_name = 'Gpt_%s' % self.user_id ## socket连接的唯一标识？
         # Join room group
         await self.channel_layer.group_add(
             self.key_group_name,
@@ -27,7 +28,7 @@ class ChatGPTMessageConsumer(AsyncWebsocketConsumer):
         )
         await self.accept()
         await self.send(text_data=json.dumps({
-                "type":ChatGPTMessageType.connect,
+                "type":GptMessageType.connect,
                 "data":{},
                 "user_id":self.user_id
             })
@@ -45,16 +46,16 @@ class ChatGPTMessageConsumer(AsyncWebsocketConsumer):
         try:
             text_data_json = json.loads(text_data)
             print("receive ws message",text_data_json)
-            if text_data_json.get("type",None)== ChatGPTMessageType.query:
+            if text_data_json.get("type",None)== GptMessageType.query:
                 ## START CREATE TASK
                 data = text_data_json.get("data",None)
                 asyncio.run_coroutine_threadsafe(
-                    chatGPT_create_request(
+                    Gpt_create_request(
                         data=data,
                         ws=self), 
                     asyncio.get_running_loop()
-                ).add_done_callback(chatGPT_callback)
-            elif text_data_json.get("type",None)== ChatGPTMessageType.disconnect:
+                ).add_done_callback(Gpt_callback)
+            elif text_data_json.get("type",None)== GptMessageType.disconnect:
                 ...# TODO
             message = "generating data ing..."
         except json.JSONDecodeError:

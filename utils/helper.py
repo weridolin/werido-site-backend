@@ -1,15 +1,5 @@
 # -*- encoding: utf-8 -*-
-'''
-Description: 
-email: 359066432@qq.com
-Author: lhj
-software: vscode
-Date: 2021-10-04 10:01:15
-platform: windows 10
-LastEditors: lhj
-LastEditTime: 2021-10-05 11:23:06
-'''
-
+import pytz,datetime
 from typing import Iterable
 
 
@@ -31,3 +21,19 @@ def parse_ip(ip=None):
         # '         lat': 24.9139, 'lon': 118.5858, 'timezone': 'Asia/Shanghai', 
         # 'isp': 'Chinanet', 'org': 'Chinanet FJ', 'as': 'AS4134 CHINANET-BACKBONE', 'query': '110.84.0.129'}
         return res.json()
+    
+
+def parse_user_agent(ua):
+    ## 判断是移动端还是PC端
+    return ua,"mobile"
+
+
+def nativeTime2utcTime(nativeTime:str):
+    dt_naive = datetime.datetime.strptime(nativeTime, "%Y-%m-%d %H:%M:%S")
+    # 将 naive datetime 转换为 aware datetime，指定时区为中国标准时间（东八区）
+    china_tz = pytz.timezone('Asia/Shanghai')
+    dt_aware = china_tz.localize(dt_naive)
+    # 将 aware datetime 转换为 ISO 8601 格式字符串
+    iso_format_with_timezone = dt_aware.isoformat()
+    return iso_format_with_timezone
+

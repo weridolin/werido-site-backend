@@ -67,7 +67,7 @@ urlpatterns = [
     path("wechat/api/v1/",include('wechat.v1.urls')),
     path("shortUrl/api/v1/",include('thirdApis.shortUrls.urls')),
     path("apiCollector/api/v1/",include('thirdApis.apiCollector.urls')),
-    path("chatGPT/api/v1/",include('thirdApis.chatGPT.urls'))
+    path("gpt/api/v1/",include('thirdApis.gpt.urls'))
 
 
 ]

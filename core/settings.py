@@ -14,7 +14,7 @@ from datetime import timedelta
 from pathlib import Path
 import os
 import environ
-
+import corsheaders
 # initialize env
 env = environ.Env(
     # # set casting, default value
@@ -51,6 +51,7 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -58,7 +59,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'corsheaders',
+    # 'corsheaders',
     # "oauth2_provider",
     'django_filters',
     "channels",
@@ -77,6 +78,9 @@ INSTALLED_APPS = [
     # 'oauth.apps.OauthConfig',
     "covid19.apps.Covid19Config",
     "wechat.apps.WechatConfig",
+    # "payment.apps.PaymentConfig"
+    "django_grpc_framework"
+
 ]
 
 # DJANGO CHANNELS
@@ -88,9 +92,10 @@ CHANNEL_LAYERS = {
 
 
 MIDDLEWARE = [
-    'middleswares.trace.OpenTracingMiddleware',
+    # 'middleswares.trace.OpenTracingMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  # CORS中间件
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -100,10 +105,45 @@ MIDDLEWARE = [
 ]
 
 # # 跨域配置
-CORS_ORIGIN_WHITELIST = (
-)
 
 CORS_ALLOW_CREDENTIALS = True  # 允许携带cookie
+CORS_ORIGIN_WHITELIST = [
+
+    'http://127.0.0.1:3000',  # 允许的前端域名列表
+
+]
+
+
+CORS_ALLOW_METHODS = [
+    'GET',
+    'POST',
+    'PUT',
+    'PATCH',
+    'DELETE',
+    'OPTIONS',
+]
+
+
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+
+CORS_EXPOSE_HEADERS = [
+    'access-control-allow-origin',
+    'access-control-allow-methods',
+    'access-control-allow-credentials',
+
+]
+
+
 
 ROOT_URLCONF = 'core.urls'
 
@@ -134,12 +174,18 @@ ASGI_APPLICATION = 'core.asgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': env("SITE_DATA_DB"),  # 数据库名称
-        'USER': env("SITE_USER"),  # 拥有者，这个一般没修改
-        'PASSWORD': env("SITE_PASSWORD"),  # 密码，自己设定的
+        # 'NAME': env("SITE_DATA_DB"),  # 数据库名称
+        # 'USER': env("SITE_USER"),  # 拥有者，这个一般没修改
+        # 'PASSWORD': env("SITE_PASSWORD"),  # 密码，自己设定的
+        # # 默认的就没写
+        # 'HOST': env("POSTGRES_HOST") if env("K8S") != "1" else f"{env('SITEDB_SVC_NAME')}.{env('SITEDB_SVC_NAME_NAMESPACE')}",
+        # 'PORT': env("POSTGRES_PORT") if env("K8S") != "1" else f"{env('SITEDB_SVC_NAME_PORT')}",
+        'NAME': "blogDB",  # 数据库名称
+        'USER': "werido",  # 拥有者，这个一般没修改
+        'PASSWORD': "359066432",  # 密码，自己设定的
         # 默认的就没写
-        'HOST': env("POSTGRES_HOST") if env("K8S") != "1" else f"{env('SITEDB_SVC_NAME')}.{env('SITEDB_SVC_NAME_NAMESPACE')}",
-        'PORT': env("POSTGRES_PORT") if env("K8S") != "1" else f"{env('SITEDB_SVC_NAME_PORT')}",
+        'HOST':"43.128.110.230",
+        'PORT': "30001",
     }
 }
 
@@ -149,8 +195,9 @@ CACHES = {
         "BACKEND": "django_redis.cache.RedisCache",
         # "LOCATION": f"redis://:{os.environ.get('REDIS_PASSWORD','werido')}@{os.environ.get('REDIS_HOST','8.131.78.84')}:{os.environ.get('REDIS_PORT','6379')}/0",
         # "LOCATION": f"redis://:{os.environ.get('REDIS_PASSWORD','werido')}@localhost:6379/0",
-        "LOCATION": f"redis://:{env('REDIS_PASSWORD')}@{env('REDIS_HOST')}:{env('REDIS_PORT')}/0" if env("K8S") != "1" else \
-        f"redis://:{env('REDIS_PASSWORD')}@{env('REDIS_SVC_NAME')}.{env('REDIS_SVC_NAME_NAMESPACE')}:{env('REDIS_SVC_PORT')}/1",
+        # "LOCATION": f"redis://:{env('REDIS_PASSWORD')}@{env('REDIS_HOST')}:{env('REDIS_PORT')}/0" if env("K8S") != "1" else \
+        # f"redis://:{env('REDIS_PASSWORD')}@{env('REDIS_SVC_NAME')}.{env('REDIS_SVC_NAME_NAMESPACE')}:{env('REDIS_SVC_PORT')}/1",
+        "LOCATION": f"redis://werido:359066432@43.128.110.230:30000/0",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
             # "PASSWORD": "mysecret",
@@ -234,11 +281,14 @@ CELERY_RESULT_BACKEND = CELERY_BROKER_URL
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from authenticationV1 import V1Authentication
 
 # rest framework
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        # 'rest_framework_simplejwt.authentication.JWTAuthentication',
+        "authenticationV1.V1Authentication",
 
     ),
     'EXCEPTION_HANDLER': 'utils.exceptions.exceptions_handler',
@@ -332,3 +382,6 @@ OPENTRACING_TRACER_CONFIG = {
     },
     'logging': True,
 }
+
+
+JWT_KEY =  os.environ.get("JWT_KEY","DEBUGJWTKEY")

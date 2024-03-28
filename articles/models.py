@@ -73,7 +73,7 @@ class Projects(BaseModel):
     summary = models.TextField(verbose_name="项目描述", null=True)
     url = models.CharField(max_length=128, verbose_name="项目地址")
     status = models.CharField(max_length=32, verbose_name="项目状态",
-                              choices=Project_Status, default="dev", null=False, blank=False)
+                            choices=Project_Status, default="dev", null=False, blank=False)
 
 
 class Article(BaseModel):

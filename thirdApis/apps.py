@@ -1,5 +1,5 @@
 from django.apps import AppConfig
-import datetime,os,sys
+import datetime,os,sys,asyncio
 class ThirdapisConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'thirdApis'
@@ -22,6 +22,4 @@ class ThirdapisConfig(AppConfig):
         #     },
 
         # )
-
-
         return super().ready()

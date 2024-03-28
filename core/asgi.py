@@ -1,22 +1,3 @@
-'''
-Description: 
-email: 359066432@qq.com
-Author: lhj
-software: vscode
-Date: 2021-04-28 15:43:58
-platform: windows 10
-LastEditors: lhj
-LastEditTime: 2021-09-04 12:21:31
-'''
-"""
-ASGI config for weridoBlog project.
-
-It exposes the ASGI callable as a module-level variable named ``application``.
-
-For more information on this file, see
-https://docs.djangoproject.com/en/3.1/howto/deployment/asgi/
-"""
-
 
 import os
 from django.core.asgi import get_asgi_application
@@ -28,13 +9,43 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
 # is populated before importing code that may import ORM models.
 django_asgi_app = get_asgi_application()
 
-
 from channels.routing import ProtocolTypeRouter,URLRouter
+from thirdApis.gpt.apis import GptSSEConsumer
+from authenticationV1 import AsyncHttpConsumerMiddleware
+
+
+# from datetime import datetime
+# from channels.generic.http import AsyncHttpConsumer
+
+# import asyncio
+# class ServerSentEventsConsumer(AsyncHttpConsumer):
+#     async def handle(self, body):
+#         await self.send_headers(headers=[
+#             (b"Cache-Control", b"no-cache"),
+#             (b"Content-Type", b"text/event-stream"),
+#             (b"Transfer-Encoding", b"chunked"),
+#         ])
+#         for i in range(3):
+#             payload = "data: %s\n\n" % i
+#             await self.send_body(payload.encode("utf-8"), more_body=True)
+#             await asyncio.sleep(0)
+
+# application = ProtocolTypeRouter({
+#     "http": URLRouter([
+#         re_path(r"test", ServerSentEventsConsumer.as_asgi()),  
+#     ]),
+# })
+
 
 application = ProtocolTypeRouter({
-  "http": django_asgi_app,
+    "http": AsyncHttpConsumerMiddleware(URLRouter([      
+      re_path(r"^sse(.*)$", GptSSEConsumer.as_asgi()),
+      re_path(r'^(?!\/sse)(.*)$', django_asgi_app),
+      # re_path(r"", django_asgi_app),
+  ])),
   "websocket": URLRouter(channel_router),
 })
+
 
 # ## learn asgi
 # from channels.generic.http import AsyncHttpConsumer

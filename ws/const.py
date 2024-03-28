@@ -5,7 +5,7 @@ class WSMessageType:
     finish = 4
     error = 5
 
-class ChatGPTMessageType:
+class GptMessageType:
     connect=1
     disconnect = 2
     reply = 3

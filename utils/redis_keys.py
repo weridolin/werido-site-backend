@@ -12,25 +12,25 @@ class WECHAT:
         return f"wechat.public.access_token"
 
     @staticmethod
-    def chatGpt_time_remain(wechat_id):
+    def Gpt_time_remain(wechat_id):
         """
-            chatGpt剩余时间
+            Gpt剩余时间
         """
-        return f"wechat.public.chatGPTModeTimeRemain.{wechat_id}"
+        return f"wechat.public.GptModeTimeRemain.{wechat_id}"
 
     @staticmethod
-    def chatGpt_result(wechat_id):
+    def Gpt_result(wechat_id):
         """
-            存放最近一次chatGpt查询结果
+            存放最近一次Gpt查询结果
         """
-        return f"wechat.public.chatGptResult.{wechat_id}"
+        return f"wechat.public.GptResult.{wechat_id}"
 
     @staticmethod
-    def chatGpt_request_num(wechat_id):
+    def Gpt_request_num(wechat_id):
         """
-            chatgpt模式下第几次回调
+            Gpt模式下第几次回调
         """
-        return f"wechat.public.chatGptResult.{wechat_id}"
+        return f"wechat.public.GptResult.{wechat_id}"
 
 
 class Weather:

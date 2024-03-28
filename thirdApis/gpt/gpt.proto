@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package GptApp;
+
+service GptMessage {
+
+  rpc UpdateQueryResult (UpdateQueryResultRequest) returns (UpdateQueryResultReply) {}
+
+}
+
+message UpdateQueryResultRequest {
+
+  string reply_content = 1;
+  string  query_message_id = 2;
+  bool  interrupt = 3;
+  string interrupt_reason = 4;
+  bool error = 5;
+  string error_code = 6;
+  string error_detail = 7;
+
+}
+
+message UpdateQueryResultReply {
+
+  bool success = 1;
+
+}
