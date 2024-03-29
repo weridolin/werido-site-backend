@@ -55,10 +55,10 @@ worker_class = 'uvicorn.workers.UvicornWorker' # 支持ASGI
 # 设置最大并发量
 worker_connections = 1000
 # 设置进程文件目录
-pidfile = '/usr/gunicorn.pid'
+pidfile = 'gunicorn.pid'
 # 设置访问日志和错误信息日志路径
-accesslog = '/usr/gunicorn_acess.log'
-errorlog = '/usr/gunicorn_error.log'
+accesslog = 'gunicorn_acess.log'
+errorlog = 'gunicorn_error.log'
 # 设置日志记录水平
 loglevel = 'info'
 
