@@ -4,7 +4,7 @@ from rest_framework import exceptions
 class V1Authentication(authentication.BaseAuthentication):
     def authenticate(self, request):
         user_id = request.META.get('HTTP_X_USER_ID') or request.META.get('HTTP_X_USER')
-        # print(">>>",request.META)
+        print(">>>",request.META)
         if not user_id:
             raise exceptions.AuthenticationFailed('user auth failed,please login first')
         return (user_id, None)
