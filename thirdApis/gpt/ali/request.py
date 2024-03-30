@@ -78,8 +78,9 @@ class HttpRequest(HttpMixins):
                     await self.async_consumer.send_headers(headers=[
                         (b'Cache-Control', b'no-cache'),
                         (b'Content-Type', b'text/event-stream'),
-                        (b"Transfer-Encoding", b"chunked"),
+                        # (b"Transfer-Encoding", b"chunked"),
                         (b'Access-Control-Allow-Origin', b'*'),
+                        (b'X-Accel-Buffering',b"no")
                     ])                   
                     async for res in response.content:
                         res = res.decode('utf8') 
