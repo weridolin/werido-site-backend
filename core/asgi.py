@@ -38,10 +38,9 @@ from authenticationV1 import AsyncHttpConsumerMiddleware
 
 
 application = ProtocolTypeRouter({
-    "http": URLRouter([      
-      re_path(r"^sse(.*)$", AsyncHttpConsumerMiddleware(GptSSEConsumer.as_asgi())),
-      re_path(r'^(?!\/sse)(.*)$', django_asgi_app),
-      # re_path(r"", django_asgi_app),
+    "http": URLRouter([
+      re_path(r'^gpt.*gpt-sse$', AsyncHttpConsumerMiddleware(GptSSEConsumer.as_asgi())),
+      re_path(r'^(apiCollector|blog|chatGPT|home|covid19|dataFaker|fileBroker|drug|shortUrl|gpt|)(.*)$', django_asgi_app),
   ]),
   "websocket": URLRouter(channel_router),
 })
