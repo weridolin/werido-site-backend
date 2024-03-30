@@ -6,7 +6,7 @@ class V1Authentication(authentication.BaseAuthentication):
         user_id = request.META.get('HTTP_X_USER_ID') or request.META.get('HTTP_X_USER')
         print(">>>",request.META)
         if not user_id:
-            raise exceptions.AuthenticationFailed('user auth failed,please login first')
+            raise exceptions.NotAuthenticated('user auth failed,please login first')
         return (user_id, None)
     
 
