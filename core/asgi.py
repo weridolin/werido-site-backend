@@ -38,11 +38,11 @@ from authenticationV1 import AsyncHttpConsumerMiddleware
 
 
 application = ProtocolTypeRouter({
-    "http": AsyncHttpConsumerMiddleware(URLRouter([      
-      re_path(r"^sse(.*)$", GptSSEConsumer.as_asgi()),
+    "http": URLRouter([      
+      re_path(r"^sse(.*)$", AsyncHttpConsumerMiddleware(GptSSEConsumer.as_asgi())),
       re_path(r'^(?!\/sse)(.*)$', django_asgi_app),
       # re_path(r"", django_asgi_app),
-  ])),
+  ]),
   "websocket": URLRouter(channel_router),
 })
 
