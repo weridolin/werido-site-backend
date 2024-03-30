@@ -54,6 +54,7 @@ class AsyncHttpConsumerMiddleware:
     
     def is_authenticated(self, scope):
         # return True
+        print(">>>",scope)
         headers = scope['headers']  
         for header in headers:
             key,value = header  

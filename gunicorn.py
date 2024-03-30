@@ -61,6 +61,8 @@ accesslog = 'gunicorn_acess.log'
 errorlog = 'gunicorn_error.log'
 # 设置日志记录水平
 loglevel = 'info'
+#
+enable_stdio_inheritance=True
 
 # docker 部署下，服务注册到ETCD 
 APP_KEYS = {
