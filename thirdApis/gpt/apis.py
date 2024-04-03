@@ -87,19 +87,18 @@ class GptConversationViewsSet(ModelViewSet):
         """
             注册websocketID
         """
-        user_id = request.user
-        
+        # user_id = request.user
         websocket_id = str(uuid.uuid4())
-        conversation_id = request.query_params.get("conversation_id")
+        # conversation_id = request.query_params.get("conversation_id")
         payload = {
             "websocket_id":websocket_id,
-            "conversation_id":conversation_id,
-            "user_id":int(user_id),
+            # "conversation_id":conversation_id,
+            "user_id":int(1),
             "exp": (datetime.datetime.now() + datetime.timedelta(days=1)).timestamp()
         }
         ## 加密成ACCESS_TOKEN
         token = generate_jwt_token(payload,secret_key=settings.JWT_KEY)
-        url = f"wss://www.weridolin.cn/gpt/?token={token}"
+        url = f"wss://www.weridolin.cn/ws-endpoint/api/v1/gpt?token={token}"
         return HTTPResponse(
             data={"websocket_uri":url}
         )
