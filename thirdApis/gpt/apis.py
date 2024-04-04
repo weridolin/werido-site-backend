@@ -36,7 +36,7 @@ class GptConversationViewsSet(ModelViewSet):
     serializer_class = GptConversationSerializer
     # permission_classes = [IsAuthenticated]
     pagination_class = GptPagination
-    authentication_classes = []
+    authentication_classes = [V1Authentication]
 
     def get_queryset(self):
         query_set =  GptConversation.objects.all()
