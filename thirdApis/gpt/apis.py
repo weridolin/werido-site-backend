@@ -188,8 +188,8 @@ class GptMessageViewSet(ModelViewSet):
             "exp": (datetime.datetime.now() + datetime.timedelta(days=1)).timestamp()
         })
         request.data.update({
-            "callback_url":f"{url}/update-result",
-            "callback_url_grpc":f"{request.get_host().split(':',1)[0]}:50001"}
+            "callback_url":f"svc-site-oldbackend:8000/gpt/api/v1/message/update-result",
+            "callback_url_grpc":f"svc-site-oldbackend:50001"}
             )
 
         ## 推送消息到websocket服务
