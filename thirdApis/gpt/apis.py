@@ -159,6 +159,8 @@ class GptMessageViewSet(ModelViewSet):
         url = request.build_absolute_uri()
         # 查询对话上下文
         conversation_id = request.data.get("conversation_id")
+        conversation = GptConversation.objects.filter(uuid=conversation_id).first()
+        api_key = conversation.key
         history = list()
         history_messages = GptMessage.objects.filter(conversation_id=conversation_id).all().order_by("created")
         for message in history_messages:
@@ -177,6 +179,7 @@ class GptMessageViewSet(ModelViewSet):
         request.data.update({
             "user_id":user_id,
             "uuid":id,
+            "api_key":api_key
         })
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
