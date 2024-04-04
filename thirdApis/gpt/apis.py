@@ -100,7 +100,7 @@ class GptConversationViewsSet(ModelViewSet):
         host = request.get_host()
         ## 加密成ACCESS_TOKEN
         token = generate_jwt_token(payload,secret_key=settings.JWT_KEY)
-        url = f"wss://{host}/ws-endpoint/api/v1/gpt?token={token}"
+        url = f"wss://www.weridolin.cn/ws-endpoint/api/v1/gpt?token={token}"
         return HTTPResponse(
             data={"websocket_uri":url}
         )
@@ -180,8 +180,7 @@ class GptMessageViewSet(ModelViewSet):
         })
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
+        serializer.save()
         request.data.update({
             "history":history,
             "from_app":"gpt",
@@ -199,7 +198,7 @@ class GptMessageViewSet(ModelViewSet):
             json.dumps(request.data,ensure_ascii=False)
         )
         if res:
-            return HTTPResponse(data=serializer.data,status=status.HTTP_201_CREATED,headers=headers)
+            return HTTPResponse(data=serializer.data,status=status.HTTP_201_CREATED)
         else:
             return HTTPResponse(
                 message="推送消息失败!",
