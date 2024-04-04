@@ -18,7 +18,7 @@ import logging,asyncio
 from thirdApis.gpt.ali.request import HttpRequest as AliHttpRequest,HttpMixins
 from thirdApis.gpt.manager import get_manager
 
-logging.basicConfig(level=logging.DEBUG)
+# logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 class GptPagination(PageNumberPaginationWrapper):
@@ -36,7 +36,7 @@ class GptConversationViewsSet(ModelViewSet):
     serializer_class = GptConversationSerializer
     # permission_classes = [IsAuthenticated]
     pagination_class = GptPagination
-    authentication_classes = [V1Authentication]
+    authentication_classes = []
 
     def get_queryset(self):
         query_set =  GptConversation.objects.all()
@@ -96,9 +96,11 @@ class GptConversationViewsSet(ModelViewSet):
             "user_id":int(1),
             "exp": (datetime.datetime.now() + datetime.timedelta(days=1)).timestamp()
         }
+        ## 获取当前 host
+        host = request.get_host()
         ## 加密成ACCESS_TOKEN
         token = generate_jwt_token(payload,secret_key=settings.JWT_KEY)
-        url = f"wss://www.weridolin.cn/ws-endpoint/api/v1/gpt?token={token}"
+        url = f"wss://{host}/ws-endpoint/api/v1/gpt?token={token}"
         return HTTPResponse(
             data={"websocket_uri":url}
         )
@@ -171,7 +173,7 @@ class GptMessageViewSet(ModelViewSet):
             "role":"user",
             "content":request.data.get("query_content")
         })
-        ## 新的查询记录入库
+        ## 新的查询记录入库 
         request.data.update({
             "user_id":user_id,
             "uuid":id,
@@ -196,7 +198,13 @@ class GptMessageViewSet(ModelViewSet):
             "gpt.chat.message.query",
             json.dumps(request.data,ensure_ascii=False)
         )
-        return HTTPResponse(data=serializer.data,status=status.HTTP_201_CREATED,headers=headers)
+        if res:
+            return HTTPResponse(data=serializer.data,status=status.HTTP_201_CREATED,headers=headers)
+        else:
+            return HTTPResponse(
+                message="推送消息失败!",
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
@@ -438,7 +446,6 @@ class GptMessageRpcImpl(gpt_pb2_grpc.GptMessageServicer):
                 response.success=False
             return response
         except Exception as e:
-            import traceback
-            print(traceback.format_exc())
+            logger.error(f"grpc update query result error {e}",exc_info=True)
             response.success=False
             return response
