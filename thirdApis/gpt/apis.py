@@ -102,7 +102,7 @@ class GptConversationViewsSet(ModelViewSet):
         token = generate_jwt_token(payload,secret_key=settings.JWT_KEY)
         url = f"wss://www.weridolin.cn/ws-endpoint/api/v1/gpt?token={token}"
         return HTTPResponse(
-            data={"websocket_uri":url}
+            data={"websocket_uri":url,"websocket_id":websocket_id}
         )
 
 class GptMessagePagination(PageNumberPaginationWrapper):
