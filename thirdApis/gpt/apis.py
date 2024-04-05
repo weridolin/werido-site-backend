@@ -152,11 +152,8 @@ class GptMessageViewSet(ModelViewSet):
         return super().get_renderers()
 
     def create(self, request, *args, **kwargs):
-        
         user_id = int(request.user)
-        # id = str(uuid.uuid4())
         ## 获取当前请求的完全路径
-        url = request.build_absolute_uri()
         # 查询对话上下文
         conversation_id = request.data.get("conversation_id")
         conversation = GptConversation.objects.filter(uuid=conversation_id).first()
@@ -178,7 +175,6 @@ class GptMessageViewSet(ModelViewSet):
         ## 新的查询记录入库 
         request.data.update({
             "user_id":user_id,
-            # "uuid":id,
             "api_key":api_key
         })
         serializer = self.get_serializer(data=request.data)
@@ -190,9 +186,10 @@ class GptMessageViewSet(ModelViewSet):
             "exp": (datetime.datetime.now() + datetime.timedelta(days=1)).timestamp()
         })
         request.data.update({
-            "callback_url":f"svc-site-oldbackend:8000/gpt/api/v1/message/update-result",
-            "callback_url_grpc":f"svc-site-oldbackend:50001"}
-            )
+                "callback_url":f"svc-site-oldbackend:8000/gpt/api/v1/message/update-result",
+                "callback_url_grpc":f"svc-site-oldbackend:50001"
+            }
+        )   
 
         ## 推送消息到websocket服务
         res = public_message(
