@@ -34,3 +34,6 @@ def public_message(exchange, routing_key, message):
     print(f"send message to {exchange} with routing key {routing_key} message -> {message}")
     return True
 
+
+# if __name__ == '__main__':
+#     public_message('rest-svc', 'gpt.chat.message.query', 'hello world')

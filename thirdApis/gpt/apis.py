@@ -154,7 +154,7 @@ class GptMessageViewSet(ModelViewSet):
     def create(self, request, *args, **kwargs):
         
         user_id = int(request.user)
-        id = str(uuid.uuid4())
+        # id = str(uuid.uuid4())
         ## 获取当前请求的完全路径
         url = request.build_absolute_uri()
         # 查询对话上下文
@@ -178,7 +178,7 @@ class GptMessageViewSet(ModelViewSet):
         ## 新的查询记录入库 
         request.data.update({
             "user_id":user_id,
-            "uuid":id,
+            # "uuid":id,
             "api_key":api_key
         })
         serializer = self.get_serializer(data=request.data)
