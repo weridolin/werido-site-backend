@@ -10,7 +10,7 @@ def get_client():
         os.environ.get("RABBITMQ_PORT",30003), 
         credentials=credentials,
         virtual_host='/',
-        heartbeat=60,  # 设置心跳周期，防止网络故障导致的假死
+        heartbeat=10,  # 设置心跳周期，防止网络故障导致的假死
         blocked_connection_timeout=300,  # 当连接被服务器阻塞时的超时时间
         connection_attempts=3,  # 连接失败后的重试次数
         retry_delay=5,  # 两次连接尝试之间的延迟
