@@ -18,6 +18,9 @@ def get_client():
     )
     connection = pika.BlockingConnection(parameters)
     channel = connection.channel()
+    channel.confirm_delivery()
+
+
     return channel
 
 def public_message(exchange, routing_key, message):
@@ -31,11 +34,21 @@ def public_message(exchange, routing_key, message):
         exchange=exchange, 
         routing_key=routing_key, 
         body=message, 
-        properties=pika.BasicProperties(delivery_mode=DeliveryMode.Persistent)
+        properties=pika.BasicProperties(delivery_mode=DeliveryMode.Persistent),
+        mandatory=True
     )
     print(f"send message to {exchange} with routing key {routing_key} message -> {message}")
     return True
 
 
-# if __name__ == '__main__':
-#     public_message('rest-svc', 'gpt.chat.message.query', 'hello world')
+if __name__ == '__main__':
+    pass
+    for i in range(1, 10):
+        while True:
+            try:
+                res = public_message('rest-svc', 'gpt.wsmessage.d637089d-1fb5-4c0e-901d-c37002b1482e', f'hello world:{i}')
+                break
+            except Exception as e:
+                print(e)
+                continue
+        print(res)

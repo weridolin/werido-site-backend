@@ -156,6 +156,7 @@ class GptMessageViewSet(ModelViewSet):
         ## 获取当前请求的完全路径
         # 查询对话上下文
         conversation_id = request.data.get("conversation_id")
+        websocket_id = request.data.get("web_socket_id")
         conversation = GptConversation.objects.filter(uuid=conversation_id).first()
         api_key = conversation.key
         history = list()
@@ -179,7 +180,7 @@ class GptMessageViewSet(ModelViewSet):
         })
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
+        # serializer.save()
         request.data.update({
             "history":history,
             "from_app":"gpt",
@@ -192,18 +193,26 @@ class GptMessageViewSet(ModelViewSet):
         )   
 
         ## 推送消息到websocket服务
-        res = public_message(
-            "rest-svc",
-            "gpt.chat.message.query",
-            json.dumps(request.data,ensure_ascii=False)
+        for _ in range(1, 10):
+            try:
+            ## 重试10次,避免投递傻失败
+                res = public_message(
+                    "rest-svc",
+                    f"gpt.wsmessage.{websocket_id}",
+                    json.dumps(request.data,ensure_ascii=False)
+                )
+                serializer.save()
+                return HTTPResponse(data=serializer.data,status=status.HTTP_201_CREATED)
+            except Exception as e:
+                logger.error(f"send message to rabbitmq error {e},retry...",exc_info=True)
+                continue
+        # if res:
+        #     return HTTPResponse(data=serializer.data,status=status.HTTP_201_CREATED)
+        # else:
+        return HTTPResponse(
+            message="推送消息失败!请重试",
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
-        if res:
-            return HTTPResponse(data=serializer.data,status=status.HTTP_201_CREATED)
-        else:
-            return HTTPResponse(
-                message="推送消息失败!",
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
 
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
