@@ -156,7 +156,7 @@ class GptMessageViewSet(ModelViewSet):
         ## 获取当前请求的完全路径
         # 查询对话上下文
         conversation_id = request.data.get("conversation_id")
-        websocket_id = request.data.get("web_socket_id")
+        websocket_id = request.data.get("websocket_id")
         conversation = GptConversation.objects.filter(uuid=conversation_id).first()
         api_key = conversation.key
         history = list()
