@@ -191,14 +191,15 @@ class GptMessageViewSet(ModelViewSet):
                 "callback_url_grpc":f"svc-site-oldbackend:50001"
             }
         )   
-
+        router_key  = f"gpt.wsmessage.{websocket_id}"
+        print("router_key -> ",router_key)
         ## 推送消息到websocket服务
-        for _ in range(1, 10):
+        for _ in range(1, 20):
             try:
-            ## 重试10次,避免投递傻失败
+            ## 重试20次,避免投递傻失败
                 res = public_message(
                     "rest-svc",
-                    f"gpt.wsmessage.{websocket_id}",
+                    router_key,
                     json.dumps(request.data,ensure_ascii=False)
                 )
                 serializer.save()
