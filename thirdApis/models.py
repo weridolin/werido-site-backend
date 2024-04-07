@@ -190,7 +190,7 @@ class GptMessage(BaseModel):
     reply_finish = models.BooleanField(help_text="是否回复完成", verbose_name="是否回复完成",default=False)
     user_id = models.SmallIntegerField(verbose_name="消息发送者", null=False, help_text="消息发送者")
     interrupt = models.BooleanField(help_text="是否半途停止", verbose_name="是否半途停止",default=False)
-    interrupt_reason = models.CharField(max_length=16, verbose_name="停止类型", help_text="停止类型",null=True,blank=True)
+    interrupt_reason = models.CharField(max_length=128, verbose_name="停止类型", help_text="停止类型",null=True,blank=True)
     websocket_id = models.CharField(max_length=64, verbose_name="websocketID", help_text="该次对话对应的websocketID",default=get_uuid,db_index=True) # 
     has_sended = models.BooleanField(help_text="是否已经发送给客户端", verbose_name="是否已经发送给客户端",default=False)
     error = models.BooleanField(help_text="是否出错", verbose_name="是否出错",default=False)
