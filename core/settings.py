@@ -47,8 +47,9 @@ DEBUG = env("DEBUG")
 
 ALLOWED_HOSTS = ['*']
 
-
+# from django.contrib import 
 # Application definition
+from django.middleware.gzip import GZipMiddleware
 
 INSTALLED_APPS = [
     # 'daphne',
@@ -65,6 +66,7 @@ INSTALLED_APPS = [
     "channels",
     "django_celery_beat",
     "rest_framework_simplejwt.token_blacklist",
+    
 
     # 'authentication.apps.AuthenticationConfig',     # 移动到usercenter
     "thirdApis.apps.ThirdapisConfig",
@@ -102,6 +104,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.gzip.GZipMiddleware',
+
 ]
 
 # # 跨域配置

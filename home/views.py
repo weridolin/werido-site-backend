@@ -291,8 +291,10 @@ class BackImagesViews(viewsets.ModelViewSet):
         else:
             with open(os.path.join(os.path.dirname(__file__),"bgList",file_name),"rb") as f:
                 image = f.read()
-            
-        return HttpResponse(image,content_type='image/*')
+            header = {
+                "Cache-Control":"max-age=604800"
+            }
+        return HttpResponse(image,content_type='image/*',headers=header)
         # redis_conn:Redis = get_redis_connection("default")
         # image = redis_conn.get(file_name)
         # if not image:
