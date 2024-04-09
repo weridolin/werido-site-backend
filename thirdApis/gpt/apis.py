@@ -101,7 +101,7 @@ class GptConversationViewsSet(ModelViewSet):
         host = request.get_host()
         ## 加密成ACCESS_TOKEN
         token = generate_jwt_token(payload,secret_key=settings.JWT_KEY)
-        url = f"wss://{host}/ws-endpoint/api/v1/?token={token}"
+        url = f"wss://www.weridolin.cn/ws-endpoint/api/v1/?token={token}"
         return HTTPResponse(
             data={"websocket_uri":url,"websocket_id":websocket_id}
         )
