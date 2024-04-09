@@ -93,6 +93,7 @@ class GptConversationViewsSet(ModelViewSet):
         payload = {
             "websocket_id":websocket_id,
             # "conversation_id":conversation_id,
+            "app":"site.alinlab.gpt",
             "user_id":int(1),
             "exp": (datetime.datetime.now() + datetime.timedelta(days=1)).timestamp()
         }
@@ -100,7 +101,7 @@ class GptConversationViewsSet(ModelViewSet):
         host = request.get_host()
         ## 加密成ACCESS_TOKEN
         token = generate_jwt_token(payload,secret_key=settings.JWT_KEY)
-        url = f"wss://www.weridolin.cn/ws-endpoint/api/v1/gpt?token={token}"
+        url = f"wss://{host}/ws-endpoint/api/v1/?token={token}"
         return HTTPResponse(
             data={"websocket_uri":url,"websocket_id":websocket_id}
         )
@@ -183,7 +184,7 @@ class GptMessageViewSet(ModelViewSet):
         # serializer.save()
         request.data.update({
             "history":history,
-            "from_app":"gpt",
+            "from_app":"site.alinlab.gpt",
             "exp": (datetime.datetime.now() + datetime.timedelta(days=1)).timestamp()
         })
         request.data.update({
@@ -191,14 +192,14 @@ class GptMessageViewSet(ModelViewSet):
                 "callback_url_grpc":f"svc-site-oldbackend:50001"
             }
         )   
-        router_key  = f"gpt.wsmessage.{websocket_id}"
+        router_key  = f"site.alinlab.gpt.wsmessage.{websocket_id}"
         print("router_key -> ",router_key)
         ## 推送消息到websocket服务
         for _ in range(1, 20):
             try:
             ## 重试20次,避免投递傻失败
                 res = public_message(
-                    "rest-svc",
+                    "site.rest-svc",
                     router_key,
                     json.dumps(request.data,ensure_ascii=False)
                 )

@@ -46,7 +46,7 @@ if __name__ == '__main__':
     for i in range(1, 10):
         while True:
             try:
-                res = public_message('rest-svc', 'gpt.wsmessage.d637089d-1fb5-4c0e-901d-c37002b1482e', f'hello world:{i}')
+                res = public_message('site.rest-svc', 'gpt.wsmessage.d637089d-1fb5-4c0e-901d-c37002b1482e', f'hello world:{i}')
                 break
             except Exception as e:
                 print(e)
