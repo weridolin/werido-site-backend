@@ -33,7 +33,7 @@ from authenticationV1 import V1Authentication
 
 import uuid
 class FakerRecord(APIView):
-    authentication_classes = []
+    authentication_classes = [V1Authentication]
     permission_classes = []
 
     def get(self, request):
@@ -56,10 +56,10 @@ class FakerRecord(APIView):
 
     def post(self,request):
         ## 初始化record生成信息
-        if not request.user.is_authenticated:
-            user = User.objects.get(id=2)
-        else:
-            user = request.user
+        # if not request.user.is_authenticated:
+        #     user = User.objects.get(id=2)
+        # else:
+        user_id = request.user
         ## 先判断是否已经存在，是的直接返回下载码:
         fields = request.data.get("fields",[])
         count = request.data.get("count",0)
@@ -72,7 +72,7 @@ class FakerRecord(APIView):
         record_key = generate_file_key()
         record:DataFakerRecordInfo =DataFakerRecordInfo(
             expire_time = datetime.datetime.now()+datetime.timedelta(hours=request.data.get("expire",24)),
-            user = user,
+            user = user_id,
             fields=fields,
             count =count,
             record_key =record_key,
@@ -82,7 +82,7 @@ class FakerRecord(APIView):
         ## 生成 websocket token
         payload = {
             "record_key":record_key,
-            "user_id":user.id,
+            "user_id":user_id,
             "app":"site.alinlab.datafaker",
             "exp": (datetime.datetime.now() + datetime.timedelta(days=1)).timestamp(),
             "websocket_id": str(uuid.uuid4()),

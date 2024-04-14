@@ -24,7 +24,8 @@ class DataFakerRecordInfo(BaseModel):
     file = models.FileField(max_length=255, upload_to=upload_path,null=True)
     download_code = models.CharField(max_length=255,verbose_name="文件下载码",null=True)
     is_finish = models.BooleanField(verbose_name="数据是否已经生成完成",default=False)
-    user = models.ForeignKey(to=User,verbose_name="文件上传所属用户",on_delete=models.CASCADE,null=True)
+    # user = models.ForeignKey(to=User,verbose_name="文件上传所属用户",on_delete=models.CASCADE,null=True)
+    user = models.IntegerField(verbose_name="文件上传所属用户",null=True)
     fields = models.JSONField(verbose_name="字段集",null=False,default=[])
     count = models.IntegerField(verbose_name="数据条数",default=-1,null=False)
 
