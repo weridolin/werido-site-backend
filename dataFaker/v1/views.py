@@ -29,10 +29,13 @@ from dataFaker.models import DataFakerRecordInfo,upload_path
 from dataFaker.v1.serializers import DataFakerRecordInfoSerializer
 from utils.http_ import HTTPResponse
 from utils.jwt import generate_jwt_token
+from authenticationV1 import V1Authentication
 
 import uuid
 class FakerRecord(APIView):
-    
+    authentication_classes = [V1Authentication]
+    permission_classes = []
+
     def get(self, request):
         # if not request.user.is_authenticated:
         #     return HttpResponseForbidden("please login first")
