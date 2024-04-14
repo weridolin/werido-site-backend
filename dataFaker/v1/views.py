@@ -33,7 +33,7 @@ from authenticationV1 import V1Authentication
 
 import uuid
 class FakerRecord(APIView):
-    authentication_classes = [V1Authentication]
+    authentication_classes = []
     permission_classes = []
 
     def get(self, request):
