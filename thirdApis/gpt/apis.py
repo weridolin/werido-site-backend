@@ -17,6 +17,7 @@ import json
 import logging,asyncio
 from thirdApis.gpt.ali.request import HttpRequest as AliHttpRequest,HttpMixins
 from thirdApis.gpt.manager import get_manager
+from dataFaker.models import DataFakerRecordInfo
 
 # logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -87,14 +88,14 @@ class GptConversationViewsSet(ModelViewSet):
         """
             注册websocketID
         """
-        # user_id = request.user
+        user_id = request.user
         websocket_id = str(uuid.uuid4())
         # conversation_id = request.query_params.get("conversation_id")
         payload = {
             "websocket_id":websocket_id,
             # "conversation_id":conversation_id,
             "app":"site.alinlab.gpt",
-            "user_id":int(1),
+            "user_id":user_id,
             "exp": (datetime.datetime.now() + datetime.timedelta(days=1)).timestamp()
         }
         ## 获取当前 host
@@ -453,6 +454,28 @@ class GptMessageRpcImpl(gpt_pb2_grpc.GptMessageServicer):
                 response.success=True
             else:
                 response = gpt_pb2.UpdateQueryResultReply()
+                response.success=False
+            return response
+        except Exception as e:
+            logger.error(f"grpc update query result error {e}",exc_info=True)
+            response.success=False
+            return response
+
+    async def UpdateDataFakerGenerateResult(self, request, context):
+        try:
+            record_key = request.record_key
+            file_path = request.file_path
+            download_code = request.download_code
+            res = DataFakerRecordInfo.objects.filter(record_key=record_key).update(
+                download_code=download_code,
+                file_path=file_path,
+                is_finish=True
+            )
+            if res:
+                response = gpt_pb2.UpdateDataFakerGenerateResultReply()
+                response.success=True
+            else:
+                response = gpt_pb2.UpdateDataFakerGenerateResultReply()
                 response.success=False
             return response
         except Exception as e:

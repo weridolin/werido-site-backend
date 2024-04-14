@@ -25,10 +25,12 @@ from rest_framework.decorators import action
 from urllib.parse import unquote
 from celery_app.tasks import remove_file
 from filebroker.utils import generate_file_key
-from dataFaker.models import DataFakerRecordInfo
+from dataFaker.models import DataFakerRecordInfo,upload_path
 from dataFaker.v1.serializers import DataFakerRecordInfoSerializer
 from utils.http_ import HTTPResponse
+from utils.jwt import generate_jwt_token
 
+import uuid
 class FakerRecord(APIView):
     
     def get(self, request):
@@ -73,7 +75,26 @@ class FakerRecord(APIView):
             record_key =record_key,
         )
         record.save()
-        return HTTPResponse(data={"key":record_key,"is_exist":False},status=status.HTTP_200_OK,app_code="dataFaker")
+        relative_path = upload_path(instance=record)
+        ## 生成 websocket token
+        payload = {
+            "record_key":record_key,
+            "user_id":user.id,
+            "app":"site.alinlab.datafaker",
+            "exp": (datetime.datetime.now() + datetime.timedelta(days=1)).timestamp(),
+            "websocket_id": str(uuid.uuid4()),
+            "target_path": os.path.join(settings.MEDIA_ROOT,relative_path), 
+            "data_count" : count,
+            "fields_info":fields,
+            "callback_url_grpc":f"svc-site-oldbackend:50001"   
+        }
+        token = generate_jwt_token(payload,settings.JWT_KEY,algorithm="HS256")
+
+        return HTTPResponse(data={
+            "key":record_key,
+            "is_exist":False,
+            "websocket_url":f"wss://www.weridolin.cn/ws-endpoint/api/v1/?token={token}"
+        },status=status.HTTP_200_OK,app_code="dataFaker")
 
 from rest_framework.decorators import api_view
         

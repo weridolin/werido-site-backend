@@ -5,6 +5,7 @@ package GptApp;
 service GptMessage {
 
   rpc UpdateQueryResult (UpdateQueryResultRequest) returns (UpdateQueryResultReply) {}
+  rpc UpdateDataFakerGenerateResult (UpdateDataFakerGenerateResultRequest) returns (UpdateDataFakerGenerateResultReply) {}
 
 }
 
@@ -21,6 +22,19 @@ message UpdateQueryResultRequest {
 }
 
 message UpdateQueryResultReply {
+
+  bool success = 1;
+
+}
+
+
+message UpdateDataFakerGenerateResultRequest {
+  string record_key=1;
+  string file_path=2;
+  string download_code=3;
+}
+
+message UpdateDataFakerGenerateResultReply {
 
   bool success = 1;
 

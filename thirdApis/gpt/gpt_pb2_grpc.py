@@ -19,12 +19,23 @@ class GptMessageStub(object):
                 request_serializer=gpt__pb2.UpdateQueryResultRequest.SerializeToString,
                 response_deserializer=gpt__pb2.UpdateQueryResultReply.FromString,
                 )
+        self.UpdateDataFakerGenerateResult = channel.unary_unary(
+                '/GptApp.GptMessage/UpdateDataFakerGenerateResult',
+                request_serializer=gpt__pb2.UpdateDataFakerGenerateResultRequest.SerializeToString,
+                response_deserializer=gpt__pb2.UpdateDataFakerGenerateResultReply.FromString,
+                )
 
 
 class GptMessageServicer(object):
     """Missing associated documentation comment in .proto file."""
 
     def UpdateQueryResult(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def UpdateDataFakerGenerateResult(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -37,6 +48,11 @@ def add_GptMessageServicer_to_server(servicer, server):
                     servicer.UpdateQueryResult,
                     request_deserializer=gpt__pb2.UpdateQueryResultRequest.FromString,
                     response_serializer=gpt__pb2.UpdateQueryResultReply.SerializeToString,
+            ),
+            'UpdateDataFakerGenerateResult': grpc.unary_unary_rpc_method_handler(
+                    servicer.UpdateDataFakerGenerateResult,
+                    request_deserializer=gpt__pb2.UpdateDataFakerGenerateResultRequest.FromString,
+                    response_serializer=gpt__pb2.UpdateDataFakerGenerateResultReply.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -62,5 +78,22 @@ class GptMessage(object):
         return grpc.experimental.unary_unary(request, target, '/GptApp.GptMessage/UpdateQueryResult',
             gpt__pb2.UpdateQueryResultRequest.SerializeToString,
             gpt__pb2.UpdateQueryResultReply.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def UpdateDataFakerGenerateResult(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/GptApp.GptMessage/UpdateDataFakerGenerateResult',
+            gpt__pb2.UpdateDataFakerGenerateResultRequest.SerializeToString,
+            gpt__pb2.UpdateDataFakerGenerateResultReply.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
