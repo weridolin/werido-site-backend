@@ -10,7 +10,7 @@ from django.contrib.auth.models import User
 
 def upload_path(instance):
     # print(">>>>>>>>",instance)
-    target_path = 'faker/user_{userid}/{record_key}.csv'.format(userid=instance.user.id,record_key=instance.record_key)
+    target_path = 'faker/user_{userid}/{record_key}.csv'.format(userid=instance.user,record_key=instance.record_key)
     if os.path.exists(os.path.join(settings.MEDIA_ROOT,target_path)):
         os.remove(os.path.join(settings.MEDIA_ROOT,target_path))
     return target_path
