@@ -468,7 +468,7 @@ class GptMessageRpcImpl(gpt_pb2_grpc.GptMessageServicer):
             download_code = request.download_code
             res = DataFakerRecordInfo.objects.filter(record_key=record_key).update(
                 download_code=download_code,
-                file_path=file_path,
+                file=file_path,
                 is_finish=True
             )
             if res:
