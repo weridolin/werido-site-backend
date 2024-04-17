@@ -36,6 +36,12 @@ class FakerRecord(APIView):
     authentication_classes = [V1Authentication]
     permission_classes = []
 
+
+    def get_authenticators(self):
+        if not self.request.method == "GET":
+            return super().get_authenticators()
+        return []
+
     def get(self, request):
         # if not request.user.is_authenticated:
         #     return HttpResponseForbidden("please login first")
