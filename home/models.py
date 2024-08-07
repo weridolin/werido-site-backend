@@ -41,6 +41,9 @@ class BackGroundImages(BaseModel):
                             verbose_name="图片路径", help_text="主页图片路径")
     is_able = models.BooleanField(
         default=True, help_text="是否启用", verbose_name="是否启用")
+    
+    md5 = models.CharField(max_length=256,verbose_name="md5",null=False,blank=False,default="")
+    file_name =models.CharField(max_length=256,verbose_name="文件名",null=False,blank=False,unique=True)
 
 
 class FriendsLink(BaseModel):

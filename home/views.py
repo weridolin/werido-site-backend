@@ -23,7 +23,7 @@ from opentelemetry import trace
 from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
 from collections import OrderedDict
 from rest_framework.pagination import PageNumberPagination
-import json
+import json,os,sys
 from utils.models import CommentBrief
 from django_redis import get_redis_connection
 from redis.client import Redis
@@ -31,7 +31,7 @@ from rest_framework import mixins, viewsets
 from django.shortcuts import render
 from django.http import FileResponse
 # Create your views here.
-
+import hashlib
 from articles.v1.serializers import *
 from articles.models import *
 from django.http import Http404
@@ -268,6 +268,9 @@ class BackGroundMusicViews(APIView):
         return HTTPResponse(data=serializer.data, status=status.HTTP_200_OK)
 
 from django.http import HttpResponse
+from django.utils.cache import get_conditional_response
+from django.utils.http import http_date, quote_etag
+
 class BackImagesViews(viewsets.ModelViewSet):
     serializer_class = BackGroundImagesSerializer
     queryset = BackGroundImages.objects.all()
@@ -275,6 +278,13 @@ class BackImagesViews(viewsets.ModelViewSet):
 
     def list(self, request):
         imagesList = BackGroundImages.objects.filter(is_able=True).all()
+        # for image in imagesList:
+        #     filename = image.path.split("/")[-1]
+        #     file_path = os.path.join(os.path.dirname(__file__),"bgList",filename)
+        #     with open(file_path,"rb") as f:
+        #         image.md5 = hashlib.md5(f.read()).hexdigest()
+        #         image.file_name = filename
+        #         image.save()
         serializer = BackGroundImagesSerializer(imagesList, many=True)
         return HTTPResponse(data=serializer.data, status=status.HTTP_200_OK)
     
@@ -284,17 +294,40 @@ class BackImagesViews(viewsets.ModelViewSet):
         print("get image",file_name)
         if not file_name:
             return HTTPResponse(message="图片名称不能为空!",status=status.HTTP_400_BAD_REQUEST)
-        # 判断文件是否存在
-        import os
-        if not os.path.exists(os.path.join(os.path.dirname(__file__),"bgList",file_name)):
+        # 判断文件是否存在,
+        bg = BackGroundImages.objects.filter(file_name=file_name,is_able=True).first()
+        if not bg or not os.path.exists(os.path.join(os.path.dirname(__file__),"bgList",file_name)):
             return HTTPResponse(message="图片不存在!",status=status.HTTP_404_NOT_FOUND)
         else:
-            with open(os.path.join(os.path.dirname(__file__),"bgList",file_name),"rb") as f:
-                image = f.read()
-            header = {
-                "Cache-Control":"max-age=604800"
-            }
-        return HttpResponse(image,content_type='image/*',headers=header)
+            timestamps = os.path.getmtime(os.path.join(os.path.dirname(__file__),"bgList",file_name))
+            dt = datetime.datetime.fromtimestamp(timestamps)
+            if not timezone.is_aware(dt):
+                dt = timezone.make_aware(dt, timezone.utc)
+            last_modified = int(dt.timestamp())
+            etag = quote_etag(bg.md5)
+            response = get_conditional_response(
+                request,
+                etag=etag,
+                last_modified=last_modified,
+            )
+            print("response",response)
+            if not response:
+                with open(os.path.join(os.path.dirname(__file__),"bgList",file_name),"rb") as f:
+                    image = f.read()
+
+                header = {
+                    "Cache-Control":"max-age=60*60",
+                    "Last-Modified":http_date(last_modified),
+                    "ETag":etag
+                }
+                return HttpResponse(image,content_type='image/*',headers=header)
+            else:
+                response.headers["Cache-Control"] = "max-age=60*60"
+                if not response.has_header("Last-Modified"):
+                    response.headers["Last-Modified"] = http_date(last_modified)
+                if etag:
+                    response.headers.setdefault("ETag", etag)
+                return response  # 资源未过期 直接返回304
         # redis_conn:Redis = get_redis_connection("default")
         # image = redis_conn.get(file_name)
         # if not image:
