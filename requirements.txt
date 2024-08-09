@@ -81,9 +81,9 @@ httptools==0.4.0
 httpx==0.27.0
 hyperlink==21.0.0
 idna==3.2
-importlib-metadata==3.10.0
-incremental==21.3.0 ; sys_platform =='win32'
-install==1.3.4
+importlib-metadata
+incremental; sys_platform =='win32'
+install
 isort==5.8.0
 itemadapter==0.7.0
 itemloaders==1.0.6
