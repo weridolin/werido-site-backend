@@ -14,7 +14,6 @@ from datetime import timedelta
 from pathlib import Path
 import os
 import environ
-import corsheaders
 # initialize env
 env = environ.Env(
     # # set casting, default value
@@ -27,13 +26,12 @@ env = environ.Env(
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-if not os.path.exists(os.path.join(os.path.dirname(os.path.dirname(BASE_DIR)), ".env")):
-    print("can not find .env file...", os.path.join(
-        os.path.dirname(os.path.dirname(BASE_DIR)), ".env"))
+env_file = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), ".env")
+if not os.path.exists(env_file):
+    print("can not find .env file...", env_file)
+env.read_env(env_file,overrides=True)
 
-
-environ.Env.read_env(os.path.join(os.path.dirname(BASE_DIR), ".env"))
-
+print("read env success...",os.environ)
 EMAIL_PWD = env('EMAIL_PWD')
 
 # Quick-start development settings - unsuitable for production
@@ -49,7 +47,6 @@ ALLOWED_HOSTS = ['*']
 
 # from django.contrib import 
 # Application definition
-from django.middleware.gzip import GZipMiddleware
 
 INSTALLED_APPS = [
     # 'daphne',
@@ -173,23 +170,16 @@ TEMPLATES = [
 ASGI_APPLICATION = 'core.asgi.application'
 
 # Database
-# https://docs.djangoproject.com/en/3.1/ref/settings/#databases
-
+# https://docs.djangoproject.com/en/3.1/ref/settings/#database
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        # 'NAME': env("SITE_DATA_DB"),  # 数据库名称
-        # 'USER': env("SITE_USER"),  # 拥有者，这个一般没修改
-        # 'PASSWORD': env("SITE_PASSWORD"),  # 密码，自己设定的
+        'NAME': env("SITE_DATA_DB"),  # 数据库名称
+        'USER': env("SITE_USER"),  # 拥有者，这个一般没修改
+        'PASSWORD': env("SITE_PASSWORD"),  # 密码，自己设定的
         # # 默认的就没写
-        # 'HOST': env("POSTGRES_HOST") if env("K8S") != "1" else f"{env('SITEDB_SVC_NAME')}.{env('SITEDB_SVC_NAME_NAMESPACE')}",
-        # 'PORT': env("POSTGRES_PORT") if env("K8S") != "1" else f"{env('SITEDB_SVC_NAME_PORT')}",
-        'NAME': "blogDB",  # 数据库名称
-        'USER': "werido",  # 拥有者，这个一般没修改
-        'PASSWORD': "359066432",  # 密码，自己设定的
-        # 默认的就没写
-        'HOST':"43.128.110.230",
-        'PORT': "30001",
+        'HOST': env("POSTGRES_HOST") if env("K8S") != "1" else f"{env('SITEDB_SVC_NAME')}.{env('SITEDB_SVC_NAME_NAMESPACE')}",
+        'PORT': env("POSTGRES_PORT") if env("K8S") != "1" else f"{env('SITEDB_SVC_NAME_PORT')}",
     }
 }
 
@@ -286,7 +276,6 @@ CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from authenticationV1 import V1Authentication
 
 # rest framework
 REST_FRAMEWORK = {
