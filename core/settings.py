@@ -189,9 +189,9 @@ CACHES = {
         "BACKEND": "django_redis.cache.RedisCache",
         # "LOCATION": f"redis://:{os.environ.get('REDIS_PASSWORD','werido')}@{os.environ.get('REDIS_HOST','8.131.78.84')}:{os.environ.get('REDIS_PORT','6379')}/0",
         # "LOCATION": f"redis://:{os.environ.get('REDIS_PASSWORD','werido')}@localhost:6379/0",
-        # "LOCATION": f"redis://:{env('REDIS_PASSWORD')}@{env('REDIS_HOST')}:{env('REDIS_PORT')}/0" if env("K8S") != "1" else \
-        # f"redis://:{env('REDIS_PASSWORD')}@{env('REDIS_SVC_NAME')}.{env('REDIS_SVC_NAME_NAMESPACE')}:{env('REDIS_SVC_PORT')}/1",
-        "LOCATION": f"redis://werido:359066432@43.128.110.230:30000/0",
+        "LOCATION": f"redis://:{env('REDIS_PASSWORD')}@{env('REDIS_HOST')}:{env('REDIS_PORT')}/0" if env("K8S") != "1" else \
+            f"redis://:{env('REDIS_PASSWORD')}@{env('REDIS_SVC_NAME')}.{env('REDIS_SVC_NAME_NAMESPACE')}:{env('REDIS_SVC_PORT')}/1",
+
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
             # "PASSWORD": "mysecret",
