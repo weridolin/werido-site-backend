@@ -49,7 +49,7 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
-    # 'daphne',
+    # 'daphne', // 重写了 runserver命令,web服务用可twisted
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -60,7 +60,7 @@ INSTALLED_APPS = [
     # 'corsheaders',
     # "oauth2_provider",
     'django_filters',
-    "channels",
+    "channels", # 支持多种协议
     "django_celery_beat",
     "rest_framework_simplejwt.token_blacklist",
     
@@ -91,7 +91,7 @@ CHANNEL_LAYERS = {
 
 
 MIDDLEWARE = [
-    # 'middleswares.trace.OpenTracingMiddleware',
+    'middleswares.trace.OpenTracingMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',  # CORS中间件

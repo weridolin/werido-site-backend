@@ -121,13 +121,14 @@ class SiteCommentViewsSet(viewsets.ModelViewSet):
         user_center = get_srv(etcd_key=USERCENTER_KEY,srv_name=USERCENTER_SVC_NAME,namespace=USERCENTER_SVC_NAME_NAMESPACE)
         
         request.span.add_event("begin-call-rpc",attributes={"user_center":user_center,"rpc-path":"/user/info","user_id":user_id})
-        user_info = get_user_info(user_id=user_id,target=user_center,ctx=ctx)
+        user_info = get_user_info(user_id=user_id,target=f"{user_center}:8081",ctx=ctx)
         request.span.add_event("end-call-rpc")
-
+  
         print("user info: ",user_info)
         new_comment = SiteComments.objects.create(
             body = request.data.get("body",""),
             # qq = user_info.qq,
+            user_id=user_id,
             email = user_info.userEmail,
             name = user_info.userName,
             ip = self.ip,
@@ -310,7 +311,6 @@ class BackImagesViews(viewsets.ModelViewSet):
                 etag=etag,
                 last_modified=last_modified,
             )
-            print("response",response)
             if not response:
                 with open(os.path.join(os.path.dirname(__file__),"bgList",file_name),"rb") as f:
                     image = f.read()

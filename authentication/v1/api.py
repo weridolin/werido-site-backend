@@ -359,7 +359,6 @@ class ThirdAuthApis(viewsets.ViewSet):
     def login_by_github(self, request):
         code = request.query_params.get("code", None)
         if code:
-            ...
             # https://github.com/login/oauth/authorize?client_id=6440837d0e79ec8b00fd&http://127.0.0.1:8000/v1/oauth/githubLogin
             # 向GITHUB授权服务器申请token
             print(">>> github login", code)
@@ -387,7 +386,6 @@ class ThirdAuthApis(viewsets.ViewSet):
                         print(">>> login by github -> get user info", res.json())
                         res_json = res.json()
                         oauth_id = res_json.get("id")
-
                         record: ThirdOauthInfo = ThirdOauthInfo.objects.filter(
                             oauth_id=oauth_id, oauth_type=4).first()
                         if not record:

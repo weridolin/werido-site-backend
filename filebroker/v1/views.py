@@ -28,7 +28,7 @@ class FileOperationViews(APIView):
         #     return HttpResponseForbidden("please login first")
         ## 下载文件
         download_code = request.query_params.get("down_code",None)
-        print(">>> down load file",{download_code})
+        # print(">>> down load file",{download_code})
         if not download_code:
             return HTTPResponse(
                     code=-1,

@@ -1,3 +1,5 @@
+# trace.py
+
 from core import settings
 try:
     # Django >= 1.10
@@ -27,6 +29,10 @@ from opentelemetry.trace import SpanKind
 from utils.http_ import HTTPResponse
 import traceback
 import json
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
+from opentelemetry.exporter.jaeger.proto.grpc import JaegerExporter
+import os
 
 def use_span(
     span: Span,
@@ -39,10 +45,7 @@ def use_span(
     """
     try:
         token = context_api.attach(context_api.set_value(_SPAN_KEY, span))
-        # try:
-        #     yield span
-        # finally:
-        #     context_api.detach(token)
+        print(f"Attached token: {token}")  
         return token
     except Exception as exc:  # pylint: disable=broad-except
         if isinstance(span, Span) and span.is_recording():
@@ -53,7 +56,7 @@ def use_span(
             if set_status_on_exception:
                 span.set_status(
                     Status(
-                        status_code=StatusCode.ERROR,
+                        status_code=500,
                         description=f"{type(exc).__name__}: {exc}",
                     )
                 )
@@ -63,56 +66,79 @@ def use_span(
 class OpenTracingMiddleware(MiddlewareMixin):
 
     def __init__(self, get_response):
-        self.span = None
+        self.get_response = get_response
         self.tracer = trace.get_tracer(__name__)
-        super().__init__(get_response)
+
+        # 初始化 TracerProvider
+        trace.set_tracer_provider(TracerProvider())
+
+        # 从环境变量中读取 Jaeger gRPC 端点
+        jaeger_endpoint = os.getenv("JAEGER_ENDPOINT", "jaeger:4317")
+
+        # 创建 Jaeger 导出器
+        jaeger_exporter = JaegerExporter(
+            agent_host_name=jaeger_endpoint.split(":")[0],
+            agent_port=int(jaeger_endpoint.split(":")[1]),
+        )
+
+        # 创建 BatchSpanProcessor 并添加导出器
+        span_processor = BatchSpanProcessor(jaeger_exporter)
+        trace.get_tracer_provider().add_span_processor(span_processor)
 
     def process_view(self, request, view_func, view_args, view_kwargs):
         headers = format_request_headers(request.META)
+        print(">>>> headers ->", headers)
         ctx = TraceContextTextMapPropagator().extract(headers)
         self.span = self.tracer.start_span(name=request.path, context=ctx)
-        # self.span.add_event()
         self.token = use_span(self.span)
         carrier = dict()
         TraceContextTextMapPropagator().inject(carrier)
         if 'traceparent' in carrier.keys():
-            request.traceparent=carrier.get('traceparent')
-        request.span = self.span
-        self.span.set_attributes({
-            "http.method": request.method,
-            "http.server_name": "rest-old-site-backend",
-            "http.scheme":request.scheme,
-            "host.port": 8000,
-            "http.host": request.get_host(),
-            "http.url": request.get_full_path(),
-            "http.peer.addr":headers.get("x-real-ip",""),
-            "span.kind": SpanKind.INTERNAL,
-        })
-        
+            request.traceparent = carrier.get('traceparent')
+            request.span = self.span
+            self.span.set_attributes({
+                "http.method": request.method,
+                "http.server_name": "rest-old-site-backend",
+                "http.scheme": request.scheme,
+                "host.port": 8000,
+                "http.host": request.get_host(),
+                "http.url": request.get_full_path(),
+                "http.peer.addr": headers.get("x-real-ip", ""),
+                "span.kind": SpanKind.INTERNAL.name,
+            })
 
-    def process_exception(self, request, exception:Exception):
+        # 调用视图函数
+        response = self.get_response(request)
+
+        return response
+
+    def process_exception(self, request, exception: Exception):
         """
             process a exception
         """
-        # print(">>>>",exception,type(exception))
-        self.span.set_attribute("error",True)
-        self.span.set_attribute("otel.status_code",StatusCode.ERROR)
-        self.span.set_attribute("http.err_msg",str(exception) or "")
-        import traceback
-        self.span.set_attribute("http_err_stack",traceback.format_exc())
-        self.span.end()
-        context_api.detach(self.token)
+        if hasattr(request, 'span'):
+            span = request.span
+            span.set_attribute("error", True)
+            span.set_attribute("otel.status_code", StatusCode.ERROR.value)
+            span.set_attribute("http.err_msg", str(exception) or "")
+            import traceback
+            span.set_attribute("http_err_stack", traceback.format_exc())
+            span.end()
+            if hasattr(request, 'token'):
+                context_api.detach(request.token)
 
     def process_response(self, request, response: HTTPResponse):
-        if isinstance(response,HTTPResponse):
-            self.span.set_attribute("otel.status_code	",StatusCode.OK)
-            self.span.set_attribute("http.res_msg",response.data.get('message',None) or "")    
-            self.span.set_attribute("http.response.data",json.dumps(response.data) if response.data else "")   
-        carrier = dict()
-        TraceContextTextMapPropagator().inject(carrier)
-        self.span.end()
-        context_api.detach(self.token)
-        # print("carrier", carrier,type(response))
-        if 'traceparent' in carrier.keys():
-            response['Traceparent']=carrier.get('traceparent')
+        if hasattr(request, 'span'):
+            span = request.span
+            if isinstance(response, HTTPResponse):
+                span.set_attribute("otel.status_code", response.status_code)
+                span.set_attribute("http.res_msg", response.data.get('message', None) or "")
+                span.set_attribute("http.response.data", json.dumps(response.data) if response.data else "")
+            carrier = dict()
+            TraceContextTextMapPropagator().inject(carrier)
+            span.end()
+            if hasattr(request, 'token'):
+                context_api.detach(request.token)
+            if 'traceparent' in carrier.keys():
+                response['Traceparent'] = carrier.get('traceparent')
         return response
