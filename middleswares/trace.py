@@ -70,11 +70,12 @@ class OpenTracingMiddleware(MiddlewareMixin):
         # 初始化 TracerProvider
         trace.set_tracer_provider(TracerProvider())
         # 从环境变量中读取 Jaeger gRPC 端点
-        jaeger_endpoint = os.getenv("JAEGER_ENDPOINT", "jaeger:4317")
-
+        jaeger_endpoint = os.getenv("JAEGER_ENDPOINT", "jaeger:14250")
+        print(f"Using Jaeger endpoint: {jaeger_endpoint}")
         # 创建 Jaeger 导出器
         jaeger_exporter = JaegerExporter(
-            collector_endpoint=jaeger_endpoint
+            collector_endpoint=jaeger_endpoint,
+            insecure=False
         )
         # 创建 BatchSpanProcessor 并添加导出器
         span_processor = BatchSpanProcessor(jaeger_exporter)
