@@ -81,6 +81,7 @@ class OpenTracingMiddleware(MiddlewareMixin):
         span_processor = BatchSpanProcessor(jaeger_exporter)
         trace.get_tracer_provider().add_span_processor(span_processor)
         self.tracer = trace.get_tracer(__name__)
+        super().__init__(get_response)
 
     def process_view(self, request, view_func, view_args, view_kwargs):
         headers = format_request_headers(request.META)
@@ -104,38 +105,36 @@ class OpenTracingMiddleware(MiddlewareMixin):
                 "span.kind": SpanKind.INTERNAL.name,
             })
 
-        # 调用视图函数
-        response = self.get_response(request)
+        # # 调用视图函数
+        # response = self.get_response(request)
 
-        return response
+        # return response
 
     def process_exception(self, request, exception: Exception):
         """
             process a exception
         """
-        if hasattr(request, 'span'):
-            span = request.span
-            span.set_attribute("error", True)
-            span.set_attribute("otel.status_code", StatusCode.ERROR.value)
-            span.set_attribute("http.err_msg", str(exception) or "")
-            import traceback
-            span.set_attribute("http_err_stack", traceback.format_exc())
-            span.end()
-            if hasattr(request, 'token'):
-                context_api.detach(request.token)
+        span = request.span
+        span.set_attribute("error", True)
+        span.set_attribute("otel.status_code", StatusCode.ERROR.value)
+        span.set_attribute("http.err_msg", str(exception) or "")
+        import traceback
+        span.set_attribute("http_err_stack", traceback.format_exc())
+        span.end()
+        if hasattr(request, 'token'):
+            context_api.detach(request.token)
 
     def process_response(self, request, response: HTTPResponse):
-        if hasattr(request, 'span'):
-            span = request.span
-            if isinstance(response, HTTPResponse):
-                span.set_attribute("otel.status_code", response.status_code)
-                span.set_attribute("http.res_msg", response.data.get('message', None) or "")
-                span.set_attribute("http.response.data", json.dumps(response.data) if response.data else "")
-            carrier = dict()
-            TraceContextTextMapPropagator().inject(carrier)
-            span.end()
-            if hasattr(request, 'token'):
-                context_api.detach(request.token)
-            if 'traceparent' in carrier.keys():
-                response['Traceparent'] = carrier.get('traceparent')
+        span = request.span
+        if isinstance(response, HTTPResponse):
+            span.set_attribute("otel.status_code", response.status_code)
+            span.set_attribute("http.res_msg", response.data.get('message', None) or "")
+            span.set_attribute("http.response.data", json.dumps(response.data) if response.data else "") 
+        carrier = dict()
+        TraceContextTextMapPropagator().inject(carrier)
+        span.end()
+        if hasattr(request, 'token'):
+            context_api.detach(request.token)
+        if 'traceparent' in carrier.keys():
+            response['Traceparent'] = carrier.get('traceparent')
         return response
