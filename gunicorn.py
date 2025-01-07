@@ -17,21 +17,21 @@ from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from opentelemetry.exporter.jaeger.thrift import JaegerExporter
 from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
 
-def post_fork(server, worker):
-    print("post fork worker...setting jaeger exporter")
-    jaeger_exporter = JaegerExporter(
-        agent_host_name="jaeger",
-        agent_port= 6831,
-    )
-    resource = Resource.create(attributes={
-        "service.name": "api-old-backend"
-    })
+# def post_fork(server, worker):
+    # print("post fork worker...setting jaeger exporter")
+    # jaeger_exporter = JaegerExporter(
+    #     agent_host_name="jaeger",
+    #     agent_port= 6831,
+    # )
+    # resource = Resource.create(attributes={
+    #     "service.name": "api-old-backend"
+    # })
 
-    trace.set_tracer_provider(TracerProvider(resource=resource))
-    span_processor = BatchSpanProcessor(
-        jaeger_exporter
-    )
-    trace.get_tracer_provider().add_span_processor(span_processor)
+    # trace.set_tracer_provider(TracerProvider(resource=resource))
+    # span_processor = BatchSpanProcessor(
+    #     jaeger_exporter
+    # )
+    # trace.get_tracer_provider().add_span_processor(span_processor)
 
     # tracer = trace.get_tracer(__name__)
     # with tracer.start_as_current_span('foo'):
