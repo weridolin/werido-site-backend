@@ -67,23 +67,19 @@ class OpenTracingMiddleware(MiddlewareMixin):
 
     def __init__(self, get_response):
         self.get_response = get_response
-        self.tracer = trace.get_tracer(__name__)
-
         # 初始化 TracerProvider
         trace.set_tracer_provider(TracerProvider())
-
         # 从环境变量中读取 Jaeger gRPC 端点
         jaeger_endpoint = os.getenv("JAEGER_ENDPOINT", "jaeger:4317")
 
         # 创建 Jaeger 导出器
         jaeger_exporter = JaegerExporter(
-            agent_host_name=jaeger_endpoint.split(":")[0],
-            agent_port=int(jaeger_endpoint.split(":")[1]),
+            collector_endpoint=jaeger_endpoint
         )
-
         # 创建 BatchSpanProcessor 并添加导出器
         span_processor = BatchSpanProcessor(jaeger_exporter)
         trace.get_tracer_provider().add_span_processor(span_processor)
+        self.tracer = trace.get_tracer(__name__)
 
     def process_view(self, request, view_func, view_args, view_kwargs):
         headers = format_request_headers(request.META)
