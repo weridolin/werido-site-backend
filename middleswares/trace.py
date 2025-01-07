@@ -75,7 +75,7 @@ class OpenTracingMiddleware(MiddlewareMixin):
         # 创建 Jaeger 导出器
         jaeger_exporter = JaegerExporter(
             collector_endpoint=jaeger_endpoint,
-            insecure=False
+            insecure=True
         )
         # 创建 BatchSpanProcessor 并添加导出器
         span_processor = BatchSpanProcessor(jaeger_exporter)
