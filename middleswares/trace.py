@@ -21,13 +21,10 @@ trace-flags: 8 位，调用者的建议标志，可以考虑为调用者的建�
 
 from opentelemetry import trace
 from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
-from opentelemetry.trace.propagation import _SPAN_KEY
 from opentelemetry import context as context_api
-from opentelemetry.trace.span import Span
 from opentelemetry.trace import StatusCode, Status
 from opentelemetry.trace import SpanKind
 from utils.http_ import HTTPResponse
-import traceback
 import json
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
@@ -58,7 +55,7 @@ class OpenTracingMiddleware(MiddlewareMixin):
     def process_view(self, request, view_func, view_args, view_kwargs):
         headers = format_request_headers(request.META)
         ctx = TraceContextTextMapPropagator().extract(headers) # 生成上下文
-        self.span = self.tracer.start_span(name=request.path, context=ctx) # 开启记录一个新的span
+        self.span = self.tracer.start_span(name="svc-oldbackend", context=ctx) # 开启记录一个新的span
         self.token = context_api.attach(ctx)
         carrier = dict()
         TraceContextTextMapPropagator().inject(carrier)
