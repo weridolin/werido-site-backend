@@ -75,8 +75,8 @@ class OpenTracingMiddleware(MiddlewareMixin):
                 "http.url": request.get_full_path(),
                 "http.peer.addr": headers.get("x-real-ip", ""),
                 "span.kind": SpanKind.INTERNAL.name,
+                "service.name": "rest-old-site-backend"
             })
-
         # # 调用视图函数
         # response = self.get_response(request)
 

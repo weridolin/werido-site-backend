@@ -364,17 +364,17 @@ RABBITMQ_HOST = os.environ.get("RABBITMQ_HOST", "siterabbitmq")
 # jaeger
 SERVICE_NAME = 'site-old-backend'
 
-OPENTRACING_TRACER_CONFIG = {
-    'sampler': {
-        'type': 'const',
-        'param': 1,
-    },
-    'local_agent': {
-        'reporting_host': 'jaeger',
-        'reporting_port': '4318',
-    },
-    'logging': True,
-}
+# OPENTRACING_TRACER_CONFIG = {
+#     'sampler': {
+#         'type': 'const',
+#         'param': 1,
+#     },
+#     'local_agent': {
+#         'reporting_host': 'jaeger',
+#         'reporting_port': '4318',
+#     },
+#     'logging': True,
+# }
 
 
 JWT_KEY =  os.environ.get("JWT_KEY","DEBUGJWTKEY")

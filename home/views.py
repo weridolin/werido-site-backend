@@ -120,9 +120,9 @@ class SiteCommentViewsSet(viewsets.ModelViewSet):
         ctx = (("traceparent",request.traceparent),)
         user_center = get_srv(etcd_key=USERCENTER_KEY,srv_name=USERCENTER_SVC_NAME,namespace=USERCENTER_SVC_NAME_NAMESPACE)
         
-        request.span.add_event("begin-call-rpc",attributes={"user_center":user_center,"rpc-path":"/user/info","user_id":user_id})
+        request.span.add_event("get user info by rpc",attributes={"usercenter.service":user_center,"user_id":user_id})
         user_info = get_user_info(user_id=user_id,target=f"{user_center}:8081",ctx=ctx)
-        request.span.add_event("end-call-rpc")
+        request.span.add_event("get user info finish",attributes={f"user_info:{user_info}"})
   
         print("user info: ",user_info)
         new_comment = SiteComments.objects.create(
