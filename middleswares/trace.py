@@ -34,34 +34,6 @@ from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from opentelemetry.exporter.jaeger.proto.grpc import JaegerExporter
 import os
 
-def use_span(
-    span: Span,
-    record_exception: bool = True,
-    set_status_on_exception: bool = True,
-):
-    """
-        参考:trace.use_span,返回改成token
-
-    """
-    try:
-        token = context_api.attach(context_api.set_value(_SPAN_KEY, span))
-        print(f"Attached token: {token}")  
-        return token
-    except Exception as exc:  # pylint: disable=broad-except
-        if isinstance(span, Span) and span.is_recording():
-            # Record the exception as an event
-            if record_exception:
-                span.record_exception(exc)
-            # Set status in case exception was raised
-            if set_status_on_exception:
-                span.set_status(
-                    Status(
-                        status_code=500,
-                        description=f"{type(exc).__name__}: {exc}",
-                    )
-                )
-        raise
-
 
 class OpenTracingMiddleware(MiddlewareMixin):
 
@@ -85,12 +57,12 @@ class OpenTracingMiddleware(MiddlewareMixin):
 
     def process_view(self, request, view_func, view_args, view_kwargs):
         headers = format_request_headers(request.META)
-        print(">>>> headers ->", headers)
-        ctx = TraceContextTextMapPropagator().extract(headers)
-        self.span = self.tracer.start_span(name=request.path, context=ctx)
-        self.token = use_span(self.span)
+        ctx = TraceContextTextMapPropagator().extract(headers) # 生成上下文
+        self.span = self.tracer.start_span(name=request.path, context=ctx) # 开启记录一个新的span
+        self.token = context_api.attach(ctx)
         carrier = dict()
         TraceContextTextMapPropagator().inject(carrier)
+        print("trace middleware carrier ->",carrier)
         if 'traceparent' in carrier.keys():
             request.traceparent = carrier.get('traceparent')
             request.span = self.span
@@ -114,27 +86,29 @@ class OpenTracingMiddleware(MiddlewareMixin):
         """
             process a exception
         """
-        span = request.span
-        span.set_attribute("error", True)
-        span.set_attribute("otel.status_code", StatusCode.ERROR.value)
-        span.set_attribute("http.err_msg", str(exception) or "")
-        import traceback
-        span.set_attribute("http_err_stack", traceback.format_exc())
-        span.end()
-        if hasattr(request, 'token'):
-            context_api.detach(request.token)
+        if hasattr(request, 'span'):
+            span = request.span
+            span.set_attribute("error", True)
+            span.set_attribute("otel.status_code", StatusCode.ERROR.value)
+            span.set_attribute("http.err_msg", str(exception) or "")
+            import traceback
+            span.set_attribute("http_err_stack", traceback.format_exc())
+            span.end()
+            if hasattr(self, 'token'):
+                context_api.detach(self.token)
 
     def process_response(self, request, response: HTTPResponse):
-        span = request.span
-        if isinstance(response, HTTPResponse):
-            span.set_attribute("otel.status_code", response.status_code)
-            span.set_attribute("http.res_msg", response.data.get('message', None) or "")
-            span.set_attribute("http.response.data", json.dumps(response.data) if response.data else "") 
-        carrier = dict()
-        TraceContextTextMapPropagator().inject(carrier)
-        span.end()
-        if hasattr(request, 'token'):
-            context_api.detach(request.token)
-        if 'traceparent' in carrier.keys():
-            response['Traceparent'] = carrier.get('traceparent')
+        if hasattr(request, 'span'):
+            span = request.span
+            if isinstance(response, HTTPResponse):
+                span.set_attribute("otel.status_code", response.status_code)
+                span.set_attribute("http.res_msg", response.data.get('message', None) or "")
+                span.set_attribute("http.response.data", json.dumps(response.data) if response.data else "") 
+            carrier = dict()
+            TraceContextTextMapPropagator().inject(carrier)
+            span.end()
+            if hasattr(self, 'token'):
+                context_api.detach(self.token)
+            if 'traceparent' in carrier.keys():
+                response['Traceparent'] = carrier.get('traceparent')
         return response
