@@ -54,6 +54,7 @@ class OpenTracingMiddleware(MiddlewareMixin):
 
     def process_view(self, request, view_func, view_args, view_kwargs):
         headers = format_request_headers(request.META)
+        print(">>>>>>>>>>>>",headers)
         ctx = TraceContextTextMapPropagator().extract(headers) # 生成上下文
         self.span = self.tracer.start_span(name="svc-oldbackend", context=ctx) # 开启记录一个新的span
         self.token = context_api.attach(ctx)
