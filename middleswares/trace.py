@@ -7,6 +7,17 @@ try:
 except ImportError:
     MiddlewareMixin = object
 from middleswares.utils import *
+from opentelemetry import trace
+from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
+from opentelemetry import context as context_api
+from opentelemetry.trace import StatusCode, Status
+from opentelemetry.trace import SpanKind
+from utils.http_ import HTTPResponse
+import json,os,inspect
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
+from opentelemetry.exporter.jaeger.proto.grpc import JaegerExporter
+from opentelemetry.sdk.resources import Resource
 
 """
 00-480e22a2781fe54d992d878662248d94-b4b37b64bb3f6141-00
@@ -19,25 +30,16 @@ trace-flags: 8 位，调用者的建议标志，可以考虑为调用者的建�
 
 """
 
-from opentelemetry import trace
-from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
-from opentelemetry import context as context_api
-from opentelemetry.trace import StatusCode, Status
-from opentelemetry.trace import SpanKind
-from utils.http_ import HTTPResponse
-import json
-from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import BatchSpanProcessor
-from opentelemetry.exporter.jaeger.proto.grpc import JaegerExporter
-import os
-
 
 class OpenTracingMiddleware(MiddlewareMixin):
 
     def __init__(self, get_response):
         self.get_response = get_response
         # 初始化 TracerProvider
-        trace.set_tracer_provider(TracerProvider())
+        resource = Resource(attributes={
+            "service.name": "svc-oldbackend",
+        })
+        trace.set_tracer_provider(TracerProvider(resource=resource))
         # 从环境变量中读取 Jaeger gRPC 端点
         jaeger_endpoint = os.getenv("JAEGER_ENDPOINT", "jaeger:14250")
         print(f"Using Jaeger endpoint: {jaeger_endpoint}")
@@ -54,9 +56,18 @@ class OpenTracingMiddleware(MiddlewareMixin):
 
     def process_view(self, request, view_func, view_args, view_kwargs):
         headers = format_request_headers(request.META)
-        print(">>>>>>>>>>>>",request.META)
+        print(">>>>>>>>>>>>",request.META,view_func)
+        function_name = getattr(view_func, '__name__', None)
+        if not function_name:
+            # 如果是类方法或静态方法等情况
+            if inspect.ismethod(view_func):
+                function_name = view_func.__func__.__name__
+            elif inspect.isfunction(view_func):
+                function_name = view_func.__name__
+            else:
+                function_name = str(view_func)
         ctx = TraceContextTextMapPropagator().extract(headers) # 生成上下文
-        self.span = self.tracer.start_span(name="svc-oldbackend", context=ctx) # 开启记录一个新的span
+        self.span = self.tracer.start_span(name=function_name, context=ctx) # 开启记录一个新的span
         self.token = context_api.attach(ctx)
         carrier = dict()
         TraceContextTextMapPropagator().inject(carrier)
